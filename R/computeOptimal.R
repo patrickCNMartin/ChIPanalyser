@@ -1,6 +1,7 @@
 computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
     LocusProfile,setSequence, DNAAccessibility = NULL,
-    occupancyProfileParameters = NULL,parameter = "all"){
+    occupancyProfileParameters = NULL,parameter = "all",
+    peakMethod="moving_kernel"){
     #validity checking
 
 
@@ -26,7 +27,7 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
     BPFrequency(genomicProfileParameters)<-BPFrequency(
         genomicProfileParameters)
     }
-
+    peakMethod <- peakMethod
     #Setting default Paramters if not provided by user
     if(length(ScalingFactorPWM(genomicProfileParameters))<2){
     ScalingFactorPWM(genomicProfileParameters) <- c(0.25, 0.5, 0.75, 1, 1.25,
@@ -58,7 +59,7 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
     PedictedProfile <- computeChipProfile(setSequence = setSequence,
         occupancy = Occupancy,
         occupancyProfileParameters = occupancyProfileParameters,
-        norm = TRUE ,method="moving_kernel", peakSignificantThreshold= NULL,
+        norm = TRUE ,method=peakMethod, peakSignificantThreshold= NULL,
         verbose = FALSE)
 
     message("Computing Accuracy of Profile")

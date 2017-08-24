@@ -15,7 +15,8 @@ ChIP-seq-like profile and a real ChIP-seq profile for a given loci.
 \usage{
 computeOptimal(DNASequenceSet, genomicProfileParameters, LocusProfile,
     setSequence, DNAAccessibility = NULL,
-    occupancyProfileParameters = NULL, parameter = "all")
+    occupancyProfileParameters = NULL, parameter = "all",
+    peakMethod="moving_kernel")
 }
 
 \arguments{
@@ -57,6 +58,15 @@ computeOptimal(DNASequenceSet, genomicProfileParameters, LocusProfile,
     \code{parameter} is a character string which determines which parameter
     should be computed. There are four options
     c("correlation", "MSE", "theta", "all")
+    }
+    \item{peakMethod}{
+    \code{peakMethod} is a character string  of one of the following:
+    c("moving_kernel","truncated_kernel","exact"). If set to moving_kernel,
+    the peaks will be approximated using Rcpp (Default).
+    If set to truncated_kernel, the peaks will be approximated
+    however this method does not require Rcpp. If set to exact, the peaks will
+    not be approximated.
+
     }
 }
 \details{
@@ -115,6 +125,7 @@ optimalParam <- computeOptimal(DNASequenceSet = DNASequenceSet,
     setSequence = eveLocus,
     DNAAccessibility = Access,
     occupancyProfileParameters = OPP,
-    parameter = "all")
+    parameter = "all",
+    peakMethod="moving_kernel")
 }
 }

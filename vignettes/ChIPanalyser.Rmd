@@ -172,7 +172,8 @@ optimalParam <- computeOptimal(DNASequenceSet = DNASequenceSet,
     setSequence = eveLocus,
     DNAAccessibility = Access,
     occupancyProfileParameters = OPP,
-    parameter = "all")
+    parameter = "all",
+    peakMethod="moving_kernel")
 optimalParam
 
 ```
@@ -1132,7 +1133,8 @@ computeOptimal(DNASequenceSet,
     setSequence,
     DNAAccessibility = NULL,
     occupancyProfileParameters = NULL,
-    parameter = "all")
+    parameter = "all",
+    peakMethod="moving_kernel")
 ```
 **Please note that this functions will take some time to complete.
 Do not be alarmed if it seems to have stalled.**
@@ -1155,10 +1157,17 @@ All other slots will be computed internally.
 Although optional, we strongly advise to tailor this object by using values
 directly extracted from `LocusProfile`
 
-The last argument, `parameter` defines which metric you wish to compute.
+`parameter` defines which metric you wish to compute.
 There are four possible choices: *correlation, MSE, theta* or *all*.
 It is imperative that the lists/GRanges are named with the name of
 the Loci of interest.
+`peakMethod`describes if you wish to use an approximation for ChIP-seq profile
+peaks.
+`moving_kernel` will use Rcpp to approximate and compute peaks,
+`truncated_kernel` will also approximate peaks but without using Rcpp,
+and `exact` will not approximate peaks. These methods represent different
+way of computing and/or approximating ChIP-seq peaks.
+
 
 ### computeOptimal
 
