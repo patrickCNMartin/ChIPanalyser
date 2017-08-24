@@ -1,0 +1,58 @@
+\name{backgroundSignal}
+\alias{backgroundSignal}
+\alias{backgroundSignal-methods}
+
+
+\title{
+Accessor method for the \code{backgroundSignal} slot in a
+\code{\link{occupancyProfileParameters}} object.
+}
+\description{
+Extract or access the \code{backgroundSignal} slot in a
+\code{\link{occupancyProfileParameters}} object.
+}
+\usage{
+backgroundSignal(object)
+}
+
+\arguments{
+    \item{object}{
+    \code{object} is an \code{\link{occupancyProfileParameters}}
+    }
+}
+\details{
+Default Value: 0
+
+When computing \code{\link{computeOccupancy}}, a ChIP-seq background
+signal is used to scale Occupancy by considering both a
+\code{backgroundSignal} and a \code{\link{maxSignal}}.
+The \code{backgroundSignal}
+is also used to nomalise occupancies against maxOccupancy.
+The \code{backgroundSignal} usually comes from
+experimental data and is provided by user. As a general rule,
+if ChIP-seq data is available and will be used in
+\code{\link{computeChipProfile}}
+, \code{\link{profileAccuracyEstimate}} or \code{\link{plotOccupancyProfile}},
+it is advised to use the \code{backgroundSignal} from this data.
+We strongly encourage to set values when building a
+\code{\link{occupancyProfileParameters}} object.
+}
+\value{
+Returns a \code{backgroundSignal} of a
+\code{\link{occupancyProfileParameters}} object.
+}
+\references{
+Zabet NR, Adryan B (2015) Estimating binding properties of transcription
+factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
+}
+\author{
+Patrick C.N. Martin <pm16057@essex.ac.uk>
+}
+\examples{
+# Building occupancyProfileParameters object
+OPP <- occupancyProfileParameters()
+#Viewing single value in object
+backgroundSignal(OPP)
+
+
+}

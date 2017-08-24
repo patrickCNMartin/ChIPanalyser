@@ -1,0 +1,48 @@
+Package: ChIPanalyser
+Type: Package
+Title: ChIPanalyser: Predicting Transcription Factor Binding Sites
+Version: 0.99.6
+Date: 2017-08-01
+Author: c(person("Patrick", "Martin", email = "pm16057@essex.ac.uk",
+    role = c("aut", "cre")),
+    person("Nicolae Radu", "Zabet", email="nzabet@essex.ac.uk",
+    role="aut")
+Maintainer: Patrick C.N. Martin <pm16057@essex.ac.uk>
+Description: Based on a statistical thermodynamic framework, ChIPanalyser
+    tries to produce ChIP-seq like profile.
+    The model relies on four consideration:
+    TF binding sites can be scored using a Position weight Matrix,
+    DNA accessibility plays a role in Transcription Factor binding,
+    binding profiles are dependant on	the number of transcription
+    factors bound to DNA and finally binding energy
+    (another way of describing PWM's) or binding specificity should be
+    modulated (hence the introduction of a binding specificity modulator).
+    The end result of ChIPanalyser is to produce profiles simulating
+    real ChIP-seq profile and provide accuracy measurements
+    of these predicted profiles after being compared to real ChIP-seq data.
+    The ultimate goal is to produce ChIP-seq like profiles predicting ChIP-seq
+    like profile to circumvent the need to produce costly ChIP-seq experiments.
+License: GPL-3
+Collate: 2AllS4Class_ProfileParameters.R
+	  3AllGenerics.R
+	  4AllMethods.R
+	  AllInitialize.R
+	  AllShowMethods.R
+	  computeChIPProfile.R
+	  computeOccupancy.R
+	  computeOptimal.R
+	  computePWMScore.R
+	  genomeWidePWM.R
+	  GenomicProfileGenericFunctions.R
+	  plotOccupancyProfile.R
+	  plotOptimalHeatMaps.R
+	  profileAccuracyEstimate.R
+Depends: R (>= 3.4.1),GenomicRanges, Biostrings, BSgenome, RcppRoll
+Imports: methods, IRanges, S4Vectors,grDevices,graphics,stats,utils
+Suggests: BSgenome.Dmelanogaster.UCSC.dm3,knitr, RUnit, BiocGenerics
+Encoding: UTF-8
+LazyData: true
+biocViews: Software, BiologicalQuestion, WorkflowStep, Transcription,
+    Sequencing, ChipOnChip, Coverage, Alignment, ChIPSeq, SequenceMatching,
+    DataImport ,PeakDetection
+VignetteBuilder: knitr

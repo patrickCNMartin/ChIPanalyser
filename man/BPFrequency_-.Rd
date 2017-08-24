@@ -1,0 +1,96 @@
+\name{BPFrequency<-}
+\alias{BPFrequency<-}
+\alias{BPFrequency<--methods}
+
+
+
+
+\title{
+Setter method for \code{BPFrequency} slot in a
+\code{\link{genomicProfileParameters}} object.
+}
+\description{
+Setter method for \code{BPFrequency} slot in a
+\code{\link{genomicProfileParameters}} object.
+If base pair frequency is unknown, \code{BPFrequency} will compute base pair
+frequency from a DNA sequence.
+}
+
+\usage{
+BPFrequency(object)<-value
+}
+
+\arguments{
+    \item{object}{
+    \code{object} is a \code{\link{genomicProfileParameters}} object.
+    }
+    \item{value}{
+    \code{value} can three different objects:
+
+
+    A vector of length 4 containing the probability of occurrence of each base
+    pair (A,C,G,T) in order.
+    Default value is c(0.25,0.25,0.25,0.25).
+
+
+    A \code{BSgenome} of the organism of interest. The base pair frequency will
+    automatically be computed and updated in
+    \code{\link{genomicProfileParameters}}.
+
+
+    A \code{\link[Biostrings]{DNAStringSet}} of the organisme of interest.
+    The base pair frequency will automatically be computed and updated
+    in \code{\link{genomicProfileParameters}} (Prefered method).
+    }
+}
+
+
+\details{
+Default value is c(0.25,0.25,0.25,0.25)
+When generating a Postion Weight Matrix from a Position Frequency Matrix,
+the probability of occurrence of each base pair (Base Pair Frequency) is
+necessary (as originally described by Gary Stormo). It is possible to
+set custom values for \code{BPFrequency} with a vector of length 4
+containing the probability of occurrence of each base pair (A,C,G,T) in order.
+If Base pair frequency is unknown, \code{BPFrequency} will compute base pair
+frequency from a DNA sequence when building a
+\code{\link{genomicProfileParameters}} object.
+The nature of this sequence can be a\code{BSgenome} object or a
+\code{\link[Biostrings]{DNAStringSet}}. In order to decrease run time,
+it is advised to use \code{\link[Biostrings]{DNAStringSet}}.
+}
+\value{
+Returns a \code{\link{genomicProfileParameters}} object with an updated
+value for \code{BPFrequency}.
+}
+\references{
+Zabet NR, Adryan B (2015) Estimating binding properties of transcription
+factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
+}
+\author{
+Patrick C.N. Martin <pm16057@essex.ac.uk>
+}
+
+\examples{
+
+data(ChIPanalyserData)
+# path to Position Frequency Matrix
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+#As an example of genome, this example will run on the Drosophila genome
+\donttest{
+if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
+    source("https://bioconductor.org/biocLite.R")
+    biocLite("BSgenome.Dmelanogaster.UCSC.dm3")
+    }
+library(BSgenome.Dmelanogaster.UCSC.dm3)
+DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+# Building genomicProfileParameters object
+GPP <- genomicProfileParameters(PFM=PFM, BPFrequency=DNASequenceSet)
+# Updating BPFrequency
+## !! Note!! BPFrequency is used to compute PWM from PFM
+## IF updated after building GPP, then it will not influence PWM
+## Advised to build with BPFrequency directly
+BPFrequency(GPP) <- DNASequenceSet
+BPFrequency(GPP) <- c(0.25,0.25,0.25,0.25)
+}
+}
