@@ -3,10 +3,10 @@ title: "The ChIPanalyser User's Guide"
 author: "Patrick Martin"
 date: "22/08/2017"
 output:
-  pdf_document: null
-  keep_tex: yes
-  number_sections: no
-  html_document: default
+    pdf_document: null
+    keep_tex: yes
+    number_sections: no
+    html_document: default
 package: '`ChIPanalyser'''
 vignette: |
     %\VignetteIndexEntry{ChIPanalyser User's Guide}
