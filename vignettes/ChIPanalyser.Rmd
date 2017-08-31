@@ -9,9 +9,9 @@ output:
   html_document: default
 package: '`ChIPanalyser'''
 vignette: |
-  %\VignetteIndexEntry{ChIPanalyser User's Guide}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteIndexEntry{ChIPanalyser User's Guide}
+    %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::rmarkdown}
 ---
 # Introduction
 Transcriptional regulation is undeniably a key aspect of cellular homeostasis.
@@ -100,11 +100,11 @@ use a full genome sequence for this object.
 * `PFM` is a path to file. In this case, it is a Position Frequency Matrix
 derived from the Bicoid Transcription factor in *Drosophila melanogaster*.
 This PFM is in RAW format. Although it is possible to to directly
-use a PFM R object, we chose to use a path to a file for this example. 
+use a PFM R object, we chose to use a path to a file for this example.
 Most PFM's downloadable online will come in a text file
 (with various formats: RAW, TRANSFAC, JASPAR).
 `ChIPanalyser` is capable of handling all these formats and parsing
-these files to usable objects within the package. 
+these files to usable objects within the package.
 * `Access` is a `GRanges` object containing accessible DNA for
 the sequence above.
 * `geneRef` is list of `GRanges` containing genetic information
@@ -126,7 +126,7 @@ The first step is to set up your data storing objects. These objects
 will automatically compute Position Weight Matrix from a Position
 Frequency Matrix, and Base Pair Frequency from a DNAStringSet.
 The values that are provided in this example are extracted
-from real biological data. 
+from real biological data.
 
 NOTE:These values
 will differ depending on the source of the data and the data
@@ -160,7 +160,7 @@ OPP
 
 The model is based on the approximation of statistical thermodynamics with
 inference of two parameters (ScalingFactorPWM and boundMolecules).
-In order to infer these parameters, 
+In order to infer these parameters,
 we suggest to use `computeOptimal`.
 Values that should be tested for `ScalingFactorPWM` and for
 `boundMolecules` should be provided by user as described above.
@@ -196,7 +196,7 @@ optimalParam
 
 ```
 
-**This Function might take some time to compute. Do not be alarmed 
+**This Function might take some time to compute. Do not be alarmed
 if it takes some time to run.
 You should be notified of the progress of the function as it goes**
 
@@ -272,14 +272,14 @@ This function will return a`List` of `GRangesList`s of `GRanges`.
 Each element of the list represents a combination of
 `ScalingFactorPWM` and `boundMolecules`. The `GRangesList`
 contains the Loci of interest. Finally, the individual `GRanges`
-contains ChIP-seq like scores for every *n* base pairs 
+contains ChIP-seq like scores for every *n* base pairs
 (with n = stepSize, see bellow).
 
 This object may be difficult to navigate if many different parameters,
-or Loci are used. In order to facilitate navigation, we included 
+or Loci are used. In order to facilitate navigation, we included
 a search function. **See function: searchSites**
 This function can also be used to navigate `AllSitesAboveThreshold` slot
-after occupancy scores have been computed. 
+after occupancy scores have been computed.
 
 ### Step 6 - Model Accuracy
 
@@ -338,7 +338,7 @@ on this `genomicProfileParameters` object in one form or another.
 The output of most functions will be a `genomicProfileParameters` object.
 Thus the output of one functions should be used as an input for the next
 functions in the pipeline. All functions are described bellow in
-section **Work Flow - Analysis**. 
+section **Work Flow - Analysis**.
 
 This object comes in the following form:
 ```{r, eval=FALSE, echo=TRUE}
@@ -609,7 +609,7 @@ minPWMScore(Occupancy)
 ```
 
 * `averageExpPWMScore`  a numeric value representing the exponential
-of the average PWM Score. This score depends on the values assigned 
+of the average PWM Score. This score depends on the values assigned
 to `lambda`.
 It is possible to access this slot using:
 
@@ -658,7 +658,7 @@ represent a combination of `lambda` and number of bound Molecules
 ```{r, eval=TRUE, warnings = FALSE, echo=TRUE}
 AllSitesAboveThreshold(Occupancy)
 
-# Or 
+# Or
 
 searchSites(Occupancy)
 
@@ -1049,7 +1049,7 @@ As it is the case in the previous functions, `AllSitesPWMScore` should be the
 result of the previous function (`computePWMScore`). `computeOccupancy` will
 return a `genomicProfileParameters` object with an updated
 `AllSitesAboveThreshold` slot. This slot should now contain a list
-of GRangesLists containing GRanges (one for each Loci of interest) 
+of GRangesLists containing GRanges (one for each Loci of interest)
 with two metadata columns (PWMScore and Occupancy).
 Each element in the list is named with the specific combination of
 *lambda* and *boundMolecules* used to compute this set of occupancies.
@@ -1184,7 +1184,7 @@ str(eveLocusChip)
 ```
 
 In this example, there is only one element in the list. However,
-this list can be as long as you wish and contain all the Loci 
+this list can be as long as you wish and contain all the Loci
 that you are interested in.
 
 ### profileAccuracyEstimate
