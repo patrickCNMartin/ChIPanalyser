@@ -56,7 +56,7 @@ computeChipProfile <- function(setSequence,occupancy,
     setSequence <- setSequence[names(setSequence) %in% names(Occup[[1]])]
     SplitGRList <- vector("list",length(setSequence))
     names(SplitGRList) <- names(setSequence)
-    for(i in 1:length(SplitGRList)){
+    for(i in seq_along(SplitGRList)){
         stepIndex <- seq(from=1, to=width(setSequence[i]), by=stepSize)
         SplitSeq <- GRanges(seqnames=S4Vectors::Rle(as.character(
             seqnames(setSequence[i])),
@@ -77,10 +77,10 @@ computeChipProfile <- function(setSequence,occupancy,
     OccupancyVals <- lapply(Occup,function(x){x<-lapply(x,function(y){
         y<-as.numeric(as.matrix(mcols(y)[,2]))})})
 
-    for(i in 1:length(Occup)){
+    for(i in seq_along(Occup)){
         profile[[i]]<-SplitGRList
 
-        for(j in 1:length(Occup[[i]])){
+        for(j in seq_along(Occup[[i]])){
             stepIndex<-seq(from=1, to=width(setSequence[j]), by=stepSize)
             occupancyAbundanceChIPLocal<-rep(
                 ZeroBackground,width(setSequence[j]))
@@ -88,17 +88,17 @@ computeChipProfile <- function(setSequence,occupancy,
                 start(setSequence[j]) + 1)] <- OccupancyVals[[i]][[j]]
             occupancyAbundanceChIPLocal[which(occupancyAbundanceChIPLocal <
                 removeBackground)] <- 0
-            if(method=="exact"){
+            if(any(method=="exact")){
             occupancyAbundanceChIPLocal <- .generateChIPProfile(
                 occupancyAbundanceChIPLocal,chipMean,chipSd,
                 chipSmooth,norm=norm, quick=FALSE,
                 peakSignificantThreshold=peakSignificantThreshold)
-            }else if(method=="truncated_kernel"){
+            }else if(any(method=="truncated_kernel")){
             occupancyAbundanceChIPLocal <- .generateChIPProfile(
                 occupancyAbundanceChIPLocal,chipMean,chipSd,
                 chipSmooth,norm=norm, quick=TRUE,
                 peakSignificantThreshold=peakSignificantThreshold)
-            } else if(method=="moving_kernel"){
+            } else if(any(method=="moving_kernel")){
             occupancyAbundanceChIPLocal <- .generateChIPProfileRcpp(
                 occupancyAbundanceChIPLocal, chipMean, chipSd, chipSmooth,
                 norm = norm,

@@ -60,7 +60,7 @@ computePWMScore <- function(DNASequenceSet,genomicProfileParameters,
     IntersectSequence <- vector("list", length(setSequence))
     NoAccess<-c()
 
-    for(i in 1:length(setSequence)){
+    for(i in seq_along(setSequence)){
         # Refining SequenceSet if DNA accessibility Data is available
         if(!is.null(DNAAccessibility)){
             if(verbose==TRUE & i == 1){
@@ -103,7 +103,7 @@ computePWMScore <- function(DNASequenceSet,genomicProfileParameters,
         strandLocal <- vector("list",length(AccessibleSequence[[i]][[1]]))
         AllSites <- GRangesList()
     #Extracting Strand Information for sites above Threshold
-        for(j in 1:length(AccessibleSequence[[i]][[1]])){
+        for(j in seq_along(AccessibleSequence[[i]][[1]])){
             if(strand == "+-" | strand == "-+"){
                 strandLocal[[j]]<-rep("*",
                     length(AccessibleSequence[[i]][[1]][[j]]))
@@ -161,7 +161,7 @@ computePWMScore <- function(DNASequenceSet,genomicProfileParameters,
     #Building GRanges of sites above threshold (without DNA accessibility)
         strandLocal <- vector("list",length(AccessibleSequence[[i]][[1]]))
         AllSites <- GRangesList()
-        for(j in 1:length(AccessibleSequence[[i]][[1]])){
+        for(j in seq_along(AccessibleSequence[[i]][[1]])){
             #Extracting strand Information for sites above threshold
             if(strand == "+-" | strand == "-+"){
                 strandLocal[[j]] <- rep("*",

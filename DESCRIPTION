@@ -1,8 +1,8 @@
 Package: ChIPanalyser
 Type: Package
 Title: ChIPanalyser: Predicting Transcription Factor Binding Sites
-Version: 0.99.8
-Date: 2017-08-01
+Version: 0.99.9
+Date: 2017-09-01
 Author: c(person("Patrick", "Martin", email = "pm16057@essex.ac.uk",
     role = c("aut", "cre")),
     person("Nicolae Radu", "Zabet", email="nzabet@essex.ac.uk",
@@ -37,7 +37,7 @@ Collate: 2AllS4Class_ProfileParameters.R
 	  plotOccupancyProfile.R
 	  plotOptimalHeatMaps.R
 	  profileAccuracyEstimate.R
-Depends: R (>= 3.4.1),GenomicRanges, Biostrings, BSgenome, RcppRoll
+Depends: R (>= 3.3.2),GenomicRanges, Biostrings, BSgenome, RcppRoll
 Imports: methods, IRanges, S4Vectors,grDevices,graphics,stats,utils
 Suggests: BSgenome.Dmelanogaster.UCSC.dm3,knitr, RUnit, BiocGenerics
 Encoding: UTF-8

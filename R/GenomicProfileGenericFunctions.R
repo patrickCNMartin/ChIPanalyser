@@ -20,7 +20,7 @@
             noOfSites <- max(apply(PFM,2,sum))
     }
     #normalise the pfm
-    for(i in 1:ncol(PFM)){
+    for(i in seq_len(ncol(PFM))){
         PFM[,i] <- PFM[,i]/max(apply(PFM,2,sum))
     }
 
@@ -49,8 +49,8 @@
     BPFrequency,naturalLog){
     PWM <- matrix(0,nrow = nrow(PFM),ncol = nrow(PFM))
     PWM <- PFM
-    for(i in 1:nrow(PFM)){
-        for(j in 1:ncol(PFM)){
+    for(i in seq_len(nrow(PFM))){
+        for(j in seq_len(ncol(PFM))){
             PWM[i,j] <- (PFM[i,j]*noOfSites+BPFrequency[i]*pseudocount)/
                 (noOfSites+pseudocount)
             if(naturalLog){
@@ -136,7 +136,7 @@
 .parseJASPARPFM <- function(filename){
     buffer <- readLines(filename)
     error <- FALSE
-    for(i in 1:length(buffer)){
+    for(i in seq_along(buffer)){
         if(!error){
             buffer[i] <- sub("[","",buffer[i],fixed=TRUE)
             buffer[i] <- sub("]","",buffer[i],fixed=TRUE)
@@ -190,7 +190,7 @@
 .getIndexOfPWMThresholded <- function(PWMScore, PWMThreshold){
     indexes <- vector("list",length(PWMScore))
     names(indexes) <- names(PWMScore)
-    for(i in 1:length(PWMScore)){
+    for(i in seq_along(PWMScore)){
         indexes[[i]] <- which(PWMScore[[i]] > PWMThreshold)
     }
     return(indexes)
@@ -212,19 +212,19 @@
         if(length(grep("+",strand))){
         ## Warnings from BioStrings Package
         scorePositive <- PWMscoreStartingAt(PWM,DNASequenceSet[[i]],
-            starting.at = 1:sequenceLength)
+            starting.at = seq_len(sequenceLength))
         }
 
         if(length(grep("-",strand))){
             scoreNegative <- rev(PWMscoreStartingAt(PWM,
                 reverseComplement(DNASequenceSet[[i]]),
-                starting.at = 1:sequenceLength))
+                starting.at = seq_len(sequenceLength)))
         }
 
         if(is.null(scorePositive) & is.null(scoreNegative)){
             # no strand is specified so consider the positive strand
             scoreSet[[i]] <- PWMscoreStartingAt(PWM,DNASequenceSet[[i]],
-                starting.at = 1:sequenceLength)
+                starting.at = seq_len(sequenceLength))
         } else if(!is.null(scorePositive) & !is.null(scoreNegative)){
         # both strands are specified
             if(strandRule == "sum"){
@@ -381,7 +381,8 @@
     bigF = rev(cumsum(rev(f)))
     peakSignificantSize = min(which(bigF<peakSignificantThreshold))
 
-    kernel = c(rev(bigF[2:peakSignificantSize]), bigF[1:peakSignificantSize])
+    kernel = c(rev(bigF[seq(2,peakSignificantSize)]),
+    bigF[seq_len(peakSignificantSize)])
     leftKernel=(floor(length(kernel)/2) - 1)
     rightKernel=length(kernel)-leftKernel-1
 
@@ -403,7 +404,7 @@
     if(norm && max(peaks)!=0){
         peaks=originalMax*peaks/max(peaks)
     }
-
+    peaks <- c(peaks[2:length(peaks)],0)
     return(peaks)
 }
 
@@ -426,7 +427,8 @@
 
     f <- dgamma(0:length(inputVector), shape = shp, scale = scl)
     gamma <- rev(cumsum(rev(f)))
-    sp <- c(rev(gamma[2:peakSignificantSize]), gamma[1:peakSignificantSize])
+    sp <- c(rev(gamma[seq(2,peakSignificantSize)]),
+    gamma[seq_len(peakSignificantSize)])
     lp <- length(sp)
     hp <- (lp - 1)/2
 
@@ -478,4 +480,87 @@
     }
 
     return(peaks)
+}
+
+
+## Search sites in occupancy and Chip if a lot of them
+## wow that is some good english right there
+
+searchSites <- function(Sites,ScalingFactor="all",
+    BoundMolecules="all",Locus="all"){
+
+    #Validity check
+    if(class(Sites)!="list" & class(Sites)!="genomicProfileParameters"){
+        stop(paste0(deparse(substitute(Sites)),
+        " must be a list or a genomicProfileParameters object."))
+    }
+
+    if(class(Sites)=="genomicProfileParameters"){
+        Sites <- AllSitesAboveThreshold(Sites)
+    }
+
+    #Setting Up for search
+
+    lambda <- "lambda = "
+    bound <- "boundMolecules = "
+
+    buffer <- c()
+    bufferSites <- Sites
+
+    #Search for Scaling Factor
+    if(any(ScalingFactor=="all")){
+        bufferSites <- bufferSites
+        buffer <- 0
+    } else {
+        localNames <- sapply(strsplit(names(bufferSites)," &"),"[[",1)
+        for( i in seq_along(ScalingFactor)){
+            buffer <- c(buffer,grep(paste0(lambda,ScalingFactor[i]),
+            localNames))
+
+        }
+
+        if(length(buffer)>1){
+        bufferSites <- bufferSites[buffer]
+        } else {
+        message("None of the ScalingFactors provided are in list")
+        }
+    }
+    #Search for boundMolecules
+    buffer <- c()
+    if(any(BoundMolecules=="all")){
+        bufferSites <-bufferSites
+        buffer <- 0
+    } else {
+        localNames <- sapply(strsplit(names(bufferSites),bound),"[[",2)
+        for( j in seq_along(BoundMolecules)){
+            buffer <- c(buffer, grep(paste0("^",BoundMolecules[j],"$"),
+            localNames))
+
+        }
+
+        if(length(buffer)>1){
+            bufferSites <- bufferSites[buffer]
+        } else {
+            message("None of the boundMolecules provided are in list")
+        }
+    }
+    #Search for Loci
+
+    if(Locus == "all"){
+        bufferSites <- bufferSites
+    } else {
+        if(class(bufferSites)=="list"){
+        for( k in seq_along(bufferSites)){
+            LocalLocus <- names(bufferSites[[k]])
+            buffer <- which(LocalLocus==Locus)
+            bufferSites[[k]] <- bufferSites[[k]][buffer]
+        }
+        } else {
+            LocalLocus <- names(bufferSites)
+            buffer <- which(Locus %in% LocalLocus)
+            bufferSites <- bufferSites[buffer]
+        }
+    }
+    return(bufferSites)
+
 }

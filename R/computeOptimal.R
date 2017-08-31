@@ -72,7 +72,7 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
     AllMatrix <- vector("list",3)
     AllParam <- vector("list",3)
     Param <- c("meanCorr","meanMSE","meanTheta")
-    for(i in 1:3){
+    for(i in seq_len(3)){
         AllParam[[i]] <- c(0,0)
         AllMatrix[[i]] <- matrix(0,nrow=length(ScalingFactorPWM(
             genomicProfileParameters)),
@@ -84,7 +84,7 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
         ParamSplit <- split(ParamSplit,1:length(boundMolecules(
             occupancyProfileParameters)))
 
-        for(j in 1:length(ParamSplit)){
+        for(j in seq_along(ParamSplit)){
             AllMatrix[[i]][,j] <- unname(unlist(unname(ParamSplit[[j]])))
         }
         if(Param[i]=="meanMSE"){

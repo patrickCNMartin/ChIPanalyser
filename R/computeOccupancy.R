@@ -46,7 +46,7 @@ computeOccupancy <- function(AllSitesPWMScore,
     PWMScore <- vector("list", length(PWMGRList))
     # Extracting names of regions
     name <- c()
-    for(i in 1:length(PWMGRList)){
+    for(i in seq_along(PWMGRList)){
         name <- c(name,rep(names(PWMGRList)[[i]],length(PWMGRList[[i]])))
     }
 
@@ -63,8 +63,8 @@ computeOccupancy <- function(AllSitesPWMScore,
     ParaVal <- c()
 
     #Computing Occupancy
-    for(k in 1:length(lambda)){
-        for(j in 1:length(boundMolecules)){
+    for(k in seq_along(lambda)){
+        for(j in seq_along(boundMolecules)){
             PWMScore <- as.vector(as.matrix(mcols(unlist(PWMGRList))))
             Occupancy <- rep(0,length(PWMScore))
             Occupancy <- (boundMolecules[j]*exp((1/lambda[k])*PWMScore))/

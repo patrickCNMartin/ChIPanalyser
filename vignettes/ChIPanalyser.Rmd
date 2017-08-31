@@ -3,21 +3,22 @@ title: "The ChIPanalyser User's Guide"
 author: "Patrick Martin"
 date: "22/08/2017"
 output:
-    pdf_document:
-    keep_tex: true
-    number_sections: false
+  pdf_document: null
+  keep_tex: yes
+  number_sections: no
+  html_document: default
 package: '`ChIPanalyser'''
 vignette: |
-    %\VignetteIndexEntry{ChIPanalyser User's Guide}
-    %\VignetteEncoding{UTF-8}
-    %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{ChIPanalyser User's Guide}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 # Introduction
 Transcriptional regulation is undeniably a key aspect of cellular homeostasis.
 It comes to no surprise that modern molecular biology and genomics have
 showed a keen interest in the subject. Transcription factors (TF) are a force
-to be reckoned with in the world of Transcriptional regulation. Transcription
-factors are proteins that bind to DNA in a site-specific fashion.
+to be reckoned with in the world of transcriptional regulation. Transcription
+factors are proteins that bind to DNA in a site-specific manner.
 Experimentally, this binding site can be determined by various methods
 such as SELEX-seq, EMSA or DNAse footprinting.
 The final result will be a sequence to which a
@@ -25,14 +26,14 @@ given TF will bind preferentially. In many case, these results are
 presented in the form of a Position Frequency Matrix or
 Position Weight Matrix. However at a genome wide scale, modern molecular
 biology relies on methods such as Chromatin Immuno-precipitation linked to
-sequencing. This method generatesa genome wide profile with exhibiting peaks
+sequencing. This method generates a genome wide profile with peaks
 at sites of high TF occupancy. These experiments may be very costly and it
 would be interesting to be able to predict TF occupancy
 sites *in silico*. With this idea in mind, we present **ChIPanalyser** ,
 a R package developed in the effort of predicting Transcription factor binding.
-At the core of this packageresides an approximation of statistical
-thermo dynamcis as suggested by Zabet (Zabet et al. 2015).
-The statistical thermo dynamcis framework proposed by Zabet offers a strong
+At the core of this package resides an approximation of statistical
+thermodynamcis as suggested by Zabet (Zabet et al. 2015).
+The statistical thermodynamcis framework proposed by Zabet offers a strong
 ground for binding site prediction as it requires minimal data input.
 In its current version, ChIPAnalyser requires a DNA sequence, a
 Position Weight Matrix, the number of bound molecules (or TFs bound to DNA)
@@ -47,7 +48,7 @@ thermodynamics. The core formula describing TF binding is given by :
 $$P(N,a,\lambda,\omega)_{j} = \frac{N \cdot a_{j} \cdot e^{(\frac{1}{\lambda}
 \cdot \omega_{j})}}{N \cdot a_{j} \cdot e^{(\frac{1}{\lambda}
 \cdot \omega_{j})}+ L \cdot n \cdot [a_{i} \cdot e^{(\frac{1}
-\lambda} \cdot \omega_j)}]_ {i} $$
+\lambda \cdot \omega_j)}]_ {i}} $$
 with
 
 * N , the number of TF molecules bound to DNA
@@ -56,13 +57,16 @@ with
 * $\omega$ , a Position Weight Matrix.
 
 # Work Flow - Quick start
+
 ## Example data Loading
+
 Before going through the inner workings of the package and the work flow,
 this section will quickly demonstrate how to load example datasets
-stored in the package. This data represents minimal workable examples for
+stored in the package. This data represents a minimal workable examples for
 the different functions. All data is derived from real biological data
 in *Drosophila melanogaster* (The *Drosophila melanogaster*
 genome can be found as a `BSgenome`).
+
 ```{r, eval=TRUE, warnings = FALSE, echo=TRUE}
 library(ChIPanalyser)
 
@@ -95,7 +99,12 @@ DNASequenceSet,PFM,Access,geneRef, eveLocus, eveLocusChip.
 use a full genome sequence for this object.
 * `PFM` is a path to file. In this case, it is a Position Frequency Matrix
 derived from the Bicoid Transcription factor in *Drosophila melanogaster*.
-This PFM is in RAW format.
+This PFM is in RAW format. Although it is possible to to directly
+use a PFM R object, we chose to use a path to a file for this example. 
+Most PFM's downloadable online will come in a text file
+(with various formats: RAW, TRANSFAC, JASPAR).
+`ChIPanalyser` is capable of handling all these formats and parsing
+these files to usable objects within the package. 
 * `Access` is a `GRanges` object containing accessible DNA for
 the sequence above.
 * `geneRef` is list of `GRanges` containing genetic information
@@ -110,12 +119,16 @@ This section  presents a quick work flow. For details on the work flow and
 objects, see section **Work Flow - Full Guide**
 
 ## Quick Start
+
 ### Step 1 - Building Data objects
+
 The first step is to set up your data storing objects. These objects
 will automatically compute Position Weight Matrix from a Position
 Frequency Matrix, and Base Pair Frequency from a DNAStringSet.
 The values that are provided in this example are extracted
-from the biological data used in this vignette. These values
+from real biological data. 
+
+NOTE:These values
 will differ depending on the source of the data and the data
 itself.
 
@@ -144,13 +157,14 @@ OPP
 ```
 
 ### Step 2 - Optimal Parameters
+
 The model is based on the approximation of statistical thermodynamics with
 inference of two parameters (ScalingFactorPWM and boundMolecules).
-`ScalingFactorPWM` (described in the model as lambda). In order to
-backward infer these parameters, we suggest to use `computeOptimal`.
+In order to infer these parameters, 
+we suggest to use `computeOptimal`.
 Values that should be tested for `ScalingFactorPWM` and for
 `boundMolecules` should be provided by user as described above.
-If these values are not provided (default value and only one value
+If these values are not provided (default value OR only one value
 for each parameter), then they will be assigned internally.
 The internal values are the following:
 
@@ -162,7 +176,11 @@ boundMolecules(occupancyProfileParameters) <- c(1, 10, 20, 50, 100,
     200, 500,1000,2000, 5000,10000,20000,50000, 100000,
     200000, 500000, 1000000)
 ```
+
+
 `computeOptimal`contains the following arguments:
+
+
 
 ```{r, eval = TRUE, warnings = FALSE}
 
@@ -178,13 +196,15 @@ optimalParam
 
 ```
 
-**This Function might take some time to compute. Do not be alarmed.
+**This Function might take some time to compute. Do not be alarmed 
+if it takes some time to run.
 You should be notified of the progress of the function as it goes**
 
 This function is a combination of all the functions bellow with some
-more magic to it. In the following step we will describe each of the functions.
+more magic to it. In the following steps we will describe each of the functions.
 
 ### Step 3 - Genome Wide Scoring
+
 Computing Genome Wide metrics that will be used further down the line.
 
 ```{r, eval=TRUE, warnings = FALSE}
@@ -193,55 +213,76 @@ genomeWide <- computeGenomeWidePWMScore(DNASequenceSet=DNASequenceSet,
     genomicProfileParameters=GPP, DNAAccessibility = Access)
 genomeWide
 ```
+
 `computeGenomeWidePWMScore` will return a `genomicProfileParameters` object
 with updated values for `maxPWMScore`, `minPWMScore`,`averageExpPWMScore`,
 and `DNASequenceLength`.
 
 
 ### Step 4 - PWM Scores Above Threshold
+
 Once genome wide scores have been computed, the `genomeWide` object
 (previously computed) should be parsed to the next function. The next
 function will compute sites above the assigned threshold (see below) for
 a given locus (or set of loci). If no Locus is provided then the whole
 genome will be considered.
-SitesAboveThreshold
+
+
 ```{r,eval=TRUE, warnings = FALSE}
 SitesAboveThreshold <- computePWMScore(DNASequenceSet=DNASequenceSet,
     genomicProfileParameters=genomeWide,
     setSequence=eveLocus, DNAAccessibility = Access)
 SitesAboveThreshold
 ```
+
 This function returns another `genomicProfileParameters` object with
 an updated `AllSitesAboveThreshold` slot. This slot contains a `GRanges`
 object with sites above threshold and associated PWMScores.
 
 ### Step 4 - compute Occupancy
+
 From the PWMScores, `ChIPanalyser` will compute occupancy for each
 sites above threshold.
+
 ```{r,eval=TRUE, warnings = FALSE}
 Occupancy <- computeOccupancy(SitesAboveThreshold,
     occupancyProfileParameters= OPP)
 Occupancy
 ```
+
 This function will return a `genomicProfileParameters` object with an updated
-`AllSitesAboveThreshold`. Now the Occupancy values for each sites is
+`AllSitesAboveThreshold`. Now the Occupancy values for each sites are
 included.
 
 ### Step 5 - compute ChIP -seq like profiles
+
 The ultimate goal of `ChIPanalyser` is to produce ChIP-seq like profile
 predicting transcription factor binding. To do so, the following function
-will compute ChIP-seq like score from occupancy values.
+will compute ChIP-seq like scores from occupancy values.
 
 ```{r, eval=TRUE, warnings = FALSE}
 chipProfile <- computeChipProfile(setSequence = eveLocus,
-    occupancy = Occupancy,occupancyProfileParameters = OPP)
+    occupancy = Occupancy,occupancyProfileParameters = OPP,
+    method="moving_kernel")
 chipProfile
 
 ```
-This function will return a list of `GRangesList` with ChIP-seq like scores
-for every *n* base pairs (with n = stepSize, see bellow).
+
+This function will return a`List` of `GRangesList`s of `GRanges`.
+Each element of the list represents a combination of
+`ScalingFactorPWM` and `boundMolecules`. The `GRangesList`
+contains the Loci of interest. Finally, the individual `GRanges`
+contains ChIP-seq like scores for every *n* base pairs 
+(with n = stepSize, see bellow).
+
+This object may be difficult to navigate if many different parameters,
+or Loci are used. In order to facilitate navigation, we included 
+a search function. **See function: searchSites**
+This function can also be used to navigate `AllSitesAboveThreshold` slot
+after occupancy scores have been computed. 
 
 ### Step 6 - Model Accuracy
+
 In order to plot the model accuracy (predicted model against real ChIP-seq
 data).
 
@@ -254,7 +295,9 @@ AccuracyEstimate
 ```
 
 ### Step 7 - Plotting
+
 Finally, once all has been computed, it is possible to plot the results.
+
 ```{r, eval=TRUE, warnings = FALSE, fig.width=10, fig.height=9.5}
 # Plotting Optimal heat maps
 plotOptimalHeatMaps(optimalParam, parameter="all")
@@ -276,23 +319,28 @@ plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
 
 
 # Work Flow - Full Guide
-This section will described `ChIPanalyser` work flow. However in this section
+
+This section will describe `ChIPanalyser`'s work flow.
+However in this section
 we will describe in detail data objects, parameters, and functions.
-Please refer to this section if in doubt to the use of any function or
-parameter.
+Please refer to this section if in doubt. If the doubt persists,
+don't hesitate to send an email to the maintainer.
 
 
 ## Data objects - Genomic Profile Parameters
+
 The very first aspect to consider when using ChIPAnalyser is data input.
 Many (if not all functions) require specific data inputs and parameters in
 order to carry out the computation. To facilitate, the storage of these
 parameters, we created a `genomicProfileParameters` object (S4 class).
 This is the very first step before any other work. All other functions rely
 on this `genomicProfileParameters` object in one form or another.
-The out put of most functions will be a `genomicProfileParameters` object.
+The output of most functions will be a `genomicProfileParameters` object.
 Thus the output of one functions should be used as an input for the next
 functions in the pipeline. All functions are described bellow in
-section **Work Flow - Analysis**. This object comes in the following form:
+section **Work Flow - Analysis**. 
+
+This object comes in the following form:
 ```{r, eval=FALSE, echo=TRUE}
 genomicProfileParameters(PWM, PFM, lambda, pseudocount,
     BPFrequency, naturalLog, noOfSites,
@@ -310,6 +358,7 @@ GPP <- genomicProfileParameters(PWM, PFM, lambda, pseudocount,
     PWMThreshold, DNASequenceLength,
     strandRule, whichstrand)
 ```
+
 As one can see, `genomicProfileParameters` contains many arguments.
 However many of these arguments already have default values assigned to them.
 Some of the arguments should not be set by user.
@@ -341,6 +390,7 @@ slot *access/setter* methods.  Each slot and it's *access/setter* method
 is described below.
 
 ### Position Matricies - The compulsory ones
+
 * `PWM` , a Position Weight Matrix. If a Position Weight Matrix is readily
 available it is possible to directly use this Matrix. This `PWM` should
 contain four rows ( one for each base pair; ACTG in order). The number c
@@ -367,8 +417,11 @@ Position Frequency Matricies come in various configurations.
 The most common ones (all supported by ChIPAnalyser) are RAW
 (similar to the simple matrix described previously),
 Transfac and JASPAR. Finally, if the binding sequences are available,
-it also possible to link towards (path/to/file) this file and
 the `PFM` will be generated from sequence information.
+We suggest to use a path/to/file linking towards the `PFM` file.
+Most `PFM` will come in one of the formats described above and
+`ChIPanalyser` will parse these files in a usable format.
+
 If a `PWM` is readily available, `PFM` is not necessary.
 However, keep in mind that at least one is necessary.
 Although it is possible to assign a new PFM to the `genomicProfileParameters`
@@ -395,9 +448,9 @@ Although this parameter is optional (Default value is set at 1),
 the *scaling factor* (or *lambda* as described in the equations above)
 is crucial for many functions (described below). ScalingFactorPWM, must
 be a positive numeric value or a vector containing positive numeric values.
-The optimal value for `ScalingFactorPWM` is may be inferred by using
+The optimal value for `ScalingFactorPWM` may be inferred by using
 `computeOptimal`. Different values for `ScalingFactorPWM` will influence
-the fitness of the model. For more information,
+the goodness of fit of the model. For more information,
 see `computeOptimal` and `profileAccuracyEstimate`.
 
 ```{r, eval=F, echo=TRUE}
@@ -455,8 +508,7 @@ the transformation from PFM to PWM requires a logarithmic transformation.
 The user may choose which logarithmic transformation, they would rather
 apply (Default is `TRUE`). If `naturalLog = TRUE`, then the natural
 logarithm will be used for transformation. If `naturalLog = FALSE`,
-then *log2* will be used instead. Choosing between *natural logarithm*
-or *log2* will depend on the *pseudocount* used. Keep in mind that,
+then *log2* will be used instead. Keep in mind that,
 the goal is to avoid any funky business during PFM to PWM transformation
 (e.g. Minus infinities or division by zero).
 
@@ -494,7 +546,7 @@ PWMThreshold(GPP) <- 0.7
 
 ```
 
-* `strandRule`, indicates the how the genome should be scored with
+* `strandRule`, indicates how the genome should be scored with
 the `PWM` (Default is "max"). As DNA is double stranded, it is necessary to
 specify how a strand of DNA should be scored.
 If `strandRule = "max"`, both strands will be scored and the highest score
@@ -526,7 +578,7 @@ whichstrand(GPP) <- "+"
 ### Genomic Parameters - The Updated ones
 
 Some of the slots `genomicProfileParameters` should not be changed by user.
-Although it is still possible if absolutely required, we strongly advise
+We strongly advise
 against changing these slots. Certain Parameters are updated after a certain
 computation has been carried out. For example, `maxPWMScore` and
 `minPWMScore` are computed during the `computeGenomeWidePWMScore`
@@ -536,8 +588,8 @@ score of the given DNA sequence. These slots will be updated in the
 ChIPAnalyser work flow. Essentially, they are place holders for information
 required further down the work flow. Only slots that are of interest for the
 user are available for visualisation. If these slots have note been updated,
-the function will won't return any value.
-.
+the function will not return any value.
+
 
 
 * `maxPWMScore`, a numeric value describing the highest PWM Score on a
@@ -557,7 +609,8 @@ minPWMScore(Occupancy)
 ```
 
 * `averageExpPWMScore`  a numeric value representing the exponential
-of the average PWM Score. This score depends on the value assigned to `lambda`.
+of the average PWM Score. This score depends on the values assigned 
+to `lambda`.
 It is possible to access this slot using:
 
 ```{r, eval=TRUE, warnings = FALSE, echo=TRUE}
@@ -604,11 +657,22 @@ represent a combination of `lambda` and number of bound Molecules
 
 ```{r, eval=TRUE, warnings = FALSE, echo=TRUE}
 AllSitesAboveThreshold(Occupancy)
+
+# Or 
+
+searchSites(Occupancy)
+
 ```
+The size of the `AllSitesAboveThreshold` slot will increase drastically
+as the number of values assinged to `ScalingFactorPWM` (or `lambda`) and
+`boundMolecules` increases. In order to navigate and search this slot with
+ease, it is possible to use the `searchSites` function
+(**See below: searchSites**).
+
 
 ## Data Objects - Occupancy Profile Parameters
 
-`genomicProfileParameters` represent a good chunk of the parameters
+`genomicProfileParameters` represents a good chunk of the parameters
 needed to go through the entire ChIPAnalyser work flow. However, there are
 more to come! A second parameter storing object was created to handle
 non-compulsory parameters. This lightens `genomicProfileParameters` by
@@ -617,11 +681,13 @@ handling part of the parameters. This second S4 object is called
 that none of the slots are compulsory. This means that if not provided ,
 a new `occupancyProfileParameters` object will be created internally.
 All default values will be used for further computation.
-As stated previously, we strongly advise using tailored parameters in order
-to increase model fitness. It is especially the case here, as slot such as
+As stated previously, we strongly advise using custom parameters in order
+to increase goodness of fit of model .
+It is especially the case here, as slots such as
 `maxSignal` are directly extracted from biological data
 (ChIP-seq data - see `computeChipProfile` and
 `profileAccuracyEstimate` for more information).
+
 
 ```{r, eval=FALSE}
 OPP <- occupancyProfileParameters(ploidy = 2 ,boundMolecules = 1000 ,
@@ -629,6 +695,7 @@ OPP <- occupancyProfileParameters(ploidy = 2 ,boundMolecules = 1000 ,
     chipSmooth = 250 , stepSize = 10 ,
     removeBackground = 0 , thetaThreshold = 0.1)
 ```
+
 As it is the case with `genomicProfileParameters`, it is also possible
 to *access/set* each slot individually after having created
 an `occupancyProfileParameters` object.
@@ -645,9 +712,9 @@ ploidy(OPP) <- 2
 
 * `boundMolecules`, a positive integer (or vector of positive integers)
 describing the number of bound molecules (Transcription factors) to DNA
-(Default value is set at 1000). In this model, occupancy is reliant on the
+(Default value is set at 2000). In this model, occupancy is reliant on the
 number of bound molecules. The number of molecules will influence
-the fitness of the model. It is possible to infer the number of
+the goodness of fit of the model. It is possible to infer the number of
 bound Molecules by using the `computeOptimal` function.
 For more information, see `computeOptimal` and `profileAccuracyEstimate`.
 
@@ -746,7 +813,7 @@ by maximising the correlation and minimising the Mean Squared Error
 (MSE) between the predicted profile and actual ChIP-seq profiles.
 The higher the value of *theta*, the better the ratio between correaltion
 and MSE. Values below this threshold are discarded
-(replaced by correlation and MSE Threshold) as they represent
+(replaced by Threshold) as they represent
 extremely poor accuracy with actual ChIP-seq data.
 
 ```{r, eval=FALSE, echo=TRUE}
@@ -770,6 +837,7 @@ analysis work flow first and finish with `computeOptimal` function and
 its associated plotting function `plotOptimalHeatMaps`.
 
 ## Genome Wide Scoring
+
 In order to score the entire genome (or the accessible genome),
 it is possible to use the `computeGenomeWidePWMScore` function.
 The output of this function will be influenced by the value assigned
@@ -813,8 +881,8 @@ GPP
 
 ```
 
-`DNAAccessibility` is an optinal argument in `computeGenomeWidePWMScore`.
-If present **AND** `GenomeWide = FALSE`, then the genome will be scored
+`DNAAccessibility` is an optional argument in `computeGenomeWidePWMScore`.
+If present, then the genome will be scored
 only on the accessible DNA. `DNAAccessibility` comes as a `GRanges`
 containing accessible DNA sites.
 
@@ -845,6 +913,7 @@ GenomeWide
 ```
 
 ## Scoring sites above threshold
+
 Once genome wide metrics have been computed, the next step in the analysis
 is to extract sites above threshold
 (Sites with strong binding sites according to PWM Scores).
@@ -873,6 +942,7 @@ described (`verbose` plays the same role as previously described).
 ```{r, eval=TRUE, warnings = FALSE, echo=TRUE}
 eveLocus
 ```
+
 An important aspect to mention, is that it is imperative you name your
 loci of interest (not to be confused with `seqnames`).
 If you are unfamiliar with GRanges, the following examples demonstrates
@@ -915,7 +985,7 @@ As you can see, the `genomicProfileParameters` argument is
 the `genomicProfileParameters` object computed in the previous example.
 ChIPAnalyser works in a sequential manner: resulting object from one
 functions are often parsed as arguments to other functions.
-Finally, if you sequence of interest does not contain any accessible DNA,
+Finally, if your sequence of interest does not contain any accessible DNA,
 you will be notified during the computation and it is possible to extract
 inaccessible loci by using `NoAccess(PWMScores)`
 (See NoAccess slot in `genomicProfileParameters`).
@@ -927,7 +997,7 @@ It is worth mentioning that Occupancy scores are dependant on values
 assigned to `ScalingFactorPWM`  and `boundMolecules`.
 If more than one value were to be assigned to these parameters, the resulting
 output will be a combination of both. For more information
-see `computeOccupancy` example as we will demonstrate  multiple value
+see the `computeOccupancy` example as we will demonstrate  multiple value
 computation (Single Value for lambda and boundMolecules will return an
 object identical in structure as with multiple values).
 The arguments for `computeOccupancy` are the following:
@@ -953,7 +1023,8 @@ you are either using the wrong object or you have not yet computed PWM Scores.
 `occupancyProfileParameters` is an `occupancyProfileParameters` object.
 If not provided, a new one will be generated internally.
 As previously mentioned, we strongly recommend to set those parameters
-to improve the model's fitness. As a reminder, a `occupancyProfileParameters`
+to improve the model's goodness of it.
+As a reminder, a `occupancyProfileParameters`
 object (previously created -
 see section **Data object - Occupancy profile Parameters**)
 should print on the screen as follows:
@@ -973,14 +1044,16 @@ Occupancy <- computeOccupancy(AllSitesPWMScore = PWMScores,
     occupancyProfileParameters = OPP)
 Occupancy
 ```
+
 As it is the case in the previous functions, `AllSitesPWMScore` should be the
 result of the previous function (`computePWMScore`). `computeOccupancy` will
 return a `genomicProfileParameters` object with an updated
 `AllSitesAboveThreshold` slot. This slot should now contain a list
-of GRanges with two metadata columns (PWMScore and Occupancy).
+of GRangesLists containing GRanges (one for each Loci of interest) 
+with two metadata columns (PWMScore and Occupancy).
 Each element in the list is named with the specific combination of
 *lambda* and *boundMolecules* used to compute this set of occupancies.
-Finally, if you sequence of interest does not contain any accessible DNA,
+Finally, if your sequence of interest does not contain any accessible DNA,
 you will be notified during the computation and it is possible to extract
 inaccessible loci by using `NoAccess(PWMScores)`
 (See NoAccess slot in `genomicProfileParameters`).
@@ -994,6 +1067,7 @@ from occupancy data (from sites that display a high TF occupancy).
 `computeChipProfile` creates *ChIP-seq like* profiles from occupancy
 data by smoothing occupancy *profiles* and mimicking real ChIP-seq data.
 The arguments of `computeChipProfile` are the following:
+
 ```{r, eval=FALSE}
 computeChipProfile( setSequence ,
     occupancy, occupancyProfileParameters = NULL, norm = TRUE,
@@ -1028,6 +1102,9 @@ In the case of "truncated_kernel" and "exact", the threshold
 represents a distance in base pair from the peak summit at which the peak
 should be cut. In this case, default is set at 1250 base pairs.
 
+It should be noted that these methods will produce very similar results.
+And by very similar results, we mean nearly identical.
+
 ### computeChipProfile
 
 To generate a ChIP-seq like profile:
@@ -1040,10 +1117,41 @@ chipProfile
 The output of this functions is slightly different as it returns a named
 list (each element in the list is named after the specific combination
 of *lambda* and *boundMolecules* used to compute occupancies) containing
-a GenomicRanges object with ChIP profile values as a metadata column.
+a GRangesList of GRanges with ChIP profile values as a metadata column.
 These GRanges also differ in the sense that they now contain the whole
 loci (or accessible loci) cut into bins of size equal to  `stepSize`
-(See stepSize slot in `occupancyProfileParameters`).
+(See stepSize slot in `occupancyProfileParameters`). Each GRangesList
+contains GRanges for each Loci of interest.
+
+## Searching through SitesAboveThreshold and ChIP-seq profiles
+
+As described previously, The size of the `AllSitesAboveThreshold` slot will
+increase drastically as the number of values assigned to `ScalingFactorPWM`
+(or `lambda`) and `boundMolecules` increases.
+In order to navigate and search this slot with ease, it is possible to use
+the `searchSites` function. This function may also be used on predicted
+ChIP-seq profiles (result of `computeChipProfile`). `searchSites` comes
+in the following form:
+
+```{r, eval=FALSE,echo=TRUE}
+searchSites(Sites,ScalingFactor="all", BoundMolecules="all",Locus="all")
+```
+It is possible to use this function as a simple extraction method
+similarly to the `AllSitesAboveThreshold` method. In this case, the usage
+is the following:
+
+```{r, eval=TRUE, echo=TRUE}
+searchSites(Occupancy)
+```
+If you wish to navigate and extract only certain combinations of
+`ScalingFactorPWM` and/or `boundMolecules` and/or Loci, `searchSites` could be
+use as shown below:
+
+```{r, eval=FALSE, echo=TRUE}
+
+searchSites(chipProfile, ScalingFactor=c(1.5,2.5), BoundMolecules=c(1000,1500)
+    ,Locus=c("eve","odd"))
+```
 
 ## Estimating the accuracy of the model
 
@@ -1051,7 +1159,7 @@ In order to determine how accurate the predicted model is, it is possible
 to compare the predicted *ChIP-seq like profile*
 (as built in `computeChipProfile`) to real ChIP-seq data for a
 given Transcription Factors at loci of interest.  `profileAccuracyEstimate`
-provide a way to compare both profiles.
+provides a way to compare both profiles.
 The arguments for this function are the following:
 
 ```{r, eval=FALSE}
@@ -1075,7 +1183,12 @@ This list should come in the following format:
 str(eveLocusChip)
 ```
 
+In this example, there is only one element in the list. However,
+this list can be as long as you wish and contain all the Loci 
+that you are interested in.
+
 ### profileAccuracyEstimate
+
 To test the accuracy the model against ChIP-seq data:
 
 ```{r, eval=FALSE, warnings = FALSE, echo=TRUE}
@@ -1108,7 +1221,7 @@ of `ScalingFactorPWM` and `boundMolecules`, this function will return the
 combination with the highest correlation , lowest Mean Squared Error or
 highest theta depending on which parameter was selected. As a reminder,
 theta is an in house metric representing a modified ratio of correlation
-over MSE ( extreme values are replaced by threshold). The goal is to fund
+over MSE ( extreme values are replaced by threshold). The goal is to find
 the sweet spot between high correlation and low MSE.
 Values that should be tested for `ScalingFactorPWM` and for
 `boundMolecules` should be provided by user.
@@ -1150,7 +1263,7 @@ the organism of interest.
 * `genomicProfileParameters`, a `genomicProfileParameters` object containing
 at least a *Position Weight Matrix* or *Position Frequency Matrix*.
 All other slots will be computed internally.
-* `LocusProfile`, a named list a of ChIP-seq profile for loci of interest.
+* `LocusProfile`, a named list of ChIP-seq profile for loci of interest.
 * `setSequence`, a named GRanges containing loci of interest.
 * `DNAAccessibility`, a GRanges containing Accessible DNA.
 * `occupancyProfileParameters`, an `occupancyProfileParameters` object.
@@ -1192,11 +1305,12 @@ combination of `ScalingFactorPWM` and `boundMolecules`) and
 finally the **selected parameter**.
 
 # Plotting Results
-As it the case in mamy fields, data visualisation is a key aspect
+As it is the case in mamy fields, data visualisation is a key aspect
 in any analysis. For this purpose, `ChIPAnalyser` offers
 two plotting functions: `plotOptimalHeatMaps` and `plotOccupancyProfile`.
 
 ## Optimal Parameters
+
 Once you have computed the optimal set of parameters, it is possible to
 plot these results in the form of a heat map using `plotOptimalHeatMaps`.
 Depending on what you are interested in, this function will either
@@ -1218,15 +1332,16 @@ defines if you which to plot Contour lines on your heat map. As an example:
 ```{r, eval=FALSE, warnings = FALSE, echo=TRUE, fig.width=4, fig.height=10}
 plotOptimalHeatMaps(optimalParam, parameter="all")
 ```
-This return a heat map resembling the following:
 
 
+See plot in **Quick Guide**
 
 The boxed tile represents the highest correlation or theta for a given
 combination of `ScalingFactorPWM` and `boundMolecules`.
 In the case of MSE the boxed tile represents the lowest Mean Squared Error.
 
 ## Plotting Profiles
+
 `ChIPAnalyser` produces ChIP-seq like profiles. It is possible to plot these
 profiles but also to add a variety of features to these plots.
 `plotOccupancyProfile` takes care of plotting with the following arguments:
@@ -1242,6 +1357,8 @@ plotOccupancyProfile <- function(predictedProfile,
     occupancyProfileParameters = NULL,
     geneRef = NULL)
 ```
+
+
 ### Input Data & Profiles
 In order to increase plotting flexibility, `plotOccupancyProfile`
 only plots one profile at a time. In practice, this means that only
@@ -1271,7 +1388,7 @@ This object should be the same as the one used in functions described above.
 However, the minimal requirement is that the `stepSize` slot
 remains consistent with `stepSize` used previously.
 As a reminder, stepSize default value is set at 10.
-* `geneRef`, a GRangesList containing genetic information
+* `geneRef`, a List containing genetic information
 (3'UTR, 5'UTR, exons, intron and enhancers). Each element of this list,
 is a GRanges containing the information regarding
 3'UTR, 5'UTR, exons, intron and enhancers.
@@ -1299,7 +1416,7 @@ plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
     occupancyProfileParameters = OPP,
     geneRef =geneRef)
 ```
-And the resulting plot should look similar to the following:
+
 
 
 

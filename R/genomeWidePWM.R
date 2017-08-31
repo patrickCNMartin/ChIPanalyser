@@ -66,7 +66,7 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
     averageExpPWMScore <- rep(0,length(lambda))
     sumExpPWMScoreLocal <- vector("list", length(lambda))
 
-    for(i in 1:length(lambda)){
+    for(i in seq_along(lambda)){
         sumExpPWMScoreLocal[[i]] <- sapply(lapply(
             lapply(DNASequenceScoreSetTotalAcces,"*", (1/lambda[i])),exp),sum)
         averageExpPWMScore[i] <- sum(
