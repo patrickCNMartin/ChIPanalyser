@@ -1,7 +1,7 @@
 Package: ChIPanalyser
 Type: Package
 Title: ChIPanalyser: Predicting Transcription Factor Binding Sites
-Version: 0.99.12
+Version: 0.99.13
 Date: 2017-09-01
 Author: c(person("Patrick", "Martin", email = "pm16057@essex.ac.uk",
     role = c("aut", "cre")),

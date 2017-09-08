@@ -15,7 +15,8 @@ easier between the different of functions available in \code{ChIPanalyser}.
 \usage{
 
 
-genomicProfileParameters(PWM = NULL, PFM = NULL,ScalingFactorPWM = 1,
+genomicProfileParameters(PWM = NULL, PFM = NULL,PFMFormat="raw",
+    ScalingFactorPWM = 1,
     PWMpseudocount = 1, noOfSites = 0, BPFrequency = rep(0.25, 4),
     naturalLog = FALSE, PWMThreshold = 0.7, strandRule = "max",
     whichstrand = "+-")
@@ -43,6 +44,12 @@ genomicProfileParameters(PWM = NULL, PFM = NULL,ScalingFactorPWM = 1,
     NOTE: Although the object will build, NO computation can be carried
     out without at least a PFM or a PWM.
 
+    }
+    \item{PFMFormat}{
+    \code{PFMFormat} is a character string describing the format of the
+    file used (if any) in PositionFrequencyMatrix. ChIPanalyser
+    handles most PFM formats thus this argument should take one of the
+    following: raw, transfac, JASPAR or sequences.
     }
     \item{ScalingFactorPWM}{ \code{\link{ScalingFactorPWM}}:
     A vector (or single value) contaning values for the ScalingFactorPWM
@@ -102,6 +109,9 @@ PWM = To be supplied by user
 
 
 PFM = To be supplied by user
+
+
+PFMFormat ="raw"
 
 
 ScalingFactorPWM = 1

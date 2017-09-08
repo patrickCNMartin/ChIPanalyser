@@ -9,6 +9,7 @@ setMethod("show",
         message("Object Class:", class(object), "\n", sep = " ")
         message("\n","PWM:", "\n");print(object@PWM)
         message("\n","PFM:", "\n");print(object@PFM)
+        message("\n","PFMFormat: ", object@PFMFormat,"\n")
         message("\n","PWM Scores at Sites higher than Threshold: \n")
         print(object@AllSitesAboveThreshold)
         message("\n","No Accessible DNA at Loci:","\n",object@NoAccess)

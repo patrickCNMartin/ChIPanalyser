@@ -24,6 +24,12 @@ setGeneric("PositionFrequencyMatrix",
 setGeneric("PositionFrequencyMatrix<-",
     function(object, value) standardGeneric("PositionFrequencyMatrix<-"))
 
+setGeneric("PFMFormat",
+    function(object) standardGeneric("PFMFormat"))
+
+setGeneric("PFMFormat<-",
+    function(object, value) standardGeneric("PFMFormat<-"))
+
 setGeneric("ScalingFactorPWM",
     function(object) standardGeneric("ScalingFactorPWM"))
 

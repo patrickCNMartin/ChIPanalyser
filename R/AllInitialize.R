@@ -9,6 +9,7 @@ setMethod(f="initialize",
     definition=function(.Object,
         PFM=.Object@PFM,
         PWM=.Object@PWM,
+        PFMFormat = .Object@PFMFormat,
         ScalingFactorPWM=.Object@ScalingFactorPWM,
         PWMpseudocount=.Object@PWMpseudocount,
         BPFrequency=.Object@BPFrequency,
@@ -30,35 +31,53 @@ setMethod(f="initialize",
             validObject(.Object)
             }
             if(length(ScalingFactorPWM)>0){
+                if(class(ScalingFactorPWM)=="numeric"){
             NewLambda<-ScalingFactorPWM
             .Object@ScalingFactorPWM<-NewLambda
             validObject(.Object)
-            }
+            } else {
+            stop("ScalingFactorPWM is not numeric
+            or a vector of numeric values")
+            }}
+            if(length(PFMFormat)>0){
+                if(class(PFMFormat)=="character"){
+            NewPFMFormat<-PFMFormat
+            .Object@PFMFormat<-NewPFMFormat
+            validObject(.Object)
+            } else {
+            stop("PFMFormat is not a character string of one of the following:
+            raw, transfac, JASPAR or sequences")
+            }}
             if(length(PWMpseudocount)>0){
+                if(class(PWMpseudocount)=="numeric"){
             Newpseudocount<-PWMpseudocount
             .Object@PWMpseudocount<-Newpseudocount
             validObject(.Object)
-            }
-            if(length(BPFrequency)>0){
-            NewBPFrequency<-BPFrequency
-            .Object@BPFrequency<-NewBPFrequency
-            validObject(.Object)
-            }
-            if(length(naturalLog)>0){
+            } else {
+            stop("PWMpseudocount is not numeric")
+            }}
+
+            if(length(naturalLog)>0 & is.logical(naturalLog)){
             NewnaturalLog<-naturalLog
             .Object@naturalLog<-NewnaturalLog
             validObject(.Object)
             }
             if(length(noOfSites)>0){
+                if(class(noOfSites)=="numeric"){
             NewnoOfSites<-noOfSites
             .Object@noOfSites<-NewnoOfSites
             validObject(.Object)
-            }
+            } else {
+            stop("noOfSites is not numeric")
+            }}
             if(length(PWMThreshold)>0){
+                if(class(PWMThreshold)=="numeric"){
             NewPWMThreshold<-PWMThreshold
             .Object@PWMThreshold<-NewPWMThreshold
             validObject(.Object)
-            }
+            } else {
+            stop("PWMThreshold is not numeric")
+            }}
             if(length(maxPWMScore)>0){
             NewmaxPWMScore<-maxPWMScore
             .Object@maxPWMScore<-NewmaxPWMScore
@@ -70,20 +89,30 @@ setMethod(f="initialize",
             validObject(.Object)
             }
             if(class(PFM)!= "matrix" & !is.null(PFM)){
-            PFMmatrix<-.parsePFM(PFM)
+            PFMmatrix<-.parsePFM(PFM,PFMFormat)
             .Object@PFM<-PFMmatrix
             validObject(.Object)
             }
-            if(any(c("max","mean","sum")==strandRule)){
+            if(length(strandRule)>0){
+                if(class(strandRule)=="character"){
             NewStrandRule<-strandRule
             .Object@strandRule<-NewStrandRule
             validObject(.Object)
-            }
-            if(any(c("+","-","+-","-+")==whichstrand)){
+            } else {
+            stop("strandRule is not a character string of one
+            of the following: max, mean or sum")
+            }}
+
+            if(length(whichstrand)>0){
+                if(class(whichstrand)=="character"){
             NewStrand<-whichstrand
             .Object@whichstrand<-NewStrand
             validObject(.Object)
-            }
+            } else {
+            stop("whichstrand is not a character string of one of the
+            following: +-, -+ , - or +")
+            }}
+
             if(length(PFM)<1 & length(PWM)>0){
             NewPWM<-PositionWeightMatrix
             .Object@PWM<-NewPWM
@@ -114,55 +143,85 @@ setMethod(f="initialize",
         thetaThreshold = .Object@thetaThreshold){
 
         if(length(ploidy)>0){
+            if(class(ploidy)=="numeric"){
         NewPloidy<-ploidy
         .Object@ploidy <- NewPloidy
         validObject(.Object)
-        }
+        } else {
+        stop("ploidy is not numeric")}}
+
         if(length(boundMolecules)>0){
+            if(class(boundMolecules)=="numeric"){
         NewboundMolecules<-boundMolecules
         .Object@boundMolecules <- NewboundMolecules
         validObject(.Object)
-        }
+        } else {
+        stop("boundMolecules is not numeric")}}
+
         if(length(backgroundSignal)>0){
+            if(class(backgroundSignal)=="numeric"){
         NewbackgroundSignal<-backgroundSignal
         .Object@backgroundSignal <- NewbackgroundSignal
         validObject(.Object)
-        }
+        } else {
+        stop("backgroundSignal is not numeric")}}
+
         if(length(maxSignal)>0){
+            if(class(maxSignal)=="numeric"){
         NewmaxSignal<-maxSignal
         .Object@maxSignal <- NewmaxSignal
         validObject(.Object)
-        }
+        } else {
+        stop("maxSignal is not numeric")}}
+
         if(length(chipMean)>0){
+            if(class(chipMean)=="numeric"){
         NewchipMean<-chipMean
         .Object@chipMean <- NewchipMean
         validObject(.Object)
-        }
+        } else {
+        stop("chipMean is not numeric")}}
+
         if(length(chipSd)>0){
+            if(class(chipSd)=="numeric"){
         NewchipSd<-chipSd
         .Object@chipSd <- NewchipSd
         validObject(.Object)
-        }
+        } else {
+        stop("chipSd is not numeric")}}
+
         if(length(chipSmooth)>0){
+            if(class(chipSmooth)=="numeric"){
         NewchipSmooth<-chipSmooth
         .Object@chipSmooth <- NewchipSmooth
         validObject(.Object)
-        }
+        }else{
+        stop("chipSmooth is not numeric")
+        }}
         if(length(stepSize)>0){
+            if(class(stepSize)=="numeric"){
         NewstepSize<-stepSize
         .Object@stepSize <- NewstepSize
         validObject(.Object)
-        }
+        } else {
+        stop("stepSize is not numeric")}}
+
         if(length(removeBackground)>0){
+            if(class(removeBackground)=="numeric"){
         NewremoveBackground<-removeBackground
         .Object@removeBackground <- NewremoveBackground
         validObject(.Object)
-        }
+        } else {
+        stop("removeBackground is not numeric")}}
+
         if(length(thetaThreshold)>0){
+            if(class(thetaThreshold)=="numeric"){
         NewthetaThreshold<-thetaThreshold
         .Object@thetaThreshold <- NewthetaThreshold
         validObject(.Object)
-        }
+        } else {
+        stop("thetaThreshold is not numeric")}}
+
     return(.Object)
     }
 )

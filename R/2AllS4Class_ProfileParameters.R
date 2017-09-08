@@ -75,6 +75,7 @@ setClassUnion("GRList",c("GRangesList","list"))
 setClass("genomicProfileParameters",
     slots = c(PWM = "matrix",
     PFM = "matrix",
+    PFMFormat = "character",
     ScalingFactorPWM = "vector",
     PWMpseudocount = "numeric",
     BPFrequency = "vector",
@@ -91,7 +92,8 @@ setClass("genomicProfileParameters",
     NoAccess = "vector",
     ZeroBackground = "vector"),
 
-    prototype = prototype(ScalingFactorPWM = 1.25,
+    prototype = prototype(PFMFormat="raw",
+    ScalingFactorPWM = 1.25,
     PWMpseudocount = 1,
     noOfSites = 0,
     BPFrequency = rep(0.25,4),
@@ -109,11 +111,19 @@ setClass("genomicProfileParameters",
     stop("Genomic Profile Parameters Validation:
     PWM does not seem to be a Position Weight Matrix.")
     }
+
+
+    if(all(object@PFMFormat %in% c("raw","transfac","JASPAR","sequences"))
+    ==FALSE ){
+        stop("Genomic Profile Parameters Validation:
+        PFM file is not one of the following formats:
+        raw,transfac,JASPAR,sequences.")
+    }
     if(any(object@ScalingFactorPWM < 0)){
     stop("Genomic Profile Parameters Validation:
     Lambda must be positive.")
     }
-    if(object@PWMpseudocount < 0){
+    if(object@PWMpseudocount < 0 ){
     stop("Genomic Profile Parameters: psuedocount must be positive")
     }
     if(object@PWMThreshold < 0 | object@PWMThreshold >= 1){
@@ -128,12 +138,12 @@ setClass("genomicProfileParameters",
     stop("Genomic Profile Parameters: naturalLog should either be
     TRUE or FALSE")
     }
-    if((object@strandRule %in% c("max","mean","sum")) == FALSE){
+    if(all(object@strandRule %in% c("max","mean","sum")) == FALSE){
     stop("Genomic Profile Paramters:
     strandRule should be one of the following:
     max, mean, or sum")
     }
-    if((object@whichstrand %in% c("+","-","+-","-+")) == FALSE){
+    if(all(object@whichstrand %in% c("+","-","+-","-+")) == FALSE){
     stop("Genomic Profile Paramters:
     whichstrand sould be one of the following:
     +, -, +-, or -+")
@@ -146,6 +156,7 @@ setClass("genomicProfileParameters",
 genomicProfileParameters <- function(
     PWM=NULL ,
     PFM=NULL ,
+    PFMFormat="raw",
     ScalingFactorPWM = 1,
     PWMpseudocount = 1,
     noOfSites = 0,
@@ -154,9 +165,10 @@ genomicProfileParameters <- function(
     PWMThreshold = 0.7,
     strandRule = "max",
     whichstrand = "+-"){
-    GPP<-new("genomicProfileParameters",
+    return(new("genomicProfileParameters",
         PWM = PWM,
         PFM = PFM,
+        PFMFormat =PFMFormat,
         ScalingFactorPWM = ScalingFactorPWM,
         PWMpseudocount = PWMpseudocount,
         noOfSites = noOfSites,
@@ -164,9 +176,9 @@ genomicProfileParameters <- function(
         naturalLog = naturalLog,
         PWMThreshold = PWMThreshold,
         strandRule = strandRule,
-        whichstrand = whichstrand)
-    initialize(GPP)
-    return(GPP)
+        whichstrand = whichstrand))
+
+
 }
 
 
@@ -181,7 +193,7 @@ occupancyProfileParameters <- function(
     stepSize = 10 ,
     removeBackground = 0 ,
     thetaThreshold = 0.1){
-    OPP <- new("occupancyProfileParameters",
+    return(new("occupancyProfileParameters",
         ploidy = ploidy ,
         boundMolecules = boundMolecules ,
         backgroundSignal = backgroundSignal ,
@@ -191,7 +203,7 @@ occupancyProfileParameters <- function(
         chipSmooth = chipSmooth ,
         stepSize = stepSize ,
         removeBackground = removeBackground ,
-        thetaThreshold = thetaThreshold)
-    initialize(OPP)
-    return(OPP)
+        thetaThreshold = thetaThreshold))
+
+
 }

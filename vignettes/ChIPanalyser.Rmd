@@ -135,7 +135,7 @@ itself.
 ```{r,eval=TRUE, warnings = FALSE}
 # Building a genomicProfileParameters objects for data
 # storage and PWM computation
-GPP <- genomicProfileParameters(PFM=PFM,
+GPP <- genomicProfileParameters(PFM=PFM,PFMFormat="raw",
     BPFrequency=DNASequenceSet,
     ScalingFactorPWM = 1.5,
     PWMThreshold = 0.7)
@@ -147,7 +147,7 @@ OPP
 
 # Building occupancyProfileParameters with custom values
 OPP <- occupancyProfileParameters(ploidy= 2,
-    boundMolecules=1000,
+    boundMolecules= 1000,
     chipMean = 200,
     chipSd = 200,
     chipSmooth = 250,
@@ -342,7 +342,7 @@ section **Work Flow - Analysis**.
 
 This object comes in the following form:
 ```{r, eval=FALSE, echo=TRUE}
-genomicProfileParameters(PWM, PFM, lambda, pseudocount,
+genomicProfileParameters(PWM, PFM, ScalingFactorPWM, PFMFormat, pseudocount,
     BPFrequency, naturalLog, noOfSites,
     minPWMScore, maxPWMScore, PWMThreshold,
     AllSitesAboveThreshold, DNASequenceLength,
@@ -353,8 +353,8 @@ To build a `genomicProfileParameters` object :
 
 ```{r, eval=FALSE, echo=TRUE}
 # Assign Value wanted for each parameter
-GPP <- genomicProfileParameters(PWM, PFM, lambda, pseudocount,
-    BPFrequency, naturalLog, noOfSites,
+GPP <- genomicProfileParameters(PWM, PFM,ScalingFactorPWM, PFMFormat,
+    pseudocount, BPFrequency, naturalLog, noOfSites,
     PWMThreshold, DNASequenceLength,
     strandRule, whichstrand)
 ```
@@ -372,17 +372,18 @@ be described as:
 # return empty genomicProfileParameters object
 GPP <- genomicProfileParameters()
 # return minimal working object
-GPP <- genomicProfileParameters(PFM=PFM)
+GPP <- genomicProfileParameters(PFM=PFM,PFMFormat="raw")
 # Suggested Minimal Build
-GPP <- genomicProfileParameters(PFM=PFM, BPFrequency=DNASequenceSet)
+GPP <- genomicProfileParameters(PFM=PFM,PFMFormat="raw",
+BPFrequency=DNASequenceSet)
 ```
 
 Although many parameters have assigned default values, it is recommended
 to use custom parameters to better fit the needs of the analysis.
 The method described above will build a new `genomicProfileParameters` object
-with the values that were assigned to each argument. Only two slots are
-absolutely required in order to build a `genomicProfileParameters` object
-(see below - **The compulsory ones**). Most other slots are optional.
+with the values that were assigned to each argument. Only three slots are
+required in order to build a `genomicProfileParameters` object
+(see below - **The compulsory ones**).Most other slots are optional.
 If after building `genomicProfileParameters`, you wish to modify the value
 of only *one* slot and keep the values that you had previously assigned,
 it is possible to modify each slot individually by using the
@@ -406,7 +407,14 @@ we suggest that if you were to decided to use another
 Position Weight Matrix to create a new `genomicProfileParameters`.
 
 ```{r, eval=TRUE, warnings = FALSE, echo=TRUE}
+#Accessing PositionWeightMatrix slot
 PositionWeightMatrix(GPP)
+```
+```{r,eval=FALSE, warnings= FALSE, echo=TRUE}
+# Setting PositionWeightMatrix slot
+PositionWeightMatrix(GPP) <- newPWM
+### This is not the advised method
+### newPWM is a matrix following the format described above
 ```
 
 * `PFM` , a Position Frequency Matrix. The Position Frequency Matrix argument
@@ -421,6 +429,8 @@ the `PFM` will be generated from sequence information.
 We suggest to use a path/to/file linking towards the `PFM` file.
 Most `PFM` will come in one of the formats described above and
 `ChIPanalyser` will parse these files in a usable format.
+However, PLEASE NOTE THAT THE FORMAT SHOULD BE SPECIFIED.
+See `PFMFormat` bellow.
 
 If a `PWM` is readily available, `PFM` is not necessary.
 However, keep in mind that at least one is necessary.
@@ -430,18 +440,43 @@ to decided to use another Position Frequency Matrix
 to create a new `genomicProfileParameters`.
 
 ```{r, eval=TRUE, warnings = FALSE, echo=TRUE}
+# Accessing PositionFrequencyMatrix slot
 PositionFrequencyMatrix(GPP)
 ```
+```{r,eval=FALSE, warnings=FALSE, echo=TRUE}
+# Setting PositionFrequencyMatrix slot
+PositionFrequencyMatrix(GPP) <- newPFM
 
+```
+In this situation, `newPFM` is either a path to file or a PFM matrix.
+The PFMFormat will be the one assigned to the `genomicProfileParameters`
+object.
 
 At least one of **PWM** or **PFM** is required to create a
 `genomicProfileParameters` storage object. If a `PFM` is provided
 then the `PWM` will be automatically computed and updated.
+
+
+* `PFMFormat`, a file format for `PositionFrequencyMatrix` file.
+When Loading a PFM from a file (as described above), one should
+included the format of the file that they are using.
+`PFMFormat` may be one of the following:
+"raw","transfac","JASPAR" or "sequences".
+
+```{r,eval=FALSE, echo=TRUE}
+PFMFormat(GPP)
+
+PFMFormat(GPP)<-"raw"
+```
+Default is set at "raw".
+
+
 All other arguments are optional however we strongly recommend to
-tailor the values assigned `genomicProfileParameters` to your needs.
+tailor the values assigned to `genomicProfileParameters` to your needs.
 The following sections will describe these optional parameters.
 
 ### Genomic Parameters - The optional ones
+
 
 * `ScalingFactorPWM` , a scaling factor for TF specificity.
 Although this parameter is optional (Default value is set at 1),
@@ -1147,7 +1182,7 @@ If you wish to navigate and extract only certain combinations of
 `ScalingFactorPWM` and/or `boundMolecules` and/or Loci, `searchSites` could be
 use as shown below:
 
-```{r, eval=FALSE, echo=TRUE}
+```{r, eval=TRUE, echo=TRUE}
 
 searchSites(chipProfile, ScalingFactor=c(1.5,2.5), BoundMolecules=c(1000,1500)
     ,Locus=c("eve","odd"))

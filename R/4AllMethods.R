@@ -33,13 +33,25 @@ setReplaceMethod("PositionFrequencyMatrix",
 setReplaceMethod("PositionFrequencyMatrix",
     signature(object="genomicProfileParameters",
         value="character"),
-    function(object, value){
-        value <- .parsePFM(value)
+    function(object,value){
+        value <- .parsePFM(value,object@PFMFormat)
         object@PFM<-value
     return(object)
     }
 )
 
+setMethod("PFMFormat","genomicProfileParameters",
+    function(object) object@PFMFormat
+)
+
+setReplaceMethod("PFMFormat",
+    signature(object="genomicProfileParameters",
+        value="character"),
+    function(object, value){
+        object@PFMFormat<-value
+    return(object)
+    }
+)
 
 setMethod("ScalingFactorPWM", "genomicProfileParameters",
     function(object) object@ScalingFactorPWM

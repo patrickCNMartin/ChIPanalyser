@@ -28,6 +28,9 @@
 \alias{PositionFrequencyMatrix<-,genomicProfileParameters,matrix-method}
 \alias{PositionFrequencyMatrix<-,genomicProfileParameters,character-method}
 \alias{PositionFrequencyMatrix,genomicProfileParameters-method}
+\alias{PFMFormat<-,genomicProfileParameters,character-method}
+\alias{PFMFormat,genomicProfileParameters-method}
+
 \alias{PositionWeightMatrix<-,genomicProfileParameters,matrix-method}
 \alias{PositionWeightMatrix,genomicProfileParameters-method}
 \alias{PWMpseudocount<-,genomicProfileParameters,numeric-method}
@@ -54,7 +57,8 @@ parameters easier between the different of functions available in
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form
-\code{genomicProfileParameters(PWM, PFM, ScalingFactorPWM, PWMpseudocount,
+\code{genomicProfileParameters(PWM, PFM,PFMFormat,
+    ScalingFactorPWM, PWMpseudocount,
     BPFrequency, naturalLog, noOfSites, minPWMScore,
     maxPWMScore, PWMThreshold, AllSitesAboveThreshold,
     DNASequenceLength , averageExpPWMScore , strandRule ,
@@ -72,6 +76,9 @@ Objects can be created by calls of the form
     PFM is provided)}
     \item{\code{PFM}:}{Object of class \code{"matrix"}:
     A Position Frequency Matrix (may also be a path to file containing PFM) }
+    \item{\code{PFMFormat}:}{Object of class \code{"character"}:
+    A character string of one of the following: raw, transfac,JASPAR or
+    sequences}
     \item{\code{ScalingFactorPWM}:}{Object of class \code{"vector"}:
     A vector (or single value) contaning values for the ScalingFactorPWM
     (Also known as lambda).Default:1}
@@ -162,6 +169,10 @@ Class \code{\link{occupancyProfileParameters}}, directly.
     \item{PositionFrequencyMatrix<-}{\code{signature(object =
     "genomicProfileParameters", value = "character")}: Slot Setter Method }
     \item{PositionFrequencyMatrix}{\code{signature(object =
+    "genomicProfileParam"}: Slot Accessor Method}
+    \item{PFMFormat<-}{\code{signature(object =
+    "genomicProfileParameters", value = "character")}: Slot Setter Method }
+    \item{PFMFormat}{\code{signature(object =
     "genomicProfileParam"}: Slot Accessor Method}
     \item{PositionWeightMatrix<-}{\code{signature(object =
     "genomicProfileParameters", value = "matrix")}:Slot Setter Method }

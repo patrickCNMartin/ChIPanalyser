@@ -71,7 +71,7 @@
 ### format="raw": the format of the PWM: raw, transfac, jaspar,
 ###seqs (list of binding sequences)
 ### return: a PFM matrix, with rows: A, C, G, T
-.parsePFM <- function(filename, format = "raw"){
+.parsePFM <- function(filename, format){
     PFM <- NULL
     if(format == "raw"){
         PFM <- .parseRawPFM(filename)
@@ -149,6 +149,7 @@
                 } else{
                     PFM <- rbind(PFM,values)
                 }
+
             } else{
                 error <- TRUE
             }
@@ -521,8 +522,6 @@ searchSites <- function(Sites,ScalingFactor="all",
 
         if(length(buffer)>1){
         bufferSites <- bufferSites[buffer]
-        } else {
-        message("None of the ScalingFactors provided are in list")
         }
     }
     #Search for boundMolecules
@@ -540,13 +539,11 @@ searchSites <- function(Sites,ScalingFactor="all",
 
         if(length(buffer)>1){
             bufferSites <- bufferSites[buffer]
-        } else {
-            message("None of the boundMolecules provided are in list")
         }
     }
     #Search for Loci
 
-    if(Locus == "all"){
+    if(all(Locus == "all")){
         bufferSites <- bufferSites
     } else {
         if(class(bufferSites)=="list"){

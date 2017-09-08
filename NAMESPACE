@@ -40,6 +40,8 @@ exportMethods(
     "ploidy",
     "PositionFrequencyMatrix<-",
     "PositionFrequencyMatrix",
+    "PFMFormat",
+    "PFMFormat<-",
     "PositionWeightMatrix<-",
     "PositionWeightMatrix",
     "PWMpseudocount<-",
