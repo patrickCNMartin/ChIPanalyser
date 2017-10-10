@@ -1,0 +1,68 @@
+import("GenomicRanges","Biostrings", "BSgenome","RcppRoll")
+
+importFrom("grDevices", "colorRampPalette", "heat.colors")
+importFrom("graphics", "axis", "box", "contour", "image", "lines",
+    "par", "plot", "polygon", "rect", "text", "title")
+importFrom("methods", "new", "validObject")
+importFrom("stats", "cor", "dgamma")
+importFrom("utils", "read.table")
+
+
+
+
+exportPattern("^[[:alpha:]]+")
+exportMethods(
+    "AllSitesAboveThreshold",
+    "averageExpPWMScore",
+    "backgroundSignal<-",
+    "backgroundSignal",
+    "boundMolecules<-",
+    "boundMolecules",
+    "BPFrequency<-",
+    "BPFrequency",
+    "chipMean<-",
+    "chipMean",
+    "chipSd<-",
+    "chipSd",
+    "chipSmooth<-",
+    "chipSmooth",
+    "DNASequenceLength<-",
+    "DNASequenceLength",
+    "maxPWMScore",
+    "maxSignal",
+    "minPWMScore",
+    "naturalLog<-",
+    "naturalLog",
+    "NoAccess",
+    "noOfSites<-",
+    "noOfSites",
+    "ploidy<-",
+    "ploidy",
+    "PositionFrequencyMatrix<-",
+    "PositionFrequencyMatrix",
+    "PFMFormat",
+    "PFMFormat<-",
+    "PositionWeightMatrix<-",
+    "PositionWeightMatrix",
+    "PWMpseudocount<-",
+    "PWMpseudocount",
+    "PWMThreshold<-",
+    "PWMThreshold",
+    "removeBackground<-",
+    "removeBackground",
+    "ScalingFactorPWM<-",
+    "ScalingFactorPWM",
+    "stepSize<-",
+    "stepSize",
+    "strandRule<-",
+    "strandRule",
+    "thetaThreshold<-",
+    "thetaThreshold",
+    "whichstrand<-",
+    "whichstrand"
+
+)
+exportClasses(
+    "occupancyProfileParameters",
+    "genomicProfileParameters"
+)
