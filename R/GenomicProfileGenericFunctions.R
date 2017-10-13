@@ -562,3 +562,4 @@ searchSites <- function(Sites,ScalingFactor="all",
     return(bufferSites)
 
 }
+
