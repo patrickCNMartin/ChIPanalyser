@@ -1,7 +1,7 @@
 Package: ChIPanalyser
 Type: Package
 Title: ChIPanalyser: Predicting Transcription Factor Binding Sites
-Version: 0.99.13
+Version: 0.99.14
 Date: 2017-09-01
 
 Author: Patrick C.N.Martin & Nicolae Radu Zabet
