@@ -72,7 +72,7 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
         averageExpPWMScore[i] <- sum(
             sumExpPWMScoreLocal[[i]])/DNASequenceLength
     }
-
+  
     maxPWMScore <- max(unlist(lapply(DNASequenceScoreSetTotalAcces,max)))
     minPWMScore <- min(unlist(lapply(DNASequenceScoreSetTotalAcces,min)))
 

@@ -509,13 +509,14 @@ searchSites <- function(Sites,ScalingFactor="all",
     bufferSites <- Sites
 
     #Search for Scaling Factor
-    if(any(ScalingFactor=="all")){
+    if(all(ScalingFactor=="all")){
         bufferSites <- bufferSites
         buffer <- 0
     } else {
-        localNames <- sapply(strsplit(names(bufferSites)," &"),"[[",1)
+        localNames <- sapply(strsplit(sapply(strsplit(names(bufferSites)," &"),
+        "[[",1),lambda),"[[",2)
         for( i in seq_along(ScalingFactor)){
-            buffer <- c(buffer,grep(paste0(lambda,ScalingFactor[i]),
+            buffer <- c(buffer,grep(paste0("^",ScalingFactor[i],"$"),
             localNames))
 
         }
@@ -526,7 +527,7 @@ searchSites <- function(Sites,ScalingFactor="all",
     }
     #Search for boundMolecules
     buffer <- c()
-    if(any(BoundMolecules=="all")){
+    if(all(BoundMolecules=="all")){
         bufferSites <-bufferSites
         buffer <- 0
     } else {
@@ -561,3 +562,4 @@ searchSites <- function(Sites,ScalingFactor="all",
     return(bufferSites)
 
 }
+
