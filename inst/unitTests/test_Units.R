@@ -88,7 +88,7 @@ test_occupancyProfileParametersBuild <- function(){
 #    SAT <- computePWMScore(DNASequenceSet,GPP,eveLocus)
 #    checkTrue(class(SAT)=="genomicProfileParameters")
 
-    #checkTrue(class(AllSitesAboveThreshold(SAT))=="GRangesList",
+    #checkTrue(is(AllSitesAboveThreshold(SAT), "GRangesList"),
     #"Class Check genomicProfileParameters: OK")
     #checkEquals(AllSitesAboveThreshold(SAT)$PWMScores,
     #AllSitesAboveThreshold(PWMScoresNoAccess)[[1]]$PWMScores)
@@ -105,7 +105,7 @@ test_occupancyProfileParametersBuild <- function(){
 #    SAT <- computePWMScore(DNASequenceSet,GPP,eveLocus,Access)
 #    checkTrue(class(SAT)=="genomicProfileParameters")
 
-    #checkTrue(class(AllSitesAboveThreshold(SAT))=="GRangesList",
+    #checkTrue(is(AllSitesAboveThreshold(SAT), "GRangesList"),
     #"Class Check genomicProfileParameters: OK")
     #checkEquals(AllSitesAboveThreshold(SAT)[[1]]$PWMScores,
     #AllSitesAboveThreshold(PWMScoresAccess)[[1]]$PWMScores)
