@@ -46,7 +46,7 @@ setMethod(f="initialize",
             validObject(.Object)
             } else {
             stop("PFMFormat is not a character string of one of the following:
-            raw, transfac, JASPAR or sequences")
+            raw, transfac, JASPAR, sequences or matrix")
             }}
             if(length(PWMpseudocount)>0){
                 if(class(PWMpseudocount)=="numeric"){
@@ -88,11 +88,16 @@ setMethod(f="initialize",
             .Object@minPWMScore<-NewminPWMScore
             validObject(.Object)
             }
-            if(class(PFM)!= "matrix" & !is.null(PFM)){
+            if(!is.null(PFM)){
+                if(class(PFM)!="matrix"){
             PFMmatrix<-.parsePFM(PFM,PFMFormat)
             .Object@PFM<-PFMmatrix
             validObject(.Object)
-            }
+            } else {
+            PFMMatrix<-PFM
+            .Object@PFM<-PFMMatrix
+            validObject(.Object)
+            }}
             if(length(strandRule)>0){
                 if(class(strandRule)=="character"){
             NewStrandRule<-strandRule

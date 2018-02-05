@@ -113,11 +113,11 @@ setClass("genomicProfileParameters",
     }
 
 
-    if(all(object@PFMFormat %in% c("raw","transfac","JASPAR","sequences"))
+    if(all(object@PFMFormat %in% c("raw","transfac","JASPAR","sequences","matrix"))
     ==FALSE ){
         stop("Genomic Profile Parameters Validation:
         PFM file is not one of the following formats:
-        raw,transfac,JASPAR,sequences.")
+        raw,transfac,JASPAR,sequences or matrix.")
     }
     if(any(object@ScalingFactorPWM < 0)){
     stop("Genomic Profile Parameters Validation:
