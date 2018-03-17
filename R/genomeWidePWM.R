@@ -2,7 +2,7 @@
 # Functions
 #######################################################################
 computeGenomeWidePWMScore<-function(DNASequenceSet,
-    genomicProfileParameters, DNAAccessibility = NULL,
+    genomicProfileParameters, DNAAccessibility = NULL,cores=1,
     verbose = TRUE){
 
     # Validity Checking for each argument
@@ -39,6 +39,7 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
     DNASequenceSet <- DNASequenceSet[which(sapply(DNASequenceSet,length) >
         ncol(PWMMat))]
     }
+
     # Progress Messages when required.
     if(verbose){
     message("Scoring whole genome \n")
@@ -49,30 +50,46 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
         }
     }
 
+
+    ### This section could be re worked for longer genomes?
+    ### Original Concept seems to be ok
+    #DNASequenceSet <- .splitDNASequenceSet(DNASequenceSet,cores)
+
+
+    #DNASequenceScoreSetTotalAcces <- parallel::mclapply(DNASequenceSet,
+      #  .internalScoreDNAStringSet,PWM=PWMMat,
+        #strand=strand,strandRule=strandRule,mc.cores=cores)
+  #  DNASequenceScoreSetTotalAcces <- unlist(DNASequenceScoreSetTotalAcces)
+
+
+
     # Computing PWM Score
     DNASequenceScoreSetTotalAcces <- .scoreDNAStringSet(PWMMat,
         DNASequenceSet,strand = strand,strandRule = strandRule)
+
     DNASequenceScoreSetTotalAcces <- DNASequenceScoreSetTotalAcces[[1]]
 
     #Message printing when required
     if(verbose){
-    message("Computing Mean waiting time\n")
+    message("Computing Mean waiting time \n")
     }
 
     # Compute mean waiting time, max PWM score and min PWM score
     # Computing DNA sequance Length
-    DNASequenceLength <- sum(unlist(
-        lapply(DNASequenceScoreSetTotalAcces,length)))
+    DNASequenceLength <- sum(as.numeric(sapply(DNASequenceScoreSetTotalAcces,length)))
     averageExpPWMScore <- rep(0,length(lambda))
     sumExpPWMScoreLocal <- vector("list", length(lambda))
 
+    ## This is also a limiting part. parallel as well?
+    ## Clean your parallel R script and comment it
+    browser()
     for(i in seq_along(lambda)){
         sumExpPWMScoreLocal[[i]] <- sapply(lapply(
             lapply(DNASequenceScoreSetTotalAcces,"*", (1/lambda[i])),exp),sum)
         averageExpPWMScore[i] <- sum(
             sumExpPWMScoreLocal[[i]])/DNASequenceLength
     }
-  
+
     maxPWMScore <- max(unlist(lapply(DNASequenceScoreSetTotalAcces,max)))
     minPWMScore <- min(unlist(lapply(DNASequenceScoreSetTotalAcces,min)))
 
