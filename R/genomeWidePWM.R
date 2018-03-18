@@ -82,7 +82,7 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
 
     ## This is also a limiting part. parallel as well?
     ## Clean your parallel R script and comment it
-    browser()
+  
     for(i in seq_along(lambda)){
         sumExpPWMScoreLocal[[i]] <- sapply(lapply(
             lapply(DNASequenceScoreSetTotalAcces,"*", (1/lambda[i])),exp),sum)
