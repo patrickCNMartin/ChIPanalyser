@@ -1,9 +1,11 @@
-ChIPanalyser Version 0.99.0
+ChIPanalyser Version 1.1.0
 
 ---------------------------
 
-Pre-Release Version 
+Release Version 
 
 ---------------------------
+In the next version, ChIPanalyser will:
 
-News will be added soon 
+* support multi core usage  
+* preprocess ChIP data from bed files
