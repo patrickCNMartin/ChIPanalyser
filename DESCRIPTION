@@ -4,7 +4,7 @@ Title: ChIPanalyser: Predicting Transcription Factor Binding Sites
 Authors@R: c(
     person(c("Patrick", "CN"), "Martin", role=c("cre", "aut"), email="pm16057@essex.ac.uk"),
     person(c("Nicolea","Radu"), "Zabet", role="aut"))
-Version: 1.0.2
+Version: 1.0.3
 Date: 2017-09-01
 Author: Patrick C.N.Martin & Nicolae Radu Zabet
 Maintainer: Patrick C.N. Martin <pm16057@essex.ac.uk>
@@ -44,7 +44,7 @@ Depends: R (>= 3.4.1),GenomicRanges, Biostrings, BSgenome, RcppRoll, parallel
 Imports: methods, IRanges, S4Vectors,grDevices,graphics,stats,utils,rtracklayer
 Suggests: BSgenome.Dmelanogaster.UCSC.dm3,knitr, RUnit, BiocGenerics
 Encoding: UTF-8
-LazyData: false
+LazyData: true
 biocViews: Software, BiologicalQuestion, WorkflowStep, Transcription,
     Sequencing, ChipOnChip, Coverage, Alignment, ChIPSeq, SequenceMatching,
     DataImport ,PeakDetection
