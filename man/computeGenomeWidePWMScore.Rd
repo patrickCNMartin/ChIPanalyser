@@ -11,7 +11,7 @@ It is possible to restrict the scoring of the genome to only Accessible DNA.
 }
 \usage{
 computeGenomeWidePWMScore(DNASequenceSet, genomicProfileParameters,
-    DNAAccessibility = NULL, cores=1,verbose = TRUE)
+    DNAAccessibility = NULL, cores=1, verbose = TRUE)
 }
 
 \arguments{
