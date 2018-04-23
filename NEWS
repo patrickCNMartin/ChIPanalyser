@@ -1,9 +1,15 @@
-ChIPanalyser Version 0.99.0
+ChIPanalyser Version 1.0.2
 
 ---------------------------
 
-Pre-Release Version 
+BioConductor 3.6
 
 ---------------------------
 
-News will be added soon 
+#### Package Updates ####
+
+* Parallel Support 
+* New plotOccupancyProfiles Function with increased flexibility for graphical 
+paramters
+* Data pre-processing Function 
+* rtracklayer import support  
