@@ -12,7 +12,7 @@ of total sites that should NOT be considered.
 }
 \usage{
 computePWMScore(DNASequenceSet, genomicProfileParameters,
-    setSequence = NULL, DNAAccessibility = NULL, verbose = TRUE)
+    setSequence = NULL, DNAAccessibility = NULL,cores=1, verbose = TRUE)
 }
 
 \arguments{
@@ -31,6 +31,9 @@ computePWMScore(DNASequenceSet, genomicProfileParameters,
     \item{DNAAccessibility}{
     \code{DNAAccessibility} is a \code{\link[GenomicRanges]{GRanges}}
     object containing Accesible DNA.
+    }
+    \item{cores}{
+    \code{cores} is the number of cores used to compute PWM Scores. 
     }
     \item{verbose}{
     \code{verbose} is a logical value indicating if progress messages

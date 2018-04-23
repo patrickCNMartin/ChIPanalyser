@@ -11,8 +11,8 @@ PWMScores, DNAAccessibility, accuracy estimates and gene information.
 }
 \usage{
 plotOccupancyProfile(predictedProfile,setSequence,
-    profileAccuracy = NULL, chipProfile = NULL, occupancy = NULL,PWM=FALSE,
-    DNAAccessibility = NULL, occupancyProfileParameters = NULL,geneRef = NULL)
+    chipProfile = NULL,DNAAccessibility = NULL, occupancy = NULL,PWM=FALSE,
+    occupancyProfileParameters = NULL,geneRef = NULL,axis=TRUE,...)
 }
 
 \arguments{
@@ -27,21 +27,17 @@ plotOccupancyProfile(predictedProfile,setSequence,
     locus of interest. This locus MUST be named.
     }
 
-    \item{profileAccuracy}{
-    \code{profileAccuracy} is the accuracy estimate resulting from
-    \code{\link{profileAccuracyEstimate}} for only one Locus and combination
-    of \code{lambda} and \code{boundMolecules}
-    }
     \item{chipProfile}{
     \code{chipProfile} is a numeric vector containing real ChIP-seq scores.
-    }
-    \item{occupancy}{
-    \code{occupancy} is a \code{\link[GenomicRanges]{GRanges}} containing PWM
-    Score and predicted Occupancies.
     }
     \item{DNAAccessibility}{
     \code{DNAAccessibility} is a \code{\link[GenomicRanges]{GRanges}}
     containing accesible DNA sites
+    }
+
+    \item{occupancy}{
+    \code{occupancy} is a \code{\link[GenomicRanges]{GRanges}} containing PWM
+    Score and predicted Occupancies.
     }
 
     \item{PWM}{
@@ -55,9 +51,21 @@ plotOccupancyProfile(predictedProfile,setSequence,
     used for previous computations (see vignette for pipeline/function order)
     }
     \item{geneRef}{
-    \code{geneRef} is a list of \code{\link[GenomicRanges]{GRanges}}
-    containing gene information on exons,introns, UTR's and enhancers
+    \code{geneRef} is a \code{\link[GenomicRanges]{GRanges}}
+    containing gene information on exons,introns, UTR's, enhancers or any
+    other genetic element to be plotted.
     }
+    \item{axis}{
+    \code{axis} is a logical value indicating if axes should be plotted or not.
+    }
+    \item{...}{
+    Any other graphical Parameter of the following : col, density, border,
+    lty, lwd, cex, cex.axis, xlab, ylab, xlim, ylim, las and axislables.
+    Each Parameter will be parsed in the same order as the arguments to
+    this function. If the name of the argument is specified, the argument value
+    will be parsed to the correct internal plotting. See examples below
+    }
+
 }
 \details{
 Once the predicted ChIP-seq like profiles have been computed,
@@ -119,17 +127,39 @@ Occupancy <- computeOccupancy(AllSitesPWMScore = PWMScores,
 #Compute ChIP profiles
 chipProfile <- computeChipProfile(setSequence = eveLocus,
     occupancy = Occupancy, occupancyProfileParameters = OPP)
-#Estimating accuracy estimate
-AccuracyEstimate <- profileAccuracyEstimate(LocusProfile = eveLocusChip,
-    predictedProfile = chipProfile, occupancyProfileParameters = OPP)
+
+
 #Plotting Profile
 plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
     setSequence=eveLocus,
-    profileAccuracy = AccuracyEstimate[[1]][[1]],
     chipProfile = eveLocusChip[[1]],
-    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
     DNAAccessibility = Access,
+    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
     occupancyProfileParameters = OPP,
     geneRef =geneRef)
+
+## Changing graphical Parameters
+
+#### In this examples ####
+### predictedProfile will be reduce
+### chipProfile will be blue
+### and DNAAccessibility will be green
+plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
+    setSequence=eveLocus,
+    chipProfile = eveLocusChip[[1]],
+    DNAAccessibility = Access,
+    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
+    occupancyProfileParameters = OPP,
+    geneRef =geneRef,col=c("red","blue","green"))
+
+### If name is specified
+plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
+    setSequence=eveLocus,
+    chipProfile = eveLocusChip[[1]],
+    DNAAccessibility = Access,
+    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
+    occupancyProfileParameters = OPP,
+    geneRef =geneRef,col=c("DNAAccessibility"="red","blue","green"))
+
 }
 }

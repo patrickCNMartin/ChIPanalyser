@@ -67,11 +67,13 @@ the different functions. All data is derived from real biological data
 in *Drosophila melanogaster* (The *Drosophila melanogaster*
 genome can be found as a `BSgenome`).
 
-```{r, eval=TRUE, warnings = FALSE, echo=TRUE}
+```{r, eval=TRUE, warnings = FALSE, echo=TRUE,message=FALSE}
+
 library(ChIPanalyser)
 
 #Load data
 data(ChIPanalyserData)
+
 
 # Loading DNASequenceSet from BSgenome object
 if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
@@ -79,6 +81,7 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
     biocLite("BSgenome.Dmelanogaster.UCSC.dm3")
     }
 library(BSgenome.Dmelanogaster.UCSC.dm3)
+
 DNASequenceSet <-getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
 
 
@@ -107,12 +110,12 @@ Most PFM's downloadable online will come in a text file
 these files to usable objects within the package.
 * `Access` is a `GRanges` object containing accessible DNA for
 the sequence above.
-* `geneRef` is list of `GRanges` containing genetic information
+* `geneRef` is a `GRanges` containing genetic information
 (exon, intron, 3'UTR, 5'UTR) for the sequence above.
 * `eveLocus` is a `GRanges` object with genomic postion for the eve strip
 locus in *Drosophila melanogaster*.
-* `eveLocusChip` is list containing real ChIP-seq data
-(normalised to each base pair) of the eve strip locus in
+* `eveLocusChip` is a data frame with ChIP score in the format of a simple
+bed file ( 4 columns : chromosome, start, end and score)
 *Drosophila melanogaster*.
 
 This section  presents a quick work flow. For details on the work flow and
@@ -120,9 +123,10 @@ objects, see section **Work Flow - Full Guide**
 
 ## Quick Start
 
-### Step 1 - Building Data objects
+### Step 1 - Building Data objects and Pre-processing ChIP data
 
-The first step is to set up your data storing objects. These objects
+The first step is to set up your data storing objects and extract normalised
+ChIP scores at loci of interest. These objects
 will automatically compute Position Weight Matrix from a Position
 Frequency Matrix, and Base Pair Frequency from a DNAStringSet.
 The values that are provided in this example are extracted
@@ -154,6 +158,12 @@ OPP <- occupancyProfileParameters(ploidy= 2,
     maxSignal = 1.847,
     backgroundSignal = 0.02550997)
 OPP
+
+## Extracting ChIP score
+eveLocusChip<-processingChIPseq(eveLocusChip,eveLocus,cores=1)
+str(eveLocusChip)
+eveLocusChip<-eveLocusChip[[1]]
+names(eveLocusChip)<-"eve"
 ```
 
 ### Step 2 - Optimal Parameters
@@ -165,7 +175,9 @@ we suggest to use `computeOptimal`.
 Values that should be tested for `ScalingFactorPWM` and for
 `boundMolecules` should be provided by user as described above.
 If these values are not provided (default value OR only one value
-for each parameter), then they will be assigned internally.
+for each parameter), then they will be assigned internally. ChIPanalyser also
+has multi-core support. If you are using large genomes, using multiple cores
+will significantly decrease computational time.
 The internal values are the following:
 
 ```{r,eval=FALSE}
@@ -191,7 +203,8 @@ optimalParam <- computeOptimal(DNASequenceSet = DNASequenceSet,
     DNAAccessibility = Access,
     occupancyProfileParameters = OPP,
     parameter = "all",
-    peakMethod="moving_kernel")
+    peakMethod="moving_kernel",
+    cores=1)
 optimalParam
 
 ```
@@ -205,12 +218,13 @@ more magic to it. In the following steps we will describe each of the functions.
 
 ### Step 3 - Genome Wide Scoring
 
-Computing Genome Wide metrics that will be used further down the line.
+Computing Genome Wide metrics that will be used further down the line. It is
+possible to set a higher number of cores to decrease computational time.
 
 ```{r, eval=TRUE, warnings = FALSE}
 
 genomeWide <- computeGenomeWidePWMScore(DNASequenceSet=DNASequenceSet,
-    genomicProfileParameters=GPP, DNAAccessibility = Access)
+    genomicProfileParameters=GPP, DNAAccessibility = Access,cores=1)
 genomeWide
 ```
 
@@ -225,13 +239,18 @@ Once genome wide scores have been computed, the `genomeWide` object
 (previously computed) should be parsed to the next function. The next
 function will compute sites above the assigned threshold (see below) for
 a given locus (or set of loci). If no Locus is provided then the whole
-genome will be considered.
+genome will be considered. It is possible to set a higher number of
+cores to decrease computational time.
+
+**It is important to set names to your setSequence object (see below). However
+if no names are supplied, names will be set internally. We recommend to set
+names yourself to make your analysis easier to keep track of.**
 
 
 ```{r,eval=TRUE, warnings = FALSE}
 SitesAboveThreshold <- computePWMScore(DNASequenceSet=DNASequenceSet,
     genomicProfileParameters=genomeWide,
-    setSequence=eveLocus, DNAAccessibility = Access)
+    setSequence=eveLocus, DNAAccessibility = Access,cores=1)
 SitesAboveThreshold
 ```
 
@@ -307,14 +326,15 @@ plotOptimalHeatMaps(optimalParam, parameter="all")
 
 ```{r, eval=TRUE, warnings = FALSE, fig.width=10, fig.height=6}
 # Plotting occupancy Profile
+##
+
 plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
     setSequence=eveLocus,
-    profileAccuracy = AccuracyEstimate[[1]][[1]],
     chipProfile = eveLocusChip[[1]],
-    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
     DNAAccessibility = Access,
+    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
     occupancyProfileParameters = OPP,
-    geneRef = geneRef)
+    geneRef =geneRef)
 ```
 
 
@@ -871,6 +891,30 @@ package (with a little bit more magic to it), we will overview a simple
 analysis work flow first and finish with `computeOptimal` function and
 its associated plotting function `plotOptimalHeatMaps`.
 
+## ChIP Score extraction.
+
+In the case of both computeOptimal and AccuracyEstimate real ChIP data is
+required. The format of this data should be in the format of a named list of
+normalised ChIP scores at a base-pair level at the loci of interest.
+ChIPanalyser provides a ChIP score extraction function.
+
+```{r, eval=FALSE}
+processingChIPseq(profile,loci=NULL,reduce=NULL,
+    occupancyProfileParameters=NULL,peaks=NULL,
+    Access=NULL,cores=1)
+
+```
+As input, this functions takes `profile` a path to file containing ChIP
+score (multi format support - see `import` from the rtracklayer package),
+`GRanges` containing ChIP scores or a `data.frame`.
+
+The `loci` argument is a GRanges of the loci of interest. If none are supplied,
+a set of Sequence will be built  
+
+If No loci of interest are selected or a `GRanges` containing a large amount of
+ranges, it
+
+
 ## Genome Wide Scoring
 
 In order to score the entire genome (or the accessible genome),
@@ -878,12 +922,13 @@ it is possible to use the `computeGenomeWidePWMScore` function.
 The output of this function will be influenced by the value assigned
 to `lambda`. If more than one value was assigned to the scaling factor,
 parameters dependant on lambda will be updated accordingly
-(computed for each value of lambda).
+(computed for each value of lambda). It is possible to run this functions and
+make use of multiple cores in order to decrease computational time.
 The arguments of the function are the following :
 
 ```{r, eval=F}
 computeGenomeWidePWMScore(DNASequenceSet, genomicProfileParameters,
-    DNAAccessibility = NULL,  GenomeWide = TRUE, verbose = TRUE)
+    DNAAccessibility = NULL,  GenomeWide = TRUE,cores=1, verbose = TRUE)
 ```
 
 ### Input Data - Genome Wide scoring
@@ -925,8 +970,9 @@ containing accessible DNA sites.
 # DNA accessibility
 Access
 ```
-Finally, `verbose` will determine if
-progress messages should be printed in the console.
+`verbose` will determine if progress messages should be printed in the console
+and cores will determine the number of cores that will be used to compute
+genome wide metrics.
 
 ### computeGenomeWidePWMScore
 
@@ -936,14 +982,14 @@ As an example of `computeGenomeWidePWMScore` usage:
 # With DNAAccessibility
 
 GenomeWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GPP, DNAAccessibility = Access)
+    genomicProfileParameters = GPP, DNAAccessibility = Access,cores=1)
 
 GenomeWide
 
 # Without DNA accessibility
 
 GenomeWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GPP)
+    genomicProfileParameters = GPP,cores=1)
 GenomeWide
 ```
 
@@ -955,11 +1001,13 @@ is to extract sites above threshold
 The `computePWMScore` function will score the genome and extract sites
 above a local threshold
 (dependant on `PWMThreshold`, `maxPWMScore` and `minPWMScore`).
+It is possible to run this functions and
+make use of multiple cores in order to decrease computational time.
 The arguments of this functions are the following:
 
 ```{r, eval=FALSE}
 computePWMScore(DNASequenceSet, genomicProfileParameter,
-    setSequence = NULL, DNAAccessibility = NULL,verbose = TRUE)
+    setSequence = NULL, DNAAccessibility = NULL, cores=1 ,verbose = TRUE)
 ```
 
 ### Input Data - Sites Above threshold
@@ -978,8 +1026,12 @@ described (`verbose` plays the same role as previously described).
 eveLocus
 ```
 
-An important aspect to mention, is that it is imperative you name your
-loci of interest (not to be confused with `seqnames`).
+An important aspect to mention, is that it is recommended you name your
+loci of interest (not to be confused with `seqnames`). If no names are supplied
+they will be named internally following the format:
+
+* ChromosomeName_startOfRange..endOfRange
+
 If you are unfamiliar with GRanges, the following examples demonstrates
 naming in the context of ChIPAnalyser. We recommend getting acquainted
 with GenomicRanges as many aspect of ChIPAnalyser require the use of GRanges.
@@ -1005,14 +1057,14 @@ To compute PWM Scores at sites above threshold:
 
 PWMScores <- computePWMScore(DNASequenceSet = DNASequenceSet,
     genomicProfileParameters = GenomeWide,
-    setSequence = eveLocus, DNAAccessibility = Access)
+    setSequence = eveLocus, DNAAccessibility = Access,cores=1)
 PWMScores
 
 # Without DNA Accessibility
 
 PWMScores <- computePWMScore(DNASequenceSet = DNASequenceSet,
     genomicProfileParameters = GenomeWide,
-    setSequence = eveLocus)
+    setSequence = eveLocus,cores=1)
 PWMScores
 ```
 
@@ -1101,13 +1153,15 @@ The ultimate goal of ChIPAnalyser is to produce *ChIP-seq like* profile
 from occupancy data (from sites that display a high TF occupancy).
 `computeChipProfile` creates *ChIP-seq like* profiles from occupancy
 data by smoothing occupancy *profiles* and mimicking real ChIP-seq data.
+It is possible to run this functions and
+make use of multiple cores in order to decrease computational time.
 The arguments of `computeChipProfile` are the following:
 
 ```{r, eval=FALSE}
 computeChipProfile( setSequence ,
     occupancy, occupancyProfileParameters = NULL, norm = TRUE,
     method = c("moving_kernel","truncated_kernel","exact"),
-    peakSignificantThreshold= NULL,
+    peakSignificantThreshold= NULL,cores=1
     verbose = TRUE)
 ```
 
@@ -1146,7 +1200,7 @@ To generate a ChIP-seq like profile:
 
 ```{r, eval=FALSE, warnings = FALSE, echo=TRUE}
 chipProfile <- computeChipProfile(setSequence = eveLocus,
-    occupancy = Occupancy,occupancyProfileParameters = OPP)
+    occupancy = Occupancy,occupancyProfileParameters = OPP,cores=1)
 chipProfile
 ```
 The output of this functions is slightly different as it returns a named
@@ -1258,6 +1312,8 @@ highest theta depending on which parameter was selected. As a reminder,
 theta is an in house metric representing a modified ratio of correlation
 over MSE ( extreme values are replaced by threshold). The goal is to find
 the sweet spot between high correlation and low MSE.
+It is possible to run this functions and
+make use of multiple cores in order to decrease computational time.
 Values that should be tested for `ScalingFactorPWM` and for
 `boundMolecules` should be provided by user.
 If these values are not provided (default value and only one value
@@ -1282,7 +1338,8 @@ computeOptimal(DNASequenceSet,
     DNAAccessibility = NULL,
     occupancyProfileParameters = NULL,
     parameter = "all",
-    peakMethod="moving_kernel")
+    peakMethod="moving_kernel"
+    cores=1)
 ```
 **Please note that this functions will take some time to complete.
 Do not be alarmed if it seems to have stalled.**
@@ -1316,6 +1373,9 @@ peaks.
 and `exact` will not approximate peaks. These methods represent different
 way of computing and/or approximating ChIP-seq peaks.
 
+Finally, cores describes the number of cores that will be used to compute the
+optimal set of parameters.
+
 
 ### computeOptimal
 
@@ -1328,7 +1388,8 @@ optimalParam <- computeOptimal(DNASequenceSet = DNASequenceSet,
     setSequence = eveLocus,
     DNAAccessibility = Access,
     occupancyProfileParameters = OPP,
-    parameter = "all")
+    parameter = "all",
+    cores=1)
 optimalParam
 ```
 
@@ -1378,19 +1439,19 @@ In the case of MSE the boxed tile represents the lowest Mean Squared Error.
 ## Plotting Profiles
 
 `ChIPAnalyser` produces ChIP-seq like profiles. It is possible to plot these
-profiles but also to add a variety of features to these plots.
+profiles but also to add a variety of features to these plots as well
+graphical parameter parsing.
 `plotOccupancyProfile` takes care of plotting with the following arguments:
 
 ```{r,eval=FALSE, fig.width=4, fig.width=10, fig.height=3}
 plotOccupancyProfile <- function(predictedProfile,
     setSequence,
-    profileAccuracy = NULL,
     chipProfile = NULL,
-    occupancy = NULL,
-    PWM=FALSE,
     DNAAccessibility = NULL,
+    occupancy = NULL,
+    PWM=FALSE,    
     occupancyProfileParameters = NULL,
-    geneRef = NULL)
+    geneRef = NULL,axis=TRUE,...)
 ```
 
 
@@ -1427,6 +1488,9 @@ As a reminder, stepSize default value is set at 10.
 (3'UTR, 5'UTR, exons, intron and enhancers). Each element of this list,
 is a GRanges containing the information regarding
 3'UTR, 5'UTR, exons, intron and enhancers.
+* `axis` determine if the axes should be included
+* `...`   Any other graphical Parameter of the following : col, density, border,
+lty, lwd, cex, cex.axis, xlab, ylab, xlim, ylim, las and axislables.
 
 As this object has not yet be described, `geneRef` should come in a
 similar format as the following:
@@ -1444,10 +1508,9 @@ As an example:
 ```{r, eval=FALSE, warnings = FALSE, echo=TRUE}
 plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
     setSequence=eveLocus,
-    profileAccuracy = AccuracyEstimate[[1]][[1]],
     chipProfile = eveLocusChip[[1]],
-    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
     DNAAccessibility = Access,
+    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
     occupancyProfileParameters = OPP,
     geneRef =geneRef)
 ```

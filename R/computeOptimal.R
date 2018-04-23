@@ -1,7 +1,7 @@
 computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
     LocusProfile,setSequence, DNAAccessibility = NULL,
     occupancyProfileParameters = NULL,parameter = "all",
-    peakMethod="moving_kernel"){
+    peakMethod="moving_kernel",cores=1){
     #validity checking
 
 
@@ -42,7 +42,7 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
     message("Computing Genome Wide PWM Score")
     GenomeWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
         genomicProfileParameters = genomicProfileParameters,
-        DNAAccessibility = DNAAccessibility,
+        DNAAccessibility = DNAAccessibility,cores=cores,
         verbose = FALSE)
 
     message("Computing PWM Score at Loci & Extracting Sites Above Threshold")
@@ -56,17 +56,17 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
         verbose = FALSE)
 
     message("Computing ChIP-seq-like Profile")
-    PedictedProfile <- computeChipProfile(setSequence = setSequence,
+    PredictedProfile <- computeChipProfile(setSequence = setSequence,
         occupancy = Occupancy,
         occupancyProfileParameters = occupancyProfileParameters,
         norm = TRUE ,method=peakMethod, peakSignificantThreshold= NULL,
-        verbose = FALSE)
+        cores=cores,verbose = FALSE)
 
     message("Computing Accuracy of Profile")
     ProfileAccuracy <- profileAccuracyEstimate(LocusProfile = LocusProfile,
-        predictedProfile = PedictedProfile,
+        predictedProfile = PredictedProfile,
         occupancyProfileParameters = occupancyProfileParameters)
-
+#browser()
 
     #Extracting Optimal matrix from Profile AccuracyEstimate
     AllMatrix <- vector("list",3)
@@ -116,6 +116,7 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
         optimalParam <- AllParam
         optimalMatrix <- AllMatrix
     }
+    #,Occupancy,PredictedProfile,ProfileAccuracy)
     return(list("Optimal Parameters" = optimalParam,
     "Optimal Matrix" = optimalMatrix,"Parameter" = parameter))
 

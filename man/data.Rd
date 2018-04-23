@@ -27,8 +27,8 @@ loci, genetic information, DNA accessibility data and ChIP-seq data.
     containing a locus of interest.
     In this case \emph{eve strip Locus} on
     chromosome 2R in \emph{Drosophila melanogaster}}
-    \item{\code{eveLocusChip}}{is a named list containing
-    real ChIP-seq data (normalised to each base pair) of the eve strip
+    \item{\code{eveLocusChip}}{is a data frame containing ChIP score similar
+    to a bed format style of the eve strip
     locus in \emph{Drosophila melanogaster}. }
     \item{\code{geneRef}}{is a \code{\link[GenomicRanges]{GRanges}}
     containing genetic information (exon, intron, 3'UTR, 5'UTR)

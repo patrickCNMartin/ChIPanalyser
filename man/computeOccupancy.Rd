@@ -13,7 +13,8 @@ This function will compute occupancy using the
 values assigned to each variable.
 }
 \usage{
-computeOccupancy(AllSitesPWMScore, occupancyProfileParameters = NULL,
+computeOccupancy(AllSitesPWMScore,DNAAccessibility=NULL,
+    occupancyProfileParameters = NULL,
     norm = TRUE, verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -23,6 +24,11 @@ computeOccupancy(AllSitesPWMScore, occupancyProfileParameters = NULL,
     object resulting from \code{\link{computePWMScore}}.
     IT is important to use this resulting object as the occuapancy will only be
     computed for sites above a threshold.
+    }
+    \item{DNAAccessibility}{
+    \code{DNAAccessibility} is a GRanges object containing Ranges of accesible
+    sequences. This object ccould also contain a DNA affinity score as a
+    metadata column.
     }
     \item{occupancyProfileParameters}{
     \code{occupancyProfileParameters} is a

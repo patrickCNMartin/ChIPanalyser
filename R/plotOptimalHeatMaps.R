@@ -42,7 +42,7 @@ plotOptimalHeatMaps<-function(optimalParam,parameter="all",Contour=TRUE){
 
     xlabs <- boundMolecules
     ylabs <- lambdas
-    contLev <- round(mean(c(length(boundMolecules), length(lambdas))))
+    contLev <- round(min(c(length(boundMolecules), length(lambdas))))
     selectedColor <- "gray20"
     optimumColor <- "darkolivegreen3"
 
@@ -65,16 +65,18 @@ plotOptimalHeatMaps<-function(optimalParam,parameter="all",Contour=TRUE){
     ## Plotting Correlation Heat maps
     if(parameter=="meanCorr"){
         par(cex=0.6)
-        par(mar=c(4, 4, 4, 1)+0.1)
+        par(mar=c(6,6.5,6, 1)+0.1)
         graphics::image(1:length(xlabs),1:length(ylabs),t(optimalMatrix),
             axes = FALSE,
-            xlab="Number of bound molecules",
-            ylab=expression(lambda),col=correlationColors)
-        title(main="Correlation",cex.main=1.6)
+            xlab=" ", ylab=" ",
+            col=correlationColors, cex.lab=3.5)
+        title(main="Correlation",cex.main=4.3)
+        title( ylab="Scaling Factor", line=4.3, cex.lab=2.5)
+        title(xlab="Number of Bound Molecules",line=4, cex.lab=2.5)
         for(textXId in 1:length(xlabs)){
             for(textYId in 1:length(ylabs)){
                 text(textXId,textYId,signif(optimalMatrix[textYId,textXId],3),
-                cex=0.7)
+                cex=1.2)
             }
         }
         if(Contour){
@@ -85,9 +87,9 @@ plotOptimalHeatMaps<-function(optimalParam,parameter="all",Contour=TRUE){
         maxCorr <- which(optimalMatrix==max(optimalMatrix), arr.ind=TRUE)
         rect(maxCorr[,2]-0.5,maxCorr[,1]-0.5,maxCorr[,2]+
             0.5,maxCorr[,1] + 0.5, border=corrMax, lwd=2)
-        axis(BELOW<-1, at=1:length(xlabs), labels=xlabs, cex.axis=0.7)
+        axis(BELOW<-1, at=1:length(xlabs), labels=xlabs, cex.axis=2)
         axis(LEFT <-2, at=1:length(ylabs), labels=ylabs,
-            las= HORIZONTAL<-1,cex.axis=0.7)
+            las= HORIZONTAL<-1,cex.axis=2)
 
     }
 
@@ -95,16 +97,18 @@ plotOptimalHeatMaps<-function(optimalParam,parameter="all",Contour=TRUE){
     ## Plotting MSE heat Maps
     if(parameter=="meanMSE"){
         par(cex=0.6)
-        par(mar=c(4, 4, 4, 1)+0.1)
+        par(mar=c(6,6.5,6, 1)+0.1)
         graphics::image(1:length(xlabs),1:length(ylabs),
             t(log10(optimalMatrix)),
-            axes = FALSE, xlab="Number of bound molecules",
-            ylab=expression(lambda),col=MSEColors)
-        title(main="Mean Squared Error",cex.main=1.6)
+            axes = FALSE, xlab=" ",
+            ylab=" ",col=MSEColors,cex.lab=3.5)
+        title(main="Mean Squared Error",cex.main=4.3)
+        title( ylab="Scaling Factor", line=4.3, cex.lab=2.5)
+        title(xlab="Number of Bound Molecules",line=4, cex.lab=2.5)
         for(textXId in 1:length(xlabs)){
             for(textYId in 1:length(ylabs)){
                 text(textXId,textYId,signif(optimalMatrix[textYId,textXId],3),
-                cex=0.7)
+                cex=1.2)
             }
         }
         if(Contour){
@@ -112,12 +116,12 @@ plotOptimalHeatMaps<-function(optimalParam,parameter="all",Contour=TRUE){
             optimalMatrix*1000)),nlevels=contLev, drawlabels=FALSE,
             add = TRUE, col = "black", lwd=1, labcex = 1.0)
         }
-        minMSE <- which(optimalMatrix==max(optimalMatrix), arr.ind=TRUE)
+        minMSE <- which(optimalMatrix==min(optimalMatrix), arr.ind=TRUE)
         rect(minMSE[,2]-0.5,minMSE[,1]-0.5,minMSE[,2]+0.5,minMSE[,1]+0.5,
             border=mseMin, lwd=2)
-        axis(BELOW<-1, at=1:length(xlabs), labels=xlabs, cex.axis=0.7)
+        axis(BELOW<-1, at=1:length(xlabs), labels=xlabs, cex.axis=2)
         axis(LEFT <-2, at=1:length(ylabs), labels=ylabs,
-        las= HORIZONTAL<-1,cex.axis=0.7)
+        las= HORIZONTAL<-1,cex.axis=2)
 
     }
 

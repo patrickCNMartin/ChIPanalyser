@@ -11,7 +11,7 @@ It is possible to restrict the scoring of the genome to only Accessible DNA.
 }
 \usage{
 computeGenomeWidePWMScore(DNASequenceSet, genomicProfileParameters,
-    DNAAccessibility = NULL, verbose = TRUE)
+    DNAAccessibility = NULL, cores=1,verbose = TRUE)
 }
 
 \arguments{
@@ -35,7 +35,10 @@ computeGenomeWidePWMScore(DNASequenceSet, genomicProfileParameters,
     containing Accessible DNA. If provided, the score will be score only on
     accesible DNA instead of genome wide.
     }
-
+    \item{cores}{
+    \code{cores} is the number of cores that will be used to compute
+    Genome Wide PWM Scores.
+    }
     \item{verbose}{
     \code{verbose} is a logical value. If TRUE, progress messages will be
     displayed in console. If FALSE, no progress message will be displayed.

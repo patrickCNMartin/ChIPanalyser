@@ -3,7 +3,7 @@
 #######################################################################
 
 
-computeOccupancy <- function(AllSitesPWMScore,
+computeOccupancy <- function(AllSitesPWMScore, DNAAccessibility=NULL,
     occupancyProfileParameters=NULL,
     norm=TRUE,verbose=TRUE) {
     # Validity checking
@@ -44,11 +44,10 @@ computeOccupancy <- function(AllSitesPWMScore,
     # Computing Occupancy at sites higher than threshold
     MultiParam <- vector("list", (length(lambda)*length(boundMolecules)))
     PWMScore <- vector("list", length(PWMGRList))
-    # Extracting names of regions
-    name <- c()
-    for(i in seq_along(PWMGRList)){
-        name <- c(name,rep(names(PWMGRList)[[i]],length(PWMGRList[[i]])))
-    }
+
+    name<-rep(names(PWMGRList),times=sapply(PWMGRList, length))
+
+    # DNAAccessibility if not continuous Data
 
     Occupancy <- vector("list",length(PWMGRList))
     names(Occupancy) <- names(PWMGRList)
@@ -65,14 +64,18 @@ computeOccupancy <- function(AllSitesPWMScore,
     #Computing Occupancy
     for(k in seq_along(lambda)){
         for(j in seq_along(boundMolecules)){
-            PWMScore <- as.vector(as.matrix(mcols(unlist(PWMGRList))))
+
+            PWMScore <- unlist(PWMGRList)$PWMScore
+
+            Access <- unlist(PWMGRList)$DNAAccessibility
+
+
             Occupancy <- rep(0,length(PWMScore))
-            Occupancy <- (boundMolecules[j]*exp((1/lambda[k])*PWMScore))/
-                (boundMolecules[j]*exp((1/lambda[k])*PWMScore) +
+            Occupancy <- (Access*boundMolecules[j]*exp((1/lambda[k])*PWMScore))/
+                (Access*boundMolecules[j]*exp((1/lambda[k])*PWMScore) +
                 DNALength*ploidy*averageExpPWMScore[k])
 
-            Occupancy <- backgroundSignal + Occupancy*
-                (maxSignal-backgroundSignal)
+            Occupancy<-backgroundSignal + Occupancy*(maxSignal-backgroundSignal)
     # Normalising Ocupancy Signal
             if(norm == TRUE){
                 maxOccupancy <- max(c(maxSignal,max(Occupancy)))
@@ -82,7 +85,9 @@ computeOccupancy <- function(AllSitesPWMScore,
                 ZeroBackground <- backgroundSignal
             }
 
+
             buffer <- unlist(PWMGRList)
+
             buffer$Occupancy <- Occupancy
     # Extracting and pasting names of Parameters
             names(buffer) <- name

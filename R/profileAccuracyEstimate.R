@@ -35,9 +35,13 @@ profileAccuracyEstimate <- function(LocusProfile,predictedProfile,
             AccuracyEstimate[[i]][[j]]<-as.numeric(as.matrix(
                 mcols(predictedProfile[[i]][[j]])))
 
-            correlation<-cor(LocusProfile[[j]][ProfileSub],
-                AccuracyEstimate[[i]][[j]])
-
+            if((sd(LocusProfile[[j]][ProfileSub],na.rm=TRUE)==0) |
+               (sd(AccuracyEstimate[[i]][[j]],na.rm=TRUE)==0)){
+                correlation <-0
+            } else {
+                correlation<-cor(na.omit(LocusProfile[[j]][ProfileSub]),
+            na.omit(AccuracyEstimate[[i]][[j]]),method="spearman")
+            }
             MSE<-sum((LocusProfile[[j]][ProfileSub]-
                 AccuracyEstimate[[i]][[j]])^2)/
                 length(LocusProfile[[j]][ProfileSub])

@@ -11,7 +11,7 @@ Occupancy data is computed using \code{\link{computeOccupancy}}.
 \usage{
 computeChipProfile(setSequence, occupancy, occupancyProfileParameters = NULL,
     norm = TRUE, method = c("moving_kernel","truncated_kernel","exact"),
-    peakSignificantThreshold= NULL, verbose = TRUE)
+    peakSignificantThreshold= NULL,cores=1, verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -63,6 +63,10 @@ computeChipProfile(setSequence, occupancy, occupancyProfileParameters = NULL,
     function. This just means that either the value is provided bu user with
     the appropriate method. If not, the default will be selected depending
     on the method selected.
+    }
+    \item{cores}{
+    \code{cores} is the number of cores that will be used to compute
+    ChIP profiles.
     }
     \item{verbose}{
     \code{verbose} is a logical value. If TRUE, progress messages will be

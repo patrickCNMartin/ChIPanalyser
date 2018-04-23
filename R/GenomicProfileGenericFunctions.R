@@ -200,7 +200,7 @@
 
 
 
-.scoreDNAStringSet <- function(PWM, DNASequenceSet, strand="+",
+.scoreDNAStringSet <- function(PWM,DNASequenceSet, strand="+",
     strandRule="max"){
     scoreSet <- vector("list", length(DNASequenceSet))
     IndexPositive <- vector("list",length(DNASequenceSet))
@@ -334,10 +334,10 @@
     if(length(object)>1){
     BPFrequency <- apply((alphabetFrequency(object,baseOnly=TRUE)[,1:4]),
     2,sum)
-    BPFrequency <- BPFrequency/sum(BPFrequency)
+    BPFrequency <- BPFrequency/sum(as.numeric(BPFrequency))
     } else {
     BPFrequency <- (alphabetFrequency(object,baseOnly=TRUE)[,1:4])
-    BPFrequency <- BPFrequency/sum(BPFrequency)
+    BPFrequency <- BPFrequency/sum(as.numeric(BPFrequency))
     }
     return(BPFrequency)
 }
@@ -521,10 +521,11 @@ searchSites <- function(Sites,ScalingFactor="all",
 
         }
 
-        if(length(buffer)>1){
+        if(length(buffer)>=1){
         bufferSites <- bufferSites[buffer]
         }
     }
+
     #Search for boundMolecules
     buffer <- c()
     if(all(BoundMolecules=="all")){
@@ -533,12 +534,13 @@ searchSites <- function(Sites,ScalingFactor="all",
     } else {
         localNames <- sapply(strsplit(names(bufferSites),bound),"[[",2)
         for( j in seq_along(BoundMolecules)){
-            buffer <- c(buffer, grep(paste0("^",BoundMolecules[j],"$"),
-            localNames))
+            buffer <- c(buffer, grep(paste0("^",as.character(as.integer(
+            BoundMolecules[j])),"$"),
+            as.character(as.integer(localNames))))
 
         }
-
-        if(length(buffer)>1){
+#browser()
+        if(length(buffer)>=1){
             bufferSites <- bufferSites[buffer]
         }
     }
@@ -563,3 +565,15 @@ searchSites <- function(Sites,ScalingFactor="all",
 
 }
 
+### Extracting Non Accesible DNA
+.AccessExtract<-function(subject,query){
+    setLocal<-vector("list",length(subject))
+
+    for(i in seq_along(subject)){
+        localIntersect<-setdiff(subject[i], query)
+        setLocal[[i]]<-data.frame("chr"=as.character(seqnames(localIntersect)),
+        "start"=start(localIntersect), "end"=end(localIntersect))
+    }
+    names(setLocal)<-names(subject)
+    return(setLocal)
+}

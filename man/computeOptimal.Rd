@@ -16,7 +16,7 @@ ChIP-seq-like profile and a real ChIP-seq profile for a given loci.
 computeOptimal(DNASequenceSet, genomicProfileParameters, LocusProfile,
     setSequence, DNAAccessibility = NULL,
     occupancyProfileParameters = NULL, parameter = "all",
-    peakMethod="moving_kernel")
+    peakMethod="moving_kernel",cores=1)
 }
 
 \arguments{
@@ -67,6 +67,10 @@ computeOptimal(DNASequenceSet, genomicProfileParameters, LocusProfile,
     however this method does not require Rcpp. If set to exact, the peaks will
     not be approximated.
 
+    }
+    \item{cores}{
+    \code{cores} is the number cores that will be used to compute optimal
+    set of parameters.
     }
 }
 \details{

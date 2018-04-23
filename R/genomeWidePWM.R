@@ -33,12 +33,44 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
     strandRule <- strandRule(genomicProfileParameters)
 
     # Extracting DNA Accessibility
+    #if(!is.null(DNAAccessibility)){
+    #DNASequenceSet <- getSeq(DNASequenceSet,DNAAccessibility)
+    #names(DNASequenceSet) <- seqnames(DNAAccessibility)
+    #DNASequenceSet <- DNASequenceSet[which(sapply(DNASequenceSet,length) >
+    #    ncol(PWMMat))]
+    #}
+
+    # Extracting DNA Accessibility in parallel
     if(!is.null(DNAAccessibility)){
-    DNASequenceSet <- getSeq(DNASequenceSet,DNAAccessibility)
-    names(DNASequenceSet) <- seqnames(DNAAccessibility)
-    DNASequenceSet <- DNASequenceSet[which(sapply(DNASequenceSet,length) >
+        ## Factor correction  and ID match
+        DNASequenceSet<-DNASequenceSet[unique(match(
+        as.character(seqnames(DNAAccessibility)), names(DNASequenceSet)))]
+        ## Split by Chromosome
+        DNA<-split(DNASequenceSet,names(DNASequenceSet))
+        Access<-split(DNAAccessibility, seqnames(DNAAccessibility))
+
+        ## parallel Intersect for large genomes
+        DNASequenceSet<-parallel::mcmapply(.internalDNASequenceFromAccess,
+        DNA=DNA,Access=Access,mc.cores=cores)
+
+
+        # Rebuilding DNASequenceSet
+        if(length(DNASequenceSet)>1){
+            buffer<-DNASequenceSet[[1]]
+            for(sub in 2:length(DNASequenceSet)){
+                buffer<-c(buffer,DNASequenceSet[[sub]])
+            }
+            DNASequenceSet<-buffer
+        } else {
+            DNASequenceSet<-DNASequenceSet[[1]]
+        }
+
+        DNASequenceSet <- DNASequenceSet[which(width(DNASequenceSet) >
         ncol(PWMMat))]
+
     }
+    # Computing DNA sequance Length
+    DNASequenceLength <- sum(width(DNASequenceSet))
 
     # Progress Messages when required.
     if(verbose){
@@ -51,23 +83,18 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
     }
 
 
-    ### This section could be re worked for longer genomes?
-    ### Original Concept seems to be ok
-    #DNASequenceSet <- .splitDNASequenceSet(DNASequenceSet,cores)
+    ### Custom DNSStringSet Split based on number of cores
+
+    DNASequenceSet <- .splitDNARanges(DNASequenceSet,cores)
+
+    ### Computing PWM Score parallel
+    DNASequenceScoreSetTotalAcces <- parallel::mclapply(DNASequenceSet,
+      .scoreDNAStringSet,PWM=PWMMat,
+       strand=strand,strandRule=strandRule,mc.cores=cores)
 
 
-    #DNASequenceScoreSetTotalAcces <- parallel::mclapply(DNASequenceSet,
-      #  .internalScoreDNAStringSet,PWM=PWMMat,
-        #strand=strand,strandRule=strandRule,mc.cores=cores)
-  #  DNASequenceScoreSetTotalAcces <- unlist(DNASequenceScoreSetTotalAcces)
-
-
-
-    # Computing PWM Score
-    DNASequenceScoreSetTotalAcces <- .scoreDNAStringSet(PWMMat,
-        DNASequenceSet,strand = strand,strandRule = strandRule)
-
-    DNASequenceScoreSetTotalAcces <- DNASequenceScoreSetTotalAcces[[1]]
+    DNASequenceScoreSetTotalAcces <- unlist(lapply(
+    DNASequenceScoreSetTotalAcces,"[[",1))
 
     #Message printing when required
     if(verbose){
@@ -75,23 +102,21 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
     }
 
     # Compute mean waiting time, max PWM score and min PWM score
-    # Computing DNA sequance Length
-    DNASequenceLength <- sum(as.numeric(sapply(DNASequenceScoreSetTotalAcces,length)))
+
     averageExpPWMScore <- rep(0,length(lambda))
-    sumExpPWMScoreLocal <- vector("list", length(lambda))
+    sumExpPWMScoreLocal <- rep(0,length(lambda))
 
     ## This is also a limiting part. parallel as well?
     ## Clean your parallel R script and comment it
-  
+
     for(i in seq_along(lambda)){
-        sumExpPWMScoreLocal[[i]] <- sapply(lapply(
-            lapply(DNASequenceScoreSetTotalAcces,"*", (1/lambda[i])),exp),sum)
-        averageExpPWMScore[i] <- sum(
-            sumExpPWMScoreLocal[[i]])/DNASequenceLength
+        sumExpPWMScoreLocal[i] <- sum(exp(DNASequenceScoreSetTotalAcces *
+        (1/lambda[i])))
+        averageExpPWMScore[i] <- sumExpPWMScoreLocal[i]/DNASequenceLength
     }
 
-    maxPWMScore <- max(unlist(lapply(DNASequenceScoreSetTotalAcces,max)))
-    minPWMScore <- min(unlist(lapply(DNASequenceScoreSetTotalAcces,min)))
+    maxPWMScore <- max(DNASequenceScoreSetTotalAcces)
+    minPWMScore <- min(DNASequenceScoreSetTotalAcces)
 
     #Updating GenomicProfileParameters object
     genomicProfileParameters <-.maxPWMScoreReplace(genomicProfileParameters,

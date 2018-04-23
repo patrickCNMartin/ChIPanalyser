@@ -24,8 +24,8 @@ setMethod(f="initialize",
             (class(BPFrequency) == "BSgenome" |
             class(BPFrequency) == "DNAStringSet")){
             BPFrequency<-.computeBPFrequency(BPFrequency)
-            }
-            if(!is.null(BPFrequency) & class(BPFrequency)=="vector") {
+            .Object@BPFrequency<-BPFrequency
+            } else if(!is.null(BPFrequency) & class(BPFrequency)=="vector") {
             NewBPFrequency<-BPFrequency
             .Object@BPFrequency<-NewBPFrequency
             validObject(.Object)

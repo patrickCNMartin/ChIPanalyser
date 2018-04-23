@@ -12,7 +12,13 @@ setMethod("show",
         message("\n","PFMFormat: ", object@PFMFormat,"\n")
         message("\n","PWM Scores at Sites higher than Threshold: \n")
         print(object@AllSitesAboveThreshold)
-        message("\n","No Accessible DNA at Loci:","\n",object@NoAccess)
+        message("\n","No Accessible DNA at Loci:","\n")
+        if(length(object@NoAccess)>20){
+            rem<-length(object@NoAccess) -20
+            message(head(object@NoAccess,20),"\n","\n",rem," Loci Omitted ")
+        }else {
+            message(object@NoAccess)
+        }
         message("\n","Genomic Profile Parameters:","\n")
         cat("Lambda:", object@ScalingFactorPWM,"\n", sep="\t")
         cat("BP Frequency:", object@BPFrequency,"\n",sep="\t")
