@@ -30,7 +30,7 @@ sequencing. This method generates a genome wide profile with peaks
 at sites of high TF occupancy. These experiments may be very costly and it
 would be interesting to be able to predict TF occupancy
 sites *in silico*. With this idea in mind, we present **ChIPanalyser** ,
-a R package developed in the effort of predicting Transcription factor binding.
+a R package developed in the effort of understanding Transcription factor binding.
 At the core of this package resides an approximation of statistical
 thermodynamcis as suggested by Zabet (Zabet et al. 2015).
 The statistical thermodynamcis framework proposed by Zabet offers a strong
@@ -65,7 +65,7 @@ this section will quickly demonstrate how to load example datasets
 stored in the package. This data represents a minimal workable examples for
 the different functions. All data is derived from real biological data
 in *Drosophila melanogaster* (The *Drosophila melanogaster*
-genome can be found as a `BSgenome`).
+genome can be found as a `BSgenome` ).
 
 ```{r, eval=TRUE, warnings = FALSE, echo=TRUE,message=FALSE}
 
@@ -100,41 +100,45 @@ DNASequenceSet,PFM,Access,geneRef, eveLocus, eveLocusChip.
 * `DNASequenceSet` is DNAStringSet extracted from the
 *Drosophila melanogaster* genome (BSgenome). It is advised to
 use a full genome sequence for this object.
+
 * `PFM` is a path to file. In this case, it is a Position Frequency Matrix
 derived from the Bicoid Transcription factor in *Drosophila melanogaster*.
-This PFM is in RAW format. Although it is possible to to directly
-use a PFM R object, we chose to use a path to a file for this example.
-Most PFM's downloadable online will come in a text file
+This PFM is in _raw_ format. Although it is possible to to directly
+use a PFM R matrix (see motifDB R package), we chose to use a path 
+to a file for this example.
+Most PFM's found online will come in a text file
 (with various formats: RAW, TRANSFAC, JASPAR).
 `ChIPanalyser` is capable of handling all these formats and parsing
 these files to usable objects within the package.
+
 * `Access` is a `GRanges` object containing accessible DNA for
 the sequence above.
+
 * `geneRef` is a `GRanges` containing genetic information
 (exon, intron, 3'UTR, 5'UTR) for the sequence above.
+
 * `eveLocus` is a `GRanges` object with genomic postion for the eve strip
 locus in *Drosophila melanogaster*.
+
 * `eveLocusChip` is a data frame with ChIP score in the format of a simple
-bed file ( 4 columns : chromosome, start, end and score)
-*Drosophila melanogaster*.
+bed file ( 4 columns : chromosome, start, end and score) for Bicoid 
+transcription factor.
+
+
+## Quick Start
 
 This section  presents a quick work flow. For details on the work flow and
 objects, see section **Work Flow - Full Guide**
 
-## Quick Start
-
 ### Step 1 - Building Data objects and Pre-processing ChIP data
 
 The first step is to set up your data storing objects and extract normalised
-ChIP scores at loci of interest. These objects
-will automatically compute Position Weight Matrix from a Position
-Frequency Matrix, and Base Pair Frequency from a DNAStringSet.
-The values that are provided in this example are extracted
-from real biological data.
+ChIP scores at loci of interest. When provided with a PFM, the 
+`genomicProfileParameters` object will automatically convert it to a PWM.
+The `occupancyProfileParameters` object requires parameters extracted from 
+ChIP data. If using the `processingChIPseq` function, the 
+`occupancyProfileParameters` will be generated internally. 
 
-NOTE:These values
-will differ depending on the source of the data and the data
-itself.
 
 ```{r,eval=TRUE, warnings = FALSE}
 # Building a genomicProfileParameters objects for data
@@ -159,11 +163,13 @@ OPP <- occupancyProfileParameters(ploidy= 2,
     backgroundSignal = 0.02550997)
 OPP
 
-## Extracting ChIP score
+## Extracting ChIP score 
 eveLocusChip<-processingChIPseq(eveLocusChip,eveLocus,cores=1)
 str(eveLocusChip)
+
+### Extracting occupancy profile parameters object built from ChIP data
+OPP<-eveLocusChip[[2]]
 eveLocusChip<-eveLocusChip[[1]]
-names(eveLocusChip)<-"eve"
 ```
 
 ### Step 2 - Optimal Parameters
@@ -242,9 +248,12 @@ a given locus (or set of loci). If no Locus is provided then the whole
 genome will be considered. It is possible to set a higher number of
 cores to decrease computational time.
 
-**It is important to set names to your setSequence object (see below). However
-if no names are supplied, names will be set internally. We recommend to set
-names yourself to make your analysis easier to keep track of.**
+** It is important to set names to your setSequence object (see below). 
+We recommend to set names yourself to make your analysis easier to keep 
+track of. Names will be set internally for computational reasons but 
+there must be concordance between setSequence and ChIP data **
+
+** This aspect cannot be stressed enough**
 
 
 ```{r,eval=TRUE, warnings = FALSE}
@@ -731,17 +740,29 @@ ease, it is possible to use the `searchSites` function
 needed to go through the entire ChIPAnalyser work flow. However, there are
 more to come! A second parameter storing object was created to handle
 non-compulsory parameters. This lightens `genomicProfileParameters` by
-handling part of the parameters. This second S4 object is called
+handling part of the parameters.
+
+This second S4 object is called
 `occupancyProfileParameters`. The interesting aspect of this object is
 that none of the slots are compulsory. This means that if not provided ,
 a new `occupancyProfileParameters` object will be created internally.
 All default values will be used for further computation.
+
 As stated previously, we strongly advise using custom parameters in order
-to increase goodness of fit of model .
-It is especially the case here, as slots such as
-`maxSignal` are directly extracted from biological data
-(ChIP-seq data - see `computeChipProfile` and
-`profileAccuracyEstimate` for more information).
+to increase goodness of fit of model. The `processingChIPseq`
+function returns a list, the second element of which is an
+`occupancyProfileParameter` object. This specific object will contain both 
+max signal and background directly extracted from you ChIP data. These slots
+are explained below. 
+
+However this function can also take a `occupancyProfileParameters`
+object as an argument if you wish to change the smoothing 
+parameters (see `chipSd`,`chipMean` and `chipSmooth`). The `processingChIPseq`
+function will update the one that is provided.
+
+** See processcingChIPseq below **
+
+
 
 
 ```{r, eval=FALSE}
@@ -779,9 +800,9 @@ boundMolecules(OPP) <- 5000
 ```
 
 * `backgroundSignal`, a numeric value representing the background Signal
-in real ChIP-seq data (Default is set at 0). It is strongly advised to
-set this parameter to the background Signal of
-the ChIP-seq data you will be using.
+in real ChIP-seq data (Default is set at 0). The background siganl is defined 
+as the mean ChIP score over the entire genome (see `processingChIPseq` below).
+
 
 ```{r, eval=FALSE, echo=TRUE}
 backgroundSignal(OPP)
@@ -790,8 +811,7 @@ backgroundSignal(OPP) <- 0.02550997
 ```
 
 * `maxSignal`, a numeric value representing the maximum signal in
-real ChIP-seq data (Default is set at 1). It is strongly advised to set
-this parameter to the maximum Signal of the ChIP-seq data you will be using.
+real ChIP-seq data (Default is set at 1) See `processingChIPseq` below)
 
 ```{r, eval=FALSE, echo=TRUE}
 maxSignal(OPP)
@@ -800,9 +820,7 @@ maxSignal(OPP) <- 1.86
 ```
 
 * `chipMean`,  a numeric value representing the average peak width in base
-pairs in real ChIP-seq data (Default is set at 150). It is strongly advised
-to set this parameter to the average peak width
-of the ChIP-seq data you will be using.
+pairs in real ChIP-seq data (Default is set at 150).
 
 ```{r, eval=FALSE, echo=TRUE}
 chipMean(OPP)
@@ -813,8 +831,7 @@ chipMean(OPP) <- 150
 
 * `chipSd`, a numeric value representing the standard deviation of
 peak width in real ChIP-seq data (Default is set at 150).
-It is strongly advised to set this parameter to the SD peak
-width of the ChIP-seq data you will be using.
+
 
 ```{r, eval=FALSE, echo=TRUE}
 chipSd(OPP)
@@ -893,10 +910,11 @@ its associated plotting function `plotOptimalHeatMaps`.
 
 ## ChIP Score extraction.
 
-In the case of both computeOptimal and AccuracyEstimate real ChIP data is
-required. The format of this data should be in the format of a named list of
-normalised ChIP scores at a base-pair level at the loci of interest.
-ChIPanalyser provides a ChIP score extraction function.
+It can be required to provied ChIP data to some of the functions in
+ChIPanalyser. We provided a function that will extract and normalise 
+ChIP data from various formats. Based on this score, an `occupancyProfileParameters`
+will also be builtor updated (see above) with value for the relevant slots
+(See `backgroundSignal` and `maxSignal`).
 
 ```{r, eval=FALSE}
 processingChIPseq(profile,loci=NULL,reduce=NULL,
@@ -904,16 +922,33 @@ processingChIPseq(profile,loci=NULL,reduce=NULL,
     Access=NULL,cores=1)
 
 ```
-As input, this functions takes `profile` a path to file containing ChIP
-score (multi format support - see `import` from the rtracklayer package),
-`GRanges` containing ChIP scores or a `data.frame`.
+As input, this functions takes:
 
-The `loci` argument is a GRanges of the loci of interest. If none are supplied,
-a set of Sequence will be built  
+* `profile` a path to file containing ChIP scores (_bed,wig,bigBed,..._),
+a `GRanges` or a `data.frame`containing ChIP scores.
 
-If No loci of interest are selected or a `GRanges` containing a large amount of
-ranges, it
+*  `loci` argument is a `GRanges` of the loci of interest. If none are supplied,
+a set of Sequence will be built internally based on the different 
+chromosome available in ChIP data.
 
+* `reduce` is a numeric value describing how many regions are to be selected.
+If a large amount of regions are supplied (let's say you split your favourite 
+genome into bins of 20kbp and built a `GRanges` with those bins), 
+you may choose to select the top regions based on the average ChIP singal in that region or
+if `peaks` are supplied select the regions overlapping with `peaks` with the highest ChIP score.
+
+* `occupancyProfileParameters` is an `occupancyProfileParameters` object. If you wish to change
+smoothing parameters (see `chipSd`,`chipMean` and `chipSmooth`) please provide the aformentioned object.
+`processingChIPseq` will return a updated `occupancyProfileParameters`.
+
+* `peaks` is a path to file or `GRanges` containing ChIP peaks. This argument is generally 
+used if reduce is **not NULL**
+
+* `Access` is a `GRanges` object containing accesible DNA for a given organism/cell type.
+If reduce is not NULL, only regions with accessible DNA will be selected. 
+If `peaks` is not NULL, regions with peaks *and* accessible DNA will be selected.
+
+* `cores` is the number of course that should be used to process ChIP data.
 
 ## Genome Wide Scoring
 
