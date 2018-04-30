@@ -19,7 +19,7 @@ processingChIPseq <- function(profile,loci=NULL,reduce=NULL,
 
     # Loading ChIP-seq profile
     if(!is.null(profile) & is(profile,"character")){
-        profile <- import(file)
+        profile <- import(profile)
         if(length(grep(x=as.character(seqnames(profile)), pattern="chr"))==0){
             profile <- data.frame("chr"=paste0("chr",
             as.character(seqnames(profile))),"start"=start(profile),
