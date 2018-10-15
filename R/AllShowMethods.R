@@ -47,7 +47,6 @@ setMethod("show",
             "chipMean: ",object@chipMean,"\n",
             "chipSd: ",object@chipSd,"\n",
             "chipSmooth: ", object@chipSmooth,"\n",
-            "Step Size: ",object@stepSize,"\n",
-            "Theta Threshold: ", object@thetaThreshold)
+            "Step Size: ",object@stepSize,"\n")
     }
 )

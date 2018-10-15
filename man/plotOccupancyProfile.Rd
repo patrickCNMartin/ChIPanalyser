@@ -11,7 +11,8 @@ PWMScores, DNAAccessibility, accuracy estimates and gene information.
 }
 \usage{
 plotOccupancyProfile(predictedProfile,setSequence,
-    chipProfile = NULL,DNAAccessibility = NULL, occupancy = NULL,PWM=FALSE,
+    chipProfile = NULL,DNAAccessibility = NULL, occupancy = NULL,
+    profileAccuracy = NULL,PWM=FALSE,
     occupancyProfileParameters = NULL,geneRef = NULL,axis=TRUE,...)
 }
 
@@ -39,6 +40,9 @@ plotOccupancyProfile(predictedProfile,setSequence,
     \code{occupancy} is a \code{\link[GenomicRanges]{GRanges}} containing PWM
     Score and predicted Occupancies.
     }
+    \item{profileAccuracy}{ \code{profileAccuracy} a vector containing accuracy
+    metrics. Metrics are computed using the
+    \code{\link{profileAccuracyEstimate}} function.}
 
     \item{PWM}{
     \code{PWM} is a logical value that in the case \code{occupancy} is

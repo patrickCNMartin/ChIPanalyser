@@ -11,7 +11,7 @@ accurate the predicted model is compared to real data.
 }
 \usage{
 profileAccuracyEstimate(LocusProfile, predictedProfile,
-    occupancyProfileParameters = NULL)
+    occupancyProfileParameters = NULL,method="all")
 }
 
 \arguments{
@@ -32,27 +32,22 @@ profileAccuracyEstimate(LocusProfile, predictedProfile,
     \code{occupancyProfileParameters} is a
     \code{\link{occupancyProfileParameters}} object
     }
+    \item{method}{\code{method} is the method that will be used to assess model
+    quality agianst ChIP-seq data. Method can be one of the following:
+    pearson, spearman, kendall, ks, geometric,fscore or all. All of these will
+    also return the MSE. Fscore contains f-score, precision,recall, MCC,
+    Accuracy and AUC ROC.}
 }
 \details{
-The accuracy of the predicted profile may be estimated by measuring
-corraltion, Mean Squared Error and theta (in house metric based on a
-modified ratio of correlation over MSE) between predicted Profiles and
-real ChIP-seq data. Actual ChIP-seq profiles should be normalised to a
-base pair level (Enrichement divded by the width of the range for that
-given score - the end result is a numeric vector of length equals to the
-length of the locus in base pairs). It should be noted that if an
-\code{\link{occupancyProfileParameters}} object is not supplied,
-then one will be created internally. However, we strongly advise to use
-the same occupancyProfileParameters object used previously.
+In order to assess the quality of the model against experimental ChIP-seq data,
+ChIPanalyser offers a wide range of method to choose from. These methods are
+also used when computing optimal paramters.
 }
 \value{
-Returns a list of lists. Each element in the list represents a combination
-of lambda (see \code{\link{ScalingFactorPWM}}) and bound molecules
-(see \code{\link{boundMolecules}}) and the list within each element is
-he list of Loci of interest. Finally, at the core of these lists is a
-named vector containing correlation and MSE for the given Loci but also
-meanCorr, meanMSE and meanTheta for all loci for a given combination of
-Lambda and bound molecules.
+Returns a list of two elements. The first element represents lists containing
+the model quality assessments for every combination of parameters (Bound Molecules and lambda)
+for every genomic region. The second element of the list contains the result of the ROCR package:
+False positives, False Negative, etc... See ROCR package.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription

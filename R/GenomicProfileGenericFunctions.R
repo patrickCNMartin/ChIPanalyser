@@ -342,27 +342,6 @@
     return(BPFrequency)
 }
 # Compute Thetha from MSE and Corr
-.computeTheta <- function(OPP,AccuracyEstimate){
-    regionsThreshold <- thetaThreshold(OPP)
-    bufferMSE <- unlist(lapply(AccuracyEstimate,function(x){x<-x[[1]][4]}))
-    thresholdMSE <- 10^(min(log10(bufferMSE))+regionsThreshold*
-        (max(log10(bufferMSE))-min(log10(bufferMSE))))
-    bufferCorr <- unlist(lapply(AccuracyEstimate,function(x){x<-x[[1]][3]}))
-    thresholdCorrelation <- (min(bufferCorr)+(1-regionsThreshold)*
-        (max(bufferCorr)-min(bufferCorr)))
-
-    bufferCorr[ bufferCorr < thresholdCorrelation ] <- thresholdCorrelation
-    bufferMSE[ bufferMSE > thresholdMSE ] <- thresholdMSE
-    meanTheta <- bufferCorr/bufferMSE
-
-    for(i in 1:length(AccuracyEstimate)){
-        for(j in 1:length(AccuracyEstimate[[i]])){
-            AccuracyEstimate[[i]][[j]]["meanTheta"] <- meanTheta[[i]]
-        }
-    }
-    return(AccuracyEstimate)
-}
-
 #Generate chip Profile
 .generateChIPProfileRcpp <- function(inputVector, mean, sd, smooth = NULL,
     norm = TRUE, peakSignificantThreshold=NULL){
@@ -534,8 +513,7 @@ searchSites <- function(Sites,ScalingFactor="all",
     } else {
         localNames <- sapply(strsplit(names(bufferSites),bound),"[[",2)
         for( j in seq_along(BoundMolecules)){
-            buffer <- c(buffer, grep(paste0("^",as.character(as.integer(
-            BoundMolecules[j])),"$"),
+            buffer <- c(buffer, grep(paste0("^",as.character(as.integer(BoundMolecules[j])),"$"),
             as.character(as.integer(localNames))))
 
         }
@@ -571,9 +549,250 @@ searchSites <- function(Sites,ScalingFactor="all",
 
     for(i in seq_along(subject)){
         localIntersect<-setdiff(subject[i], query)
-        setLocal[[i]]<-data.frame("chr"=as.character(seqnames(localIntersect)),
-        "start"=start(localIntersect), "end"=end(localIntersect))
+        setLocal[[i]]<-data.frame("chr"=as.character(seqnames(localIntersect)),"start"=start(localIntersect), "end"=end(localIntersect))
     }
     names(setLocal)<-names(subject)
     return(setLocal)
+}
+
+
+## Fscore computation for all regions
+.peakExtractionFScore<-function(predicted,locusProfile,region=TRUE){
+    # making sure that they are same length just for idx purposes
+    if(length(predicted)!=length(locusProfile)){
+        stop("precited Profile and locusProfile are not the same length")
+    }
+    ## threshold increments
+    high<-max(max(predicted),max(locusProfile))
+    low<-min(min(predicted),min(locusProfile))
+    if(low==0){
+        subs<-seq(low,high,length.out=21)
+        subs<-sapply(subs,"^",2)[seq(2,21)]
+    } else{
+        subs<-seq(low,high,length.out=20)
+        subs<-sapply(subs,"^",2)
+    }
+
+    subprof<-matrix(0,ncol=11,nrow=length(subs))
+
+    #rownames(paste0("thresh=",subs))
+    #browser()
+    matpred<-matrix(0,ncol=length(subs), nrow=length(locusProfile))
+    matloc<-matrix(0,ncol=length(subs), nrow=length(locusProfile))
+
+    for(i in seq_along(subs)){
+
+        localProfile<-rep(0,length(locusProfile))
+        ## thresh extraction
+        localProfile[locusProfile>=subs[i]]<-1
+
+        matpred[,i]<-predicted
+        matloc[,i]<-factor(localProfile)
+    }
+
+    ## Predictions and performance
+    pred<-prediction(matpred,matloc)
+    prec<-mean(sapply(performance(pred,"prec")@y.values,mean,na.rm=T))
+    rec<-mean(sapply(performance(pred,"rec")@y.values,mean,na.rm=T))
+    fscore<-mean(sapply(performance(pred,"f")@y.values,mean,na.rm=T))
+    acc<-mean(sapply(performance(pred,"acc")@y.values,mean,na.rm=T))
+    mcc<-mean(sapply(performance(pred,"mat")@y.values,mean,na.rm=T))
+    if(class(try(mean(sapply(performance(pred,"auc")@y.values,mean,na.rm=T)),silent=T))=="try-error"){
+        auc<-NA
+
+    }else{
+        auc<-mean(sapply(performance(pred,"auc")@y.values,mean,na.rm=T))
+    }
+    return(list(c("precision"=prec,"recall"=rec,"f1"=fscore,"accuracy"=acc,"MCC"=mcc,"AUC"=auc),pred))
+}
+
+##### geometricRatio
+
+.geometricRatio<-function(predcited,locusProfile,step){
+       diff<-abs(locusProfile-predcited)
+       leftEdge<-diff[seq(1,length.out=length(diff)-1)]
+       rightEdge<-diff[seq(2,length.out=length(diff)-1)]
+
+       areaDiff<-rep(0,length(diff)-1)
+       areaShared<-rep(0,length(diff)-1)
+       area<-rep(0,length(diff)-1)
+
+       for(i in seq_along(areaDiff)){
+       ## Computing Diff and shared
+          ## Diff
+          areaDiff[i]<-step*((leftEdge[i]+rightEdge[i])/2)
+          ## Shared
+          if(locusProfile[i]>=predcited[i] & locusProfile[i+1]>=predcited[i+1]){
+              areaShared[i]<-step*((predcited[i]+predcited[i+1])/2)
+          } else {
+              areaShared[i]<-step*((locusProfile[i]+locusProfile[i+1])/2)
+          }
+        }
+        ## Considering zeroes
+        if(sum(areaShared)!=0){
+            area<-sum(areaDiff)/sum(areaShared)
+        } else {
+            area<-NA
+        }
+
+    return(area)
+
+}
+
+
+### all metric extraction just to make things cleaner(should be using switch )
+
+.allMetrics<-function(predicted,locusProfile,stepSize){
+    # Checking for bullshit and doing some correlation stuff
+    if((sd(predicted,na.rm=TRUE)==0) | (sd(locusProfile,na.rm=TRUE)==0)){
+        corrP<-0
+        corrS<-0
+        corrK<-0
+    } else {
+
+        corrP<-cor(na.omit(predicted),na.omit(locusProfile),method="pearson")
+
+        corrS<-cor(na.omit(predicted),na.omit(locusProfile),method="spearman")
+
+        corrK<-cor(na.omit(predicted),na.omit(locusProfile),method="kendall")
+
+    }
+
+    ## ks distance
+    ks<-ks.test(predicted,locusProfile)
+    D<-unname(ks[[1]])
+    pval<-ks[[2]]
+
+    ## Geometric
+    geo<-.geometricRatio(predicted,locusProfile,stepSize)
+
+    ## fscore
+    AUC<-.peakExtractionFScore(predicted,locusProfile)
+
+    metrics<-c("pearson"=corrP,
+        "spearman"=corrS,
+        "kendall"=corrK,
+        "KsDist"=D,
+        "KsPval"=pval,
+        "geometric"=geo,
+         AUC[[1]])
+    return(list(metrics,AUC[[2]]))
+}
+
+
+### Processing optimal matricies and parameters
+
+.optimalExtraction<-function(genomicProfileParameters,occupancyProfileParameters,ProfileAccuracy,method){
+
+
+    if(class(ProfileAccuracy)!="list"){
+        methodsMean<-grepl("Mean",names(ProfileAccuracy[[1]][[1]])) & !grepl("MSE", names(ProfileAccuracy[[1]][[1]]))
+
+
+        mats<-vector("list",3)
+        param<-vector("list",3)
+        name<-names(ProfileAccuracy[[1]][[1]])[methodsMean]
+        names(mats)<-c(name,"MSE","Overlay")
+        names(param)<-c(name,"MSE","Overlay")
+
+        topmeth<-sapply(ProfileAccuracy, function(x){
+            x<-x[[1]][grep(paste0(names(ProfileAccuracy[[1]][[1]])[methodsMean],"Mean"),names(x[[1]]))]
+            return(x)
+        })
+        ##something is wrong with the way you rebuild the matrix.. should make a comparison
+        ## the plots look really weird as if the were not built as the should have
+        #dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
+            #length(boundMolecules(occupancyProfileParameters)))
+        topmeth<-matrix(topmeth, ncol=17, nrow=14, byrow=T)
+        rownames(topmeth) <- ScalingFactorPWM(genomicProfileParameters)
+        colnames(topmeth) <- boundMolecules(occupancyProfileParameters)
+        mats[[1]]<-topmeth
+
+        ## MSE Extracting
+        topmse<-sapply(ProfileAccuracy, function(x){
+            x<-x[[1]][grep("meanMSE",names(x[[1]]))]
+            return(x)
+        })
+        #dim(topmse)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
+        #    length(boundMolecules(occupancyProfileParameters)))
+        topmse<-matrix(topmse, ncol=17, nrow=14, byrow=T)
+        rownames(topmse) <- ScalingFactorPWM(genomicProfileParameters)
+        colnames(topmse) <- boundMolecules(occupancyProfileParameters)
+        mats[[2]]<-topmse
+
+        ## Overlay
+        # Setting up objects
+        over<-matrix(0,nrow=length(ScalingFactorPWM(genomicProfileParameters)),
+            ncol=length(boundMolecules(occupancyProfileParameters)))
+        matmethod<-matrix(0,nrow=length(ScalingFactorPWM(genomicProfileParameters)),
+            ncol=length(boundMolecules(occupancyProfileParameters)))
+        matmse<-matrix(0,nrow=length(ScalingFactorPWM(genomicProfileParameters)),
+              ncol=length(boundMolecules(occupancyProfileParameters)))
+        idx<-seq_len(length(over))
+        tops<-round(length(over))
+
+        # ordering and re shoving the ordered vec into a matrix
+        # Why you ask? Well because order doesn't work well with matricies
+        topmse<-match(idx,order(topmse,decreasing=F))
+        dim(topmse)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
+            length(boundMolecules(occupancyProfileParameters)))
+        if(any(method %in% c("pearson","spearman","kendall"))){
+            param[[1]]<-c("ScalingFactor"=rownames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)][,2])
+            param[[2]]<-c("ScalingFactor"=rownames(topmse)[which(topmse==min(topmse),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmse)[which(topmse==min(topmse),arr.ind=T)][,2])
+            topmeth<-match(idx,order(topmeth,decreasing=T))
+            dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
+                length(boundMolecules(occupancyProfileParameters)))
+
+        } else{
+            param[[1]]<-c("ScalingFactor"=rownames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,2]])
+            param[[2]]<-c("ScalingFactor"=rownames(topmse)[which(topmse==min(topmse),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmse)[which(topmse==min(topmse),arr.ind=T)[,2]])
+            topmeth<-match(idx,order(topmeth,decreasing=F))
+            dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
+                length(boundMolecules(occupancyProfileParameters)))
+        }
+        ## Creating the overlay
+        matmethod[which(topmeth>=tops, arr.ind=T)]<-1
+        matmse[which(topmse>=tops, arr.ind=T)]<-1
+        mats[[3]]<-over+matmethod+matmse
+        optimalOver<-which(mats[[3]]==2,arr.ind=T)
+        if(length(optimalOver)!=0){
+            param[[3]]<-c("lowScaling"=min(optimalOver[,1]),"highScaling"=max(optimalOver[,1]),"lowBoundMol"=min(optimalOver[,2]),"highBoundMol"=max(optimalOver[,2]))
+        } else {
+            param[[3]]<-"No overlay for top 10% of hits"
+        }
+
+    } else{
+      methodsMeanLoc<-grep("Mean",names(ProfileAccuracy[[1]][[1]][[1]]))
+
+      mats<-vector("list", length(methodsMeanLoc))
+      param<-vector("list", length(methodsMeanLoc))
+      names(mats)<-names(ProfileAccuracy[[1]][[1]][[1]])[methodsMeanLoc]
+      names(param)<-names(ProfileAccuracy[[1]][[1]][[1]])[methodsMeanLoc]
+      name<-names(ProfileAccuracy[[1]][[1]][[1]])[methodsMeanLoc]
+      for(i in seq_along(methodsMeanLoc)){
+        topmeth<-sapply(ProfileAccuracy, function(x){
+            x<-x[[1]][[1]][methodsMeanLoc[i]]
+            return(x)
+        })
+        #dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
+          #  length(boundMolecules(occupancyProfileParameters)))
+          topmeth<-matrix(topmeth, ncol=17, nrow=14, byrow=T)
+        rownames(topmeth) <- ScalingFactorPWM(genomicProfileParameters)
+        colnames(topmeth) <- boundMolecules(occupancyProfileParameters)
+        mats[[i]]<-topmeth
+
+      if(name[i] %in% c("geometricMean","MSEMean","ksMean")){
+
+        param[[i]]<-c("ScalingFactor"=rownames(topmeth)[which(topmeth==min(topmeth),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmeth)[which(topmeth==min(topmeth),arr.ind=T)[,2]])
+      } else{
+        param[[i]]<-c("ScalingFactor"=rownames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,2]])
+      }
+
+    }
+
+
+    }
+
+    return(list("Optimal Parameters"=param,"Optimal Matrix"=mats,"method"=method))
+
 }

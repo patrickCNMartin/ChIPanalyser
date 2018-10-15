@@ -11,44 +11,40 @@ Parameters and highlight the optimal combination of
 }
 
 \usage{
-plotOptimalHeatMaps(optimalParam, parameter = "all", Contour = TRUE)
+plotOptimalHeatMaps(optimalParam,contour=TRUE,col=NULL,main=NULL,layout=TRUE)
 }
 \arguments{
     \item{optimalParam}{
-    \code{optimalParam} is a list resulting of \code{\link{computeOptimal}}.
-    This list should contain three elements: optimal Parameters,
-    optimal Matrix and parameter.
+    \code{optimalParam} is a list containing containing optimal matricies
+    (or only one if only one paramter was selected). These matricies are the
+    result of the \code{computeOptimal} function
     }
-    \item{parameter}{
-    \code{parameter} is a character string representing which parameter
-    should be plotted. There are four possibilities:
-    "correlation","MSE","theta" and "all"
+    \item{contour}{
+    \code{parameter} is logical. Should contour lines be plotted?
     }
-    \item{Contour}{
-    \code{Contour} is a logical value indicating if contour
-    lines should be plotted.
+    \item{col}{
+    \code{col} vector of colours to be used for each heat map.
+    If none are specified, rainbow colours will be used. NOTE: colour
+    vector will be recyled if not enough colours are provided.
     }
+    \item{main}{\code{main} title.}
+    \item{layout}{\code{layout} is either TRUE or FALSE specifying if stadard
+    layout should be used or not. If TRUE, each heat map will be plotted on
+    an individual page with a heat map scale of the right side.}
 }
 \details{
 Once the optimal set of Parameters ( \code{\link{ScalingFactorPWM}}
 and \code{\link{boundMolecules}} ), it is possible to plot the results
-in the form of a heat map. There are four possible heat maps:
-a "correlation" heat map that will only show the correlation between a
-predicted Profile and true ChIP-seq profiles for each combination of
-Parameters ; "MSE" will show a similar heat map only with the
-Mean Squared Error associated to each predicted profile,
-true profile and parameter combination; "theta" is a in house metric
-describing the best fit between high correlation and low MSE
-(see \code{\link{thetaThreshold}}); finally "all" will plot all of the above.
+in the form of a heat map. Each heat map will be plotted in a seperate page if
+layout = TRUE, If layout= FALSE, it is up to the user to define how they wish
+to layout there heat maps.
 }
 \value{
 Returns a heat map of optimal combinations of \code{\link{ScalingFactorPWM}}
 and \code{\link{boundMolecules}}. The x axis represents the different
 value assigned to lambda ( \code{\link{ScalingFactorPWM}} )
 and the y axis represents the different values to boundMolecules
-( \code{\link{boundMolecules}} ). The hilighted box describes the
-optimal combination of parameters to either maximise "correlation"
-and "theta" or to minimise "MSE".
+( \code{\link{boundMolecules}} ).
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -83,7 +79,7 @@ optimalParam <- computeOptimal(DNASequenceSet = DNASequenceSet,
     setSequence = eveLocus,
     DNAAccessibility = Access,
     occupancyProfileParameters = OPP,
-    parameter = "all")
-plotOptimalHeatMaps(optimalParam, parameter="all")
+    optimalMethod = "all")
+plotOptimalHeatMaps(optimalParam)
 }
 }

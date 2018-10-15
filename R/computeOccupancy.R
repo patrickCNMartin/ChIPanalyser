@@ -44,14 +44,18 @@ computeOccupancy <- function(AllSitesPWMScore, DNAAccessibility=NULL,
     # Computing Occupancy at sites higher than threshold
     MultiParam <- vector("list", (length(lambda)*length(boundMolecules)))
     PWMScore <- vector("list", length(PWMGRList))
-
+    # Extracting names of regions
+    #name <- c()
+  #  for(i in seq_along(PWMGRList)){
+      #  name <- c(name,rep(names(PWMGRList)[[i]],length(PWMGRList[[i]])))
+    #}
     name<-rep(names(PWMGRList),times=sapply(PWMGRList, length))
 
     # DNAAccessibility if not continuous Data
 
     Occupancy <- vector("list",length(PWMGRList))
     names(Occupancy) <- names(PWMGRList)
-    result <- GRangesList()
+    result <- list()
     emptyGR <- GRanges()
     # Progress message when required
     if(verbose){
@@ -75,7 +79,7 @@ computeOccupancy <- function(AllSitesPWMScore, DNAAccessibility=NULL,
                 (Access*boundMolecules[j]*exp((1/lambda[k])*PWMScore) +
                 DNALength*ploidy*averageExpPWMScore[k])
 
-            Occupancy<-backgroundSignal + Occupancy*(maxSignal-backgroundSignal)
+            Occupancy <- backgroundSignal + Occupancy*(maxSignal-backgroundSignal)
     # Normalising Ocupancy Signal
             if(norm == TRUE){
                 maxOccupancy <- max(c(maxSignal,max(Occupancy)))

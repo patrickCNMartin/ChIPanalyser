@@ -317,6 +317,8 @@ setReplaceMethod("removeBackground",
     }
 )
 
+
+
 setMethod("stepSize","occupancyProfileParameters",
     function(object) object@stepSize
 )
@@ -326,19 +328,6 @@ setReplaceMethod("stepSize",
         value="numeric"),
     function(object, value){
         object@stepSize<-value
-    return(object)
-    }
-)
-
-setMethod("thetaThreshold","occupancyProfileParameters",
-    function(object) object@thetaThreshold
-)
-
-setReplaceMethod("thetaThreshold",
-    signature(object="occupancyProfileParameters",
-        value="numeric"),
-    function(object, value){
-        object@thetaThreshold<-value
     return(object)
     }
 )

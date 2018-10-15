@@ -67,8 +67,7 @@ computeChipProfile <- function(setSequence,occupancy,
         message("Computing ChIP Profile \n")
     }
 
-    SplitGRList <-parallel::mclapply(LocalSet,.internalChIPLociSplit,
-        stepSize,mc.cores=cores)
+    SplitGRList <-parallel::mclapply(LocalSet,.internalChIPLociSplit,stepSize,mc.cores=cores)
 
     names(SplitGRList) <- names(setSequence)
 
@@ -77,8 +76,7 @@ computeChipProfile <- function(setSequence,occupancy,
 
     ##method set
     if(length(Occup)>length(Occup[[1]])){
-        OccupancyVals <- parallel::mclapply(Occup,.internalChIPOccupValsParam,
-        mc.cores=cores)
+        OccupancyVals <- parallel::mclapply(Occup,.internalChIPOccupValsParam,mc.cores=cores)
         profile <- parallel::mcmapply(.internalChIPParam,Occup=Occup,
         OccupancyVals=OccupancyVals,
         MoreArgs=list(SplitGRList=SplitGRList,LocalSet=LocalSet,
@@ -92,8 +90,7 @@ computeChipProfile <- function(setSequence,occupancy,
     profile <- vector("list", length(Occup))
     OccupancyVals <- vector("list", length(Occup))
     for(i in seq_along(Occup)){
-        OccupancyVals[[i]]<- parallel::mclapply(Occup[[i]],
-        .internalChIPOccupValsLoci,mc.cores=cores)
+        OccupancyVals[[i]]<- parallel::mclapply(Occup[[i]],.internalChIPOccupValsLoci,mc.cores=cores)
         profile[[i]]<-SplitGRList
         profile[[i]] <- parallel::mcmapply(.internalChIPLoci,
         profile=profile[[i]],Occup=Occup[[i]],LocalSet=LocalSet,

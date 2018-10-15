@@ -24,9 +24,8 @@
 
 .parameterShuffle<-function(args,geneRefColour,chrinfo){
     ## Setting Plot order for name retrieval
-
-    argsOrder<-c("predictedProfile","chipProfile","DNAAccessibility",
-    "occupancy","text",names(geneRefColour))
+    #argsOrder<-c("DNAAccessibility","chipProfile","predictedProfile","occupancy","text",names(GeneRefColour))
+    argsOrder<-c("predictedProfile","chipProfile","DNAAccessibility","occupancy","text",names(geneRefColour))
     ## Setting Defaults for color argument
     colour<-c("#D55E00","#999999","#F0E442","#56B4E9","black",geneRefColour)
     names(colour)<-argsOrder
@@ -56,8 +55,7 @@
 
     ## Setting up labels
     main<-"Occupancy Profile"
-    xlab<-paste("DNA Position",chrinfo[[1]],paste(chrinfo[[2]],":",
-    chrinfo[[4]],sep=""),sep=" ")
+    xlab<-paste("DNA Position",chrinfo[[1]],paste(chrinfo[[2]],":",chrinfo[[4]],sep=""),sep=" ")
     ylab<-"Occupancy"
 
 
@@ -163,28 +161,19 @@
 
     ##Name szwpping and multicolor handeling
     ### Genetic element coding regions
-    names(colour)[grepl("intron",names(colour)) | grepl("exon",names(colour))|
-    grepl("gene",names(colour),ignore.case=TRUE)]<-"gene"
+    names(colour)[grepl("intron",names(colour)) | grepl("exon",names(colour)) | grepl("gene",names(colour),ignore.case=TRUE)]<-"gene"
     colour[names(colour)=="gene"]<-colour[names(colour)=="gene"][1]
 
-    names(lineType)[grepl("intron",names(lineType)) |
-    grepl("exon",names(lineType)) |
-    grepl("gene",names(lineType),ignore.case=TRUE)]<-"gene"
+    names(lineType)[grepl("intron",names(lineType)) | grepl("exon",names(lineType)) | grepl("gene",names(lineType),ignore.case=TRUE)]<-"gene"
     lineType[names(lineType)=="gene"]<-lineType[names(lineType)=="gene"][1]
 
-    names(lineWidth)[grepl("intron",names(lineWidth)) |
-    grepl("exon",names(lineWidth)) |
-    grepl("gene",names(lineWidth),ignore.case=TRUE)]<-"gene"
+    names(lineWidth)[grepl("intron",names(lineWidth)) | grepl("exon",names(lineWidth)) | grepl("gene",names(lineWidth),ignore.case=TRUE)]<-"gene"
     lineWidth[names(lineWidth)=="gene"]<-lineWidth[names(lineWidth)=="gene"][1]
 
-    names(density)[grepl("intron",names(density)) |
-    grepl("exon",names(density)) |
-    grepl("gene",names(density),ignore.case=TRUE)]<-"gene"
+    names(density)[grepl("intron",names(density)) | grepl("exon",names(density)) | grepl("gene",names(density),ignore.case=TRUE)]<-"gene"
     density[names(density)=="gene"]<-density[names(density)=="gene"][1]
 
-    names(border)[grepl("intron",names(border)) |
-    grepl("exon",names(border)) |
-    grepl("gene",names(border),ignore.case=TRUE)]<-"gene"
+    names(border)[grepl("intron",names(border)) | grepl("exon",names(border)) | grepl("gene",names(border),ignore.case=TRUE)]<-"gene"
     border[names(border)=="gene"]<-border[names(border)=="gene"][1]
 
 
@@ -209,10 +198,7 @@
 
 
 
-    return(list("colour"=colour,"density"=density,"border"=border,
-    "lineType"=lineType,"lineWidth"=lineWidth,"fontsSizePlot"=fontsSizePlot,
-    "fontsSizeAxis"=fontsSizeAxis,"lableOri"=lableOri,"main"=main,"xlab"=xlab,
-    "ylab"=ylab,"xlim"=xlim,"ylim"=ylim,"xaxislabels"=xaxislabels))
+    return(list("colour"=colour,"density"=density,"border"=border,"lineType"=lineType,"lineWidth"=lineWidth,"fontsSizePlot"=fontsSizePlot,"fontsSizeAxis"=fontsSizeAxis,"lableOri"=lableOri,"main"=main,"xlab"=xlab,"ylab"=ylab,"xlim"=xlim,"ylim"=ylim,"xaxislabels"=xaxislabels))
 }
 
 
@@ -223,9 +209,8 @@
 ###### Plotiing occupancy Profile #######
 
 
-plotOccupancyProfile<-function(predictedProfile,setSequence,
-    chipProfile = NULL,DNAAccessibility = NULL
-    ,occupancy = NULL,PWM=FALSE,
+plotOccupancyProfile<-function(predictedProfile,setSequence, chipProfile = NULL,DNAAccessibility = NULL
+    ,occupancy = NULL,profileAccuracy = NULL,PWM=FALSE,
     occupancyProfileParameters = NULL, geneRef = NULL,axis=TRUE,...){
 
     # restricting setSequence to sequences present in profile
@@ -233,7 +218,7 @@ plotOccupancyProfile<-function(predictedProfile,setSequence,
 
 
     if(!is.null(DNAAccessibility)){
-        localAccessibility <- .AccessExtract(setSequence,DNAAccessibility)[[1]]
+        localAccessibility <- .AccessExtract(setSequence, DNAAccessibility)[[1]]
     } else {
         localAccessibility <- setSequence
         names(localAccessibility)<-names(setSequence)
@@ -261,28 +246,19 @@ plotOccupancyProfile<-function(predictedProfile,setSequence,
 
 
 
-    if(!is.null(geneRef)){
+    if(!is.null(geneRef) & is(geneRef,"GRanges")){
         ##Seting Graphical bounderies
 
-        if(is(geneRef,"GRanges")){
-            # Selecting genes in regions of Interest
-            genes <- geneRef[queryHits(findOverlaps(geneRef, setSequence))]
-            # Fitting to window
-            start(genes) <- pmax(start(genes), start(setSequence))
-            end(genes) <- pmin(end(genes), end(setSequence))
-            geneRefColour<-heat.colors(length(unique(genes$type)))
-            names(geneRefColour)<-unique(genes$type)
-        } else {
-            genes<-import(geneRef)
-            # Selecting genes in regions of Interest
-            genes <- geneRef[queryHits(findOverlaps(geneRef, setSequence))]
-            # Fitting to window
-            start(genes) <- pmax(start(genes), start(setSequence))
-            end(genes) <- pmin(end(genes), end(setSequence))
-            geneRefColour<-heat.colors(length(unique(genes$type)))
-            names(geneRefColour)<-unique(genes$type)
-        }
+        # Selecting genes in regions of Interest
+        genes <- geneRef[queryHits(findOverlaps(geneRef, setSequence))]
+
+        # Fitting to window
+        start(genes) <- pmax(start(genes), start(setSequence))
+        end(genes) <- pmin(end(genes), end(setSequence))
+        geneRefColour<-heat.colors(length(unique(genes$type)))
+        names(geneRefColour)<-unique(genes$type)
         elementBuffer<-split(genes,genes$type)
+
     } else {
         geneRefColour<-"None"
         names(geneRefColour)<-"default"
@@ -294,8 +270,7 @@ plotOccupancyProfile<-function(predictedProfile,setSequence,
 
     stepIndex <- seq(1, width(setSequence),by=stepSize)
     localPosition<-seq(start(setSequence), end(setSequence),by=stepSize)
-    localPosition<-c(localPosition[1]-1,localPosition,
-        localPosition[length(localPosition)]+1)
+    localPosition<-c(localPosition[1]-1,localPosition,localPosition[length(localPosition)]+1)
     localPredcitedPropfile <- predictedProfile$ChIP
     localPredcitedPropfile <- c(0,localPredcitedPropfile,0)
 
@@ -304,16 +279,16 @@ plotOccupancyProfile<-function(predictedProfile,setSequence,
     param<-.parameterShuffle(args,geneRefColour,chrinfo)
 
     ## setting up empty plot with and without Gene rangeBuffer
-
-    plot(0,type="n", axes=FALSE,xlab="",ylab="",
-        ylim=param$ylim,xlim=param$xlim)
-    title(xlab=param$xlab, cex.lab=param$fontsSizePlot["xlab"])
-    title(ylab=param$ylab, cex.lab=param$fontsSizePlot["ylab"])
-    title(param$main)
-    if(axis){
-      axis(side=BELOW<-1,at=param$xaxislabels,
-          labels=param$xaxislabels,cex.axis=param$fontsSizeAxis)
+    if(!is.null(profileAccuracy)){
+        par(xpd=T)
+        par(mar=c(4,2,4,10))
     }
+
+    plot(0,type="n", axes=FALSE,xlab="",ylab="",ylim=param$ylim,xlim=param$xlim)
+    title(xlab=param$xlab, cex.lab=param$fontsSizePlot["xlab"])
+    title(ylab=param$ylab, cex.lab=param$fontsSizePlot["ylab"],line=0.8)
+    title(param$main)
+    if(axis){axis(side=BELOW<-1,at=param$xaxislabels,labels=param$xaxislabels,cex.axis=param$fontsSizeAxis)}
 
 
 
@@ -321,191 +296,109 @@ plotOccupancyProfile<-function(predictedProfile,setSequence,
     ## Accesibility plotting
     if(!is.null(DNAAccessibility)){
         for(localAccess in seq_len(nrow(localAccessibility))){
-            rect(localAccessibility[localAccess,"start"],0,
-            localAccessibility[localAccess,"end"],param$ylim[2],
-            col=param$colour[["DNAAccessibility"]],
-            density=param$density[["DNAAccessibility"]],
-            border=param$borders[["DNAAccessibility"]],
-            lwd=param$lineWidth[["DNAAccessibility"]],
-            lty=param$lineType[["DNAAccessibility"]])
+            rect(localAccessibility[localAccess,"start"],0,localAccessibility[localAccess,"end"],param$ylim[2],
+            col=param$colour[["DNAAccessibility"]],density=param$density[["DNAAccessibility"]], border=param$borders[["DNAAccessibility"]],lwd=param$lineWidth[["DNAAccessibility"]],lty=param$lineType[["DNAAccessibility"]])
         }
     }
     ## ChIP Profile Plotting
     if(!is.null(chipProfile)){
         localchipProfile <- c(0,chipProfile[stepIndex],0)
-        polygon(localPosition,localchipProfile,
-        col=param$colour[["chipProfile"]],
-        density=param$density[["chipProfile"]],
-        border=param$border[["chipProfile"]],
-        lty=param$lineType[["chipProfile"]])
+        polygon(localPosition,localchipProfile,col=param$colour[["chipProfile"]],density=param$density[["chipProfile"]],border=param$border[["chipProfile"]],lty=param$lineType[["chipProfile"]])
     }
     ## Predicted Profile plotting
-    lines(localPosition,localPredcitedPropfile,
-    type="l",col=param$colour[["predictedProfile"]],
-    lwd=param$lineWidth[["predictedProfile"]],
-    lty=param$lineType[["predictedProfile"]])
+    lines(localPosition,localPredcitedPropfile,type="l",col=param$colour[["predictedProfile"]],lwd=param$lineWidth[["predictedProfile"]],lty=param$lineType[["predictedProfile"]])
 
     ## Occupancy or PWM Scores
     if(!is.null(occupancy)){
         if(PWM){
-            PWMScaling <- occupancy[head(order(
-            occupancy$PWMScore,decreasing=TRUE),
-            round(0.1*length(occupancy$PWMScore)))]
-            ReScale<-((PWMScaling$PWMScore+abs(
-            min(PWMScaling$PWMScore)))/(max(PWMScaling$PWMScore)+
-            abs(min(PWMScaling$PWMScore))))*(param$ylim[2]*0.5)
+            PWMScaling <- occupancy[head(order(occupancy$PWMScore,decreasing=T), round(0.9*length(occupancy$PWMScore)))]
+            ReScale<-((PWMScaling$PWMScore+abs(min(PWMScaling$PWMScore)))/(max(PWMScaling$PWMScore)+abs(min(PWMScaling$PWMScore))))*(param$ylim[2]*0.5)
 
-            lines(x=start(PWMScaling),y=ReScale,type="h",
-            lty=param$lineType[["occupancy"]],
-            col=param$colour[["occupancy"]],lwd=param$lineWidth[["occupancy"]])
+            lines(x=start(PWMScaling),y=ReScale,type="h",lty=param$lineType[["occupancy"]],
+                col=param$colour[["occupancy"]],lwd=param$lineWidth[["occupancy"]])
 
         }else{
-            OccupScaling <- occupancy[head(order(
-            occupancy$Occupancy,decreasing=TRUE),
-            round(0.1*length(occupancy$Occupancy)))]
+            OccupScaling <- occupancy[head(order(occupancy$Occupancy,decreasing=T), round(0.9*length(occupancy$Occupancy)))]
 
-            ReScale<-(OccupScaling$Occupancy/
-                max(OccupScaling$Occupancy))*(param$ylim[2]*0.5)
-
-            lines(x=start(OccupScaling),y=ReScale,type="h",
-            lty=param$lineType[["occupancy"]],
-            col=param$colour[["occupancy"]],lwd=param$lineWidth[["occupancy"]])
+            ReScale<-(OccupScaling$Occupancy/max(OccupScaling$Occupancy))*(param$ylim[2]*0.5)
+            lines(x=start(OccupScaling),y=ReScale,type="h",lty=param$lineType[["occupancy"]],
+                col=param$colour[["occupancy"]],lwd=param$lineWidth[["occupancy"]])
 
         }
     }
+    ## Adding accuracy estimate
+    if(!is.null(profileAccuracy)){
+
+      leg<-paste(names(profileAccuracy),"=",signif(profileAccuracy,4))
+      legend(x=(max(param$xlim)+0.06*(max(param$xlim)-min(param$xlim))),y=max(param$ylim),
+      legend=leg,cex=0.68)
+
+
+      #legend(x=(max(param$xlim)+0.01*(max(param$xlim)-min(param$xlim))),y=max(param$ylim),
+      #legend=c(paste0("Correlation = ",round(profileAccuracy[1],digits=5)," "),paste0("MSE = ",round(profileAccuracy[2],digits=6))),cex=0.7)
+    }
+
     ## Plotting geneRef
     if(!is.null(geneRef)){
-        lines(c(min(localPosition),max(localPosition)),c(-0.2,-0.2),
-        col = param$colour[["text"]],lty=param$lineType[["text"]],
-        lwd=param$lineWidth[["text"]])
-        text(min(localPosition), (-0.1), "+",
-        col=param$colour[["text"]],cex=param$fontsSizePlot["strand"])
-        text(min(localPosition), (-0.3), "-",
-        col=param$colour[["text"]],cex=param$fontsSizePlot["strand"])
+        lines(c(min(localPosition),max(localPosition)),c(-0.2,-0.2), col = param$colour[["text"]],lty=param$lineType[["text"]], lwd=param$lineWidth[["text"]])
+        text(min(localPosition), (-0.1), "+", col=param$colour[["text"]],cex=param$fontsSizePlot["strand"])
+        text(min(localPosition), (-0.3), "-", col=param$colour[["text"]],cex=param$fontsSizePlot["strand"])
         ## Genetic Element plotting
 
-        for(type in seq_along(elementBuffer)){
-            ## initialising count for "other type" elements
-            print(type)
-            cat(names(elementBuffer)[type])
-            if(names(elementBuffer)[type]=="intron"){
+        for(elem in seq_along(elementBuffer)){
+            ## initialising count for "other elem" elements
 
-                pos<-which(as.logical(strand(elementBuffer[[type]])=="+") |
-                as.logical(strand(elementBuffer[[type]])=="*") &
-                as.logical(strand(elementBuffer[[type]])!="-"))
-                neg<-which(as.logical(strand(elementBuffer[[type]])=="-") |
-                as.logical(strand(elementBuffer[[type]])=="*") &
-                as.logical(strand(elementBuffer[[type]])!="+"))
+            if(names(elementBuffer)[elem]=="intron"){
+
+                pos<-which(as.logical(strand(elementBuffer[[elem]])=="+" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="-"))
+                neg<-which(as.logical(strand(elementBuffer[[elem]])=="-" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="+"))
                 if(length(pos)>0){
-                    segments(x0=start(elementBuffer[[type]])[pos],
-                    x1=end(elementBuffer[[type]])[pos],y0=-0.1,
-                    lwd=param$lineWidth["gene"],
-                    lty=param$lineType["gene"],col=param$colour["gene"])
-                }
-                if(length(neg>0)){
-                    segments(x0=start(elementBuffer[[type]])[neg],
-                    x1=end(elementBuffer[[type]])[neg],y0=-0.3,
-                    lwd=param$lineWidth["gene"],
-                    lty=param$lineType["gene"],col=param$colour["gene"])
-                }
-
-            } else if(names(elementBuffer)[type]=="gene" |
-                names(elementBuffer)[type]=="exon"){
-
-                pos<-which(as.logical(strand(elementBuffer[[type]])=="+") |
-                as.logical(strand(elementBuffer[[type]])=="*") &
-                as.logical(strand(elementBuffer[[type]])!="-"))
-                neg<-which(as.logical(strand(elementBuffer[[type]])=="-") |
-                as.logical(strand(elementBuffer[[type]])=="*") &
-                as.logical(strand(elementBuffer[[type]])!="+"))
-                if(length(pos)>0){
-                    rect(start(elementBuffer[[type]])[pos],-0.05,
-                    end(elementBuffer[[type]])[pos],-0.15,
-                    col=param$colour["gene"],density=param$density["gene"],
-                    lty=param$lineType["gene"],lwd=param$lineWidth["gene"],
-                    border=param$border["gene"])
-                    text(start(elementBuffer[[type]])[pos],-0.18,
-                    elementBuffer[[type]]$ID,pos=4, col=param$colour["text"],
-                    cex=param$fontsSizePlot["geneRef"])
-                }
-                if(length(neg)){
-                    rect(start(elementBuffer[[type]])[neg],-0.25,
-                    end(elementBuffer[[type]])[neg],-0.35,
-                    col=param$colour["gene"],density=param$density["gene"],
-                    lty=param$lineType["gene"],lwd=param$lineWidth["gene"],
-                    border=param$border["gene"])
-                    text(start(elementBuffer[[type]])[neg],-0.38,
-                    elementBuffer[[type]]$ID,pos=4, col=param$colour["text"],
-                    cex=param$fontsSizePlot["geneRef"])
-                }
-
-            } else if(length(grep(x=names(elementBuffer)[type],
-                pattern="UTR",ignore.case=TRUE))>0){
-
-                pos<-which(as.logical(strand(elementBuffer[[type]])=="+") |
-                as.logical(strand(elementBuffer[[type]])=="*") &
-                as.logical(strand(elementBuffer[[type]])!="-"))
-                neg<-which(as.logical(strand(elementBuffer[[type]])=="-") |
-                as.logical(strand(elementBuffer[[type]])=="*") &
-                as.logical(strand(elementBuffer[[type]])!="+"))
-
-                if(length(pos)>0){
-                    rect(start(elementBuffer[[type]])[pos],-0.05,
-                    end(elementBuffer[[type]])[pos],-0.15,
-                    col=param$colour["UTR"],density=param$density["UTR"],
-                    lty=param$lineType["UTR"],lwd=param$lineWidth["UTR"],
-                    border=param$border["UTR"])
-                    text(start(elementBuffer[[type]])[pos],-0.18,
-                    elementBuffer[[type]]$ID,pos=4, col=param$colour["text"],
-                    cex=param$fontsSizePlot["geneRef"])
+                    segments(x0=start(elementBuffer[[elem]])[pos],x1=end(elementBuffer[[elem]])[pos],y0=-0.1,lwd=param$lineWidth["gene"],lty=param$lineType["gene"],col=param$colour["gene"])
                 }
                 if(length(neg)>0){
-                    rect(start(elementBuffer[[type]])[neg],-0.25,
-                    end(elementBuffer[[type]])[neg],-0.35,
-                    col=param$colour["UTR"],density=param$density["UTR"],
-                    lty=param$lineType["UTR"],lwd=param$lineWidth["UTR"],
-                    border=param$border["UTR"])
-                    text(start(elementBuffer[[type]])[neg],-0.38,
-                    elementBuffer[[type]]$ID,pos=4, col=param$colour["text"],
-                    cex=param$fontsSizePlot["geneRef"])
+                    segments(x0=start(elementBuffer[[elem]])[neg],x1=end(elementBuffer[[elem]])[neg],y0=-0.3,lwd=param$lineWidth["gene"],lty=param$lineType["gene"],col=param$colour["gene"])
+                }
+
+            } else if(names(elementBuffer)[elem]=="gene" | names(elementBuffer)[elem]=="exon"){
+
+                pos<-which(as.logical(strand(elementBuffer[[elem]])=="+" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="-"))
+                neg<-which(as.logical(strand(elementBuffer[[elem]])=="-" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="+"))
+                if(length(pos)>0){
+                    rect(start(elementBuffer[[elem]])[pos],-0.05,end(elementBuffer[[elem]])[pos],-0.15,col=param$colour["gene"],density=param$density["gene"],lty=param$lineType["gene"],lwd=param$lineWidth["gene"],border=param$border["gene"])
+                    text(start(elementBuffer[[elem]])[pos],-0.18,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+                }
+                if(length(neg)>0){
+                    rect(start(elementBuffer[[elem]])[neg],-0.25,end(elementBuffer[[elem]])[neg],-0.35,col=param$colour["gene"],density=param$density["gene"],lty=param$lineType["gene"],lwd=param$lineWidth["gene"],border=param$border["gene"])
+                    text(start(elementBuffer[[elem]])[neg],-0.38,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+                }
+
+            } else if(length(grep(x=names(elementBuffer)[elem],pattern="UTR",ignore.case=TRUE))>0){
+
+                pos<-which(as.logical(strand(elementBuffer[[elem]])=="+" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="-"))
+                neg<-which(as.logical(strand(elementBuffer[[elem]])=="-" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="+"))
+
+                if(length(pos)>0){
+                    rect(start(elementBuffer[[elem]])[pos],-0.1,end(elementBuffer[[elem]])[pos],-0.15,col=param$colour["UTR"],density=param$density["UTR"],lty=param$lineType["UTR"],lwd=param$lineWidth["UTR"],border=param$border["UTR"])
+                    text(start(elementBuffer[[elem]])[pos],-0.18,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+                }
+                if(length(neg)>0){
+                    rect(start(elementBuffer[[elem]])[neg],-0.25,end(elementBuffer[[elem]])[neg],-0.35,col=param$colour["UTR"],density=param$density["UTR"],lty=param$lineType["UTR"],lwd=param$lineWidth["UTR"],border=param$border["UTR"])
+                    text(start(elementBuffer[[elem]])[neg],-0.38,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
                 }
 
             } else {
-                # Shifting through multiple colors if different
-                #other type elements
-                  nameBuffer<-names(elementBuffer)[type]
-                  pos<-which(as.logical(strand(elementBuffer[[type]])=="+") |
-                  as.logical(strand(elementBuffer[[type]])=="*") &
-                  as.logical(strand(elementBuffer[[type]])!="-"))
-                  neg<-which(as.logical(strand(elementBuffer[[type]])=="-") |
-                  as.logical(strand(elementBuffer[[type]])=="*") &
-                  as.logical(strand(elementBuffer[[type]])!="+"))
+                # Shifting through multiple colors if different other elem elements
+                  nameBuffer<-names(elementBuffer)[elem]
+                  pos<-which(as.logical(strand(elementBuffer[[elem]])=="+" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="-"))
+                  neg<-which(as.logical(strand(elementBuffer[[elem]])=="-" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="+"))
 
                   if(length(pos)>0){
-                      rect(start(elementBuffer[[type]])[pos],-0.1,
-                      end(elementBuffer[[type]])[pos],-0.15,
-                      col=param$colour[nameBuffer],
-                      density=param$density[nameBuffer],
-                      lty=param$lineType[nameBuffer],
-                      lwd=param$lineWidth[nameBuffer],
-                      border=param$border[nameBuffer])
-                      text(start(elementBuffer[[type]])[pos],-0.18,
-                      elementBuffer[[type]]$ID,pos=4,
-                      col=param$colour["text"],
-                      cex=param$fontsSizePlot["geneRef"])
+                      rect(start(elementBuffer[[elem]])[pos],-0.1,end(elementBuffer[[elem]])[pos],-0.15,col=param$colour[nameBuffer],density=param$density[nameBuffer],lty=param$lineType[nameBuffer],lwd=param$lineWidth[nameBuffer],border=param$border[nameBuffer])
+                      text(start(elementBuffer[[elem]])[pos],-0.18,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
                   }
                   if(length(neg)>0){
-                      rect(start(elementBuffer[[type]])[neg],-0.25,
-                      end(elementBuffer[[type]])[neg],-0.35,
-                      col=param$colour[nameBuffer],
-                      density=param$density[nameBuffer],
-                      lty=param$lineType[nameBuffer],
-                      lwd=param$lineWidth[nameBuffer],
-                      border=param$border[nameBuffer])
-                      text(start(elementBuffer[[type]])[neg],-0.38,
-                      elementBuffer[[type]]$ID,pos=4,
-                      col=param$colour["text"],
-                      cex=param$fontsSizePlot["geneRef"])
+                      rect(start(elementBuffer[[elem]])[neg],-0.25,end(elementBuffer[[elem]])[neg],-0.35,col=param$colour[nameBuffer],density=param$density[nameBuffer],lty=param$lineType[nameBuffer],lwd=param$lineWidth[nameBuffer],border=param$border[nameBuffer])
+                      text(start(elementBuffer[[elem]])[neg],-0.38,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
                   }
             }
         }

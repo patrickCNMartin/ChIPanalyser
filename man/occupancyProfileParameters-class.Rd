@@ -36,8 +36,7 @@ when using certain functions.
 Objects can be created by calls of the form
 \code{occupancyProfileParameters(ploidy = 2 , boundMolecules = 1000 ,
     backgroundSignal = 0 ,  maxSignal = 1 , chipMean = 150 ,   chipSd = 150 ,
-    chipSmooth = 250 , stepSize = 10 ,  removeBackground = 0 ,
-    thetaThreshold = 0.1 )}
+    chipSmooth = 250 , stepSize = 10 ,  removeBackground = 0 )}
 
 }
 \section{Slots}{
@@ -68,10 +67,7 @@ Objects can be created by calls of the form
     \item{\code{removeBackground}:}{Object of class \code{"numeric"}:
     A numeric value describing the value at which score should be removed.
     Defualt:0 (If negative scores then remove) }
-    \item{\code{thetaThreshold}:}{Object of class \code{"numeric"}:
-    A numeric value describing a threshold at which low ratios of correlation
-    over Mean Squared Error (
-    for accuracy estimation) should be removed. Default: 0.1 }
+
     }
 }
 \section{Methods}{
@@ -114,10 +110,7 @@ Objects can be created by calls of the form
     "occupancyProfileParameters", value = "numeric")}: Slot Setter Method }
     \item{stepSize}{\code{signature(object =
     "occupancyProfileParameters")}: Slot Accessor Method }
-    \item{thetaThreshold<-}{\code{signature(object =
-    "occupancyProfileParameters", value = "numeric")}: Slot Setter Method}
-    \item{thetaThreshold}{\code{signature(object =
-    "occupancyProfileParameters")}: Slot Accessor Method }
+
     }
 }
 \references{

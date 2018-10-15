@@ -15,7 +15,7 @@ ChIP-seq-like profile and a real ChIP-seq profile for a given loci.
 \usage{
 computeOptimal(DNASequenceSet, genomicProfileParameters, LocusProfile,
     setSequence, DNAAccessibility = NULL,
-    occupancyProfileParameters = NULL, parameter = "all",
+    occupancyProfileParameters = NULL, optimalMethod = "all",
     peakMethod="moving_kernel",cores=1)
 }
 
@@ -54,10 +54,12 @@ computeOptimal(DNASequenceSet, genomicProfileParameters, LocusProfile,
     However, it is strongly advised to tailor this object to maximise the
     goodness of fit of the model when compared to ChIP-seq data.
     }
-    \item{parameter}{
-    \code{parameter} is a character string which determines which parameter
-    should be computed. There are four options
-    c("correlation", "MSE", "theta", "all")
+    \item{optimalMethod}{
+    \code{paroptimalMethodameter} is a character string which determines which
+    method for optimal parameter selection should be selected. optimalMethod
+    can be one of the following:
+    pearson, spearman, kendall, ks, fscore, geometric, or all. Default is set
+    to all.
     }
     \item{peakMethod}{
     \code{peakMethod} is a character string  of one of the following:

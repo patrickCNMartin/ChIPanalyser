@@ -1,15 +1,18 @@
 import("GenomicRanges","Biostrings", "BSgenome","RcppRoll","parallel",
     "rtracklayer")
 
-importFrom("grDevices", "colorRampPalette", "heat.colors")
+importFrom("grDevices", "colorRampPalette", "heat.colors","as.raster","rainbow")
 importFrom("graphics", "axis", "box", "contour", "image", "lines",
-    "par", "plot", "polygon", "rect", "text", "title","segments")
+    "par", "plot", "polygon", "rect", "text", "title","segments","legend",
+    "rasterImage")
 importFrom("methods", "new", "validObject","is")
-importFrom("stats", "cor", "dgamma","sd","na.omit","median")
+importFrom("stats", "cor", "dgamma","sd","na.omit","median","ks.test",
+    "quantile")
 importFrom("utils", "read.table")
 importFrom("IRanges","IRanges")
 importFrom("rtracklayer","import")
 importFrom("S4Vectors","queryHits")
+importFrom("ROCR","prediction","performance")
 
 
 
@@ -59,8 +62,6 @@ exportMethods(
     "stepSize",
     "strandRule<-",
     "strandRule",
-    "thetaThreshold<-",
-    "thetaThreshold",
     "whichstrand<-",
     "whichstrand"
 

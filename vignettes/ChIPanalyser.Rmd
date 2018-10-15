@@ -104,7 +104,7 @@ use a full genome sequence for this object.
 * `PFM` is a path to file. In this case, it is a Position Frequency Matrix
 derived from the Bicoid Transcription factor in *Drosophila melanogaster*.
 This PFM is in _raw_ format. Although it is possible to to directly
-use a PFM R matrix (see motifDB R package), we chose to use a path 
+use a PFM R matrix (see motifDB R package), we chose to use a path
 to a file for this example.
 Most PFM's found online will come in a text file
 (with various formats: RAW, TRANSFAC, JASPAR).
@@ -121,7 +121,7 @@ the sequence above.
 locus in *Drosophila melanogaster*.
 
 * `eveLocusChip` is a data frame with ChIP score in the format of a simple
-bed file ( 4 columns : chromosome, start, end and score) for Bicoid 
+bed file ( 4 columns : chromosome, start, end and score) for Bicoid
 transcription factor.
 
 
@@ -133,11 +133,11 @@ objects, see section **Work Flow - Full Guide**
 ### Step 1 - Building Data objects and Pre-processing ChIP data
 
 The first step is to set up your data storing objects and extract normalised
-ChIP scores at loci of interest. When provided with a PFM, the 
+ChIP scores at loci of interest. When provided with a PFM, the
 `genomicProfileParameters` object will automatically convert it to a PWM.
-The `occupancyProfileParameters` object requires parameters extracted from 
-ChIP data. If using the `processingChIPseq` function, the 
-`occupancyProfileParameters` will be generated internally. 
+The `occupancyProfileParameters` object requires parameters extracted from
+ChIP data. If using the `processingChIPseq` function, the
+`occupancyProfileParameters` will be generated internally.
 
 
 ```{r,eval=TRUE, warnings = FALSE}
@@ -163,8 +163,8 @@ OPP <- occupancyProfileParameters(ploidy= 2,
     backgroundSignal = 0.02550997)
 OPP
 
-## Extracting ChIP score 
-eveLocusChip<-processingChIPseq(eveLocusChip,eveLocus,cores=1)
+## Extracting ChIP score
+eveLocusChip<-processingChIPseq(eveLocusChip,eveLocus,noiseFilter="zero",cores=1)
 str(eveLocusChip)
 
 ### Extracting occupancy profile parameters object built from ChIP data
@@ -202,16 +202,16 @@ boundMolecules(occupancyProfileParameters) <- c(1, 10, 20, 50, 100,
 
 ```{r, eval = TRUE, warnings = FALSE}
 
-optimalParam <- computeOptimal(DNASequenceSet = DNASequenceSet,
+optimalParam <- suppressWarnings(computeOptimal(DNASequenceSet = DNASequenceSet,
     genomicProfileParameters = GPP,
     LocusProfile = eveLocusChip,
     setSequence = eveLocus,
     DNAAccessibility = Access,
     occupancyProfileParameters = OPP,
-    parameter = "all",
+    optimalMethod = "all",
     peakMethod="moving_kernel",
-    cores=1)
-optimalParam
+    cores=1))
+str(optimalParam)
 
 ```
 
@@ -248,9 +248,9 @@ a given locus (or set of loci). If no Locus is provided then the whole
 genome will be considered. It is possible to set a higher number of
 cores to decrease computational time.
 
-** It is important to set names to your setSequence object (see below). 
-We recommend to set names yourself to make your analysis easier to keep 
-track of. Names will be set internally for computational reasons but 
+** It is important to set names to your setSequence object (see below).
+We recommend to set names yourself to make your analysis easier to keep
+track of. Names will be set internally for computational reasons but
 there must be concordance between setSequence and ChIP data **
 
 ** This aspect cannot be stressed enough**
@@ -311,29 +311,31 @@ after occupancy scores have been computed.
 
 ### Step 6 - Model Accuracy
 
-In order to plot the model accuracy (predicted model against real ChIP-seq
+Assessing model quality (predicted model against real ChIP-seq
 data).
 
 
 ```{r, eval=TRUE, warnings = FALSE}
 AccuracyEstimate <- profileAccuracyEstimate(LocusProfile = eveLocusChip,
-    predictedProfile = chipProfile, occupancyProfileParameters = OPP)
+    predictedProfile = chipProfile, occupancyProfileParameters = OPP,method="all")
+AccuracyEstimate <-AccuracyEstimate[[1]][[1]][[1]]
 AccuracyEstimate
-
 ```
 
 ### Step 7 - Plotting
 
 Finally, once all has been computed, it is possible to plot the results.
 
-```{r, eval=TRUE, warnings = FALSE, fig.width=10, fig.height=9.5}
+```{r, eval=TRUE, warnings = FALSE, fig.width=10, fig.height=8}
 # Plotting Optimal heat maps
-plotOptimalHeatMaps(optimalParam, parameter="all")
+par(oma=c(0,0,3,0))
+layout(matrix(1:8,ncol=4, byrow=T),width=c(6,1.5,6,1.5),height=c(1,1))
+plotOptimalHeatMaps(optimalParam,layout=FALSE)
 
 ```
 
 
-```{r, eval=TRUE, warnings = FALSE, fig.width=10, fig.height=6}
+```{r, eval=TRUE, warnings = FALSE, fig.width=10, fig.height=4.5}
 # Plotting occupancy Profile
 ##
 
@@ -342,8 +344,10 @@ plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
     chipProfile = eveLocusChip[[1]],
     DNAAccessibility = Access,
     occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
+    profileAccuracy=AccuracyEstimate,
     occupancyProfileParameters = OPP,
-    geneRef =geneRef)
+    geneRef=geneRef   
+    )
 ```
 
 
@@ -751,12 +755,12 @@ All default values will be used for further computation.
 As stated previously, we strongly advise using custom parameters in order
 to increase goodness of fit of model. The `processingChIPseq`
 function returns a list, the second element of which is an
-`occupancyProfileParameter` object. This specific object will contain both 
+`occupancyProfileParameter` object. This specific object will contain both
 max signal and background directly extracted from you ChIP data. These slots
-are explained below. 
+are explained below.
 
 However this function can also take a `occupancyProfileParameters`
-object as an argument if you wish to change the smoothing 
+object as an argument if you wish to change the smoothing
 parameters (see `chipSd`,`chipMean` and `chipSmooth`). The `processingChIPseq`
 function will update the one that is provided.
 
@@ -769,7 +773,7 @@ function will update the one that is provided.
 OPP <- occupancyProfileParameters(ploidy = 2 ,boundMolecules = 1000 ,
     backgroundSignal = 0 ,maxSignal = 1, chipMean = 150 , chipSd = 150 ,
     chipSmooth = 250 , stepSize = 10 ,
-    removeBackground = 0 , thetaThreshold = 0.1)
+    removeBackground = 0 )
 ```
 
 As it is the case with `genomicProfileParameters`, it is also possible
@@ -800,7 +804,7 @@ boundMolecules(OPP) <- 5000
 ```
 
 * `backgroundSignal`, a numeric value representing the background Signal
-in real ChIP-seq data (Default is set at 0). The background siganl is defined 
+in real ChIP-seq data (Default is set at 0). The background siganl is defined
 as the mean ChIP score over the entire genome (see `processingChIPseq` below).
 
 
@@ -878,21 +882,7 @@ removeBackground(OPP)
 removeBackground(OPP) <- 0
 ```
 
-* `thetaThreshold`, a numeric value describing the threshold used to
-calculate our in house *theta* value (Default is set at 0.1).
-*Theta* is a metric used to demonstrate which parameters are optimal
-by maximising the correlation and minimising the Mean Squared Error
-(MSE) between the predicted profile and actual ChIP-seq profiles.
-The higher the value of *theta*, the better the ratio between correaltion
-and MSE. Values below this threshold are discarded
-(replaced by Threshold) as they represent
-extremely poor accuracy with actual ChIP-seq data.
 
-```{r, eval=FALSE, echo=TRUE}
-thetaThreshold(OPP)
-
-thetaThreshold(OPP) <- 0.1
-```
 
 
 # Work Flow - Analysis
@@ -911,14 +901,14 @@ its associated plotting function `plotOptimalHeatMaps`.
 ## ChIP Score extraction.
 
 It can be required to provied ChIP data to some of the functions in
-ChIPanalyser. We provided a function that will extract and normalise 
+ChIPanalyser. We provided a function that will extract and normalise
 ChIP data from various formats. Based on this score, an `occupancyProfileParameters`
 will also be builtor updated (see above) with value for the relevant slots
 (See `backgroundSignal` and `maxSignal`).
 
 ```{r, eval=FALSE}
 processingChIPseq(profile,loci=NULL,reduce=NULL,
-    occupancyProfileParameters=NULL,peaks=NULL,
+    occupancyProfileParameters=NULL,noiseFilter="zero",peaks=NULL,
     Access=NULL,cores=1)
 
 ```
@@ -928,12 +918,12 @@ As input, this functions takes:
 a `GRanges` or a `data.frame`containing ChIP scores.
 
 *  `loci` argument is a `GRanges` of the loci of interest. If none are supplied,
-a set of Sequence will be built internally based on the different 
+a set of Sequence will be built internally based on the different
 chromosome available in ChIP data.
 
 * `reduce` is a numeric value describing how many regions are to be selected.
-If a large amount of regions are supplied (let's say you split your favourite 
-genome into bins of 20kbp and built a `GRanges` with those bins), 
+If a large amount of regions are supplied (let's say you split your favourite
+genome into bins of 20kbp and built a `GRanges` with those bins),
 you may choose to select the top regions based on the average ChIP singal in that region or
 if `peaks` are supplied select the regions overlapping with `peaks` with the highest ChIP score.
 
@@ -941,12 +931,18 @@ if `peaks` are supplied select the regions overlapping with `peaks` with the hig
 smoothing parameters (see `chipSd`,`chipMean` and `chipSmooth`) please provide the aformentioned object.
 `processingChIPseq` will return a updated `occupancyProfileParameters`.
 
-* `peaks` is a path to file or `GRanges` containing ChIP peaks. This argument is generally 
+* `peaks` is a path to file or `GRanges` containing ChIP peaks. This argument is generally
 used if reduce is **not NULL**
 
 * `Access` is a `GRanges` object containing accesible DNA for a given organism/cell type.
-If reduce is not NULL, only regions with accessible DNA will be selected. 
+If reduce is not NULL, only regions with accessible DNA will be selected.
 If `peaks` is not NULL, regions with peaks *and* accessible DNA will be selected.
+
+* `noiseFilter` is one of the following: zero, mean, median or sigmoid. The noise filter
+is the method by which noise is buffered. Zero will remove all score below 0. Mean and median
+will remove all score below the mean and median respectively. Finally, sigmoid will assign a weight
+to each score based on a logistic regression curve (midpoint = ChIP-seq score 95 quantile). All scores 
+above the midpoint will receive a weight between 1 and 2. All score below will receive a score between 0 and 1.
 
 * `cores` is the number of course that should be used to process ChIP data.
 
@@ -1069,7 +1065,7 @@ they will be named internally following the format:
 
 If you are unfamiliar with GRanges, the following examples demonstrates
 naming in the context of ChIPAnalyser. We recommend getting acquainted
-with GenomicRanges as many aspect of ChIPAnalyser require the use of GRanges.
+with GenomicRanges as many aspect of ChIPanalyser require the use of GRanges.
 
 ```{r, eval=TRUE, warnings = FALSE, echo=TRUE}
 # Sequence names of Loci
@@ -1105,8 +1101,8 @@ PWMScores
 
 As you can see, the `genomicProfileParameters` argument is
 the `genomicProfileParameters` object computed in the previous example.
-ChIPAnalyser works in a sequential manner: resulting object from one
-functions are often parsed as arguments to other functions.
+ChIPAnalyser works in a sequential manner: resulting objects from one
+function are often parsed as arguments to other functions.
 Finally, if your sequence of interest does not contain any accessible DNA,
 you will be notified during the computation and it is possible to extract
 inaccessible loci by using `NoAccess(PWMScores)`
@@ -1119,7 +1115,7 @@ It is worth mentioning that Occupancy scores are dependant on values
 assigned to `ScalingFactorPWM`  and `boundMolecules`.
 If more than one value were to be assigned to these parameters, the resulting
 output will be a combination of both. For more information
-see the `computeOccupancy` example as we will demonstrate  multiple value
+see the `computeOptimal` example as we will demonstrate  multiple value
 computation (Single Value for lambda and boundMolecules will return an
 object identical in structure as with multiple values).
 The arguments for `computeOccupancy` are the following:
@@ -1288,16 +1284,15 @@ The arguments for this function are the following:
 
 ```{r, eval=FALSE}
 profileAccuracyEstimate(LocusProfile,
-    predictedProfile, occupancyProfileParameters = NULL)
+    predictedProfile, occupancyProfileParameters = NULL,method="all")
 ```
 
 ### Input data - Accuracy Estimate
-`profileAccuracyEstimate` requires only three arguments. `precitedProfile`
-is the result of `computeChipProfile` and `occupancyProfileParameters`
-is a `occupancyProfileParameters`. Finally, `LocusProfile`
-is a list containing actual ChIP-seq profiles.
-These profiles should be normalised to a base pair level.
-In other words, a peak should be divided by its width.
+`profileAccuracyEstimate` requires only two arguments. `precitedProfile`
+is the result of `computeChipProfile`. Finally, `LocusProfile`
+is a list containing actual ChIP-seq profiles. This list is the result of the 
+`processingChIPseq` function. 
+
 We also strongly recommend that each loci in `LocusProfile`
 (each element of the list) should be named in an identical manner
 as the loci used in `setSequence` (See previous functions).
@@ -1311,6 +1306,21 @@ In this example, there is only one element in the list. However,
 this list can be as long as you wish and contain all the Loci
 that you are interested in.
 
+`occupancyProfileParameters` is only required if you have change the step
+size slot. Each predicted profile, will only contain a fraction of the score (see stepSize)
+
+Finally, `method` is the quality assessment method that you wish to use. The following possibilities
+are available: pearson, spearman, kendall, ks, geometric,fscore and all.
+`pearson,spearman and kendall` are correlation methods.
+`ks` is a Kolmogorov-Smirnov test (Will return both KS Distance and KS p-value)
+`geometric` is in an house metric that describes the ratio of difference in the area between curves
+over shared area between curves.
+`fscore` is a combination of multiple metrics such as Precision,recall,Fscore,Accuracy,MCC, and AUC.
+`all` is a combination of all the above mentioned.
+
+In every case, the Mean Squared Error will also be returned.
+
+
 ### profileAccuracyEstimate
 
 To test the accuracy the model against ChIP-seq data:
@@ -1320,20 +1330,15 @@ AccuracyEstimate <- profileAccuracyEstimate(LocusProfile = eveLocusChip,
     predictedProfile = chipProfile, occupancyProfileParameters = OPP)
 AccuracyEstimate
 ```
-The result of this function will be a list of accuracy estimates for every
-loci and every combination of `ScalingFactorPWM` and `boundMolecules`.
-The correlation and Mean Squared Error (MSE) represents the correlation and
-MSE between the predicted profile
-(for a given combination on `lambda` and `boundMolecules`)
-and the ChIP-seq profile for the same loci. `meanCorr` and `meanMSE`
-describe the average correlation and MSE for all loci
-(for a given combination on `ScalingFactorPWM` and `boundMolecules`).
-The idea behind average correlation and MSE is that the scaling factor
-and number of molecules should be the same regardless of the loci as all
-TF's are contained within the same nucleus. Finally, `meanTheta` is an in
-house metric describing a modified ratio of correlation over MSE.
-The goal is to find the sweet spot between high correlation and
-low MSE (see `computeOptimal` and `plotOptimalHeatMaps`).
+This function returns a list of two elements. The first element represents lists containing
+the model quality assessments for every combination of parameters (Bound Molecules and lambda)
+for every genomic region. The second element of the list contains the result of the ROCR package:
+False positives, False Negative, etc... 
+
+
+Generally Speaking, we recommend to only use the first element of this list. However, we offer
+the possibility to choose from the other metrics available in the ROCR package by returning the 
+ROCR prediction object. 
 
 ## Finding optimal Parameters
 
@@ -1341,12 +1346,10 @@ As described previously, it is not always possible to know the optimal
 set of parameters for `ScalingFactorPWM` and `boundMolecules`.
 `ChIPAnalyser` offers the possibility to backward infer the parameters
 using the `computeOptimal` function. By testing different combinations
-of `ScalingFactorPWM` and `boundMolecules`, this function will return the
-combination with the highest correlation , lowest Mean Squared Error or
-highest theta depending on which parameter was selected. As a reminder,
-theta is an in house metric representing a modified ratio of correlation
-over MSE ( extreme values are replaced by threshold). The goal is to find
-the sweet spot between high correlation and low MSE.
+of `ScalingFactorPWM` and `boundMolecules`, the `computeOptimal` function will return
+a list of values that were the highest ranking parameter combination for each model quality assessment method 
+selected (see`profileAccuracyEstimate` above). This function will also return a list of matricies containing relevant scores 
+for each combination.
 It is possible to run this functions and
 make use of multiple cores in order to decrease computational time.
 Values that should be tested for `ScalingFactorPWM` and for
@@ -1372,7 +1375,7 @@ computeOptimal(DNASequenceSet,
     setSequence,
     DNAAccessibility = NULL,
     occupancyProfileParameters = NULL,
-    parameter = "all",
+    optimalMethod = "all",
     peakMethod="moving_kernel"
     cores=1)
 ```
@@ -1397,8 +1400,9 @@ All other slots will be computed internally.
 Although optional, we strongly advise to tailor this object by using values
 directly extracted from `LocusProfile`
 
-`parameter` defines which metric you wish to compute.
-There are four possible choices: *correlation, MSE, theta* or *all*.
+`optimalMethod` defines which metric you wish to compute.
+There are four possible choices: *pearson*, *spearman*, *kendall*, *ks*, *geometric*, 
+*fscore* or *all* 
 It is imperative that the lists/GRanges are named with the name of
 the Loci of interest.
 `peakMethod`describes if you wish to use an approximation for ChIP-seq profile
@@ -1423,17 +1427,15 @@ optimalParam <- computeOptimal(DNASequenceSet = DNASequenceSet,
     setSequence = eveLocus,
     DNAAccessibility = Access,
     occupancyProfileParameters = OPP,
-    parameter = "all",
+    optimalMethod = "all",
     cores=1)
 optimalParam
 ```
 
-This functions returns either a list or a list of lists
-(if "all" parameter was selected). Each element in the list represents
-the **optimal set of parameters**, the **optimal matrix**
-(a matrix with correlation, MSE and/or theta computed for a given
-combination of `ScalingFactorPWM` and `boundMolecules`) and
-finally the **selected parameter**.
+The `computeOptimal` function will return
+a list of values that were the highest ranking parameter combination for each model quality assessment method
+selected (see`profileAccuracyEstimate` above). This function will also return a list of matricies containing relevant scores 
+for each combination.
 
 # Plotting Results
 As it is the case in mamy fields, data visualisation is a key aspect
@@ -1449,19 +1451,25 @@ plot *correlation ,MSE, theta* or *all of the previous*.
 This functions requires minimal input as described below:
 
 ```{r, eval=F}
-plotOptimalHeatMaps(optimalParam=optimalParam ,
-    parameter="all", Contour=TRUE)
+plotOptimalHeatMaps(optimalParam=optimalParam,contour=TRUE,col=NULL,main=NULL,
+    layout=TRUE)
 ```
 
 ### Input Data & Plotting
 `plotOptimalHeatMaps` only requires one data input in the form of the
-result of `computeOptimal` (see `computeOptimal`). The `parameter` argument
-defines which of the following parameters you wish to plot:
-*correlation ,MSE, theta* or *all of the previous*. Finally, `Contour`
-defines if you which to plot Contour lines on your heat map. As an example:
+result of `computeOptimal` (see `computeOptimal`). `contour` defines if contour
+lines should be plotted. `col` are the colors that you wish to use for your heatmaps.
+It should be noted that the color vector will be recycled if not enough colors are provided.
+`main` is the main title. Finally, `layout` is a logical value that defines if standard layout should be selected.
+Standard layout will generate an individual heatmap for each matrix provided (`computeOptimal` result) with a heat map scale bar on the left.
+
+NOTE: If you use your own layout, you should be aware that the `plotOptimalHeatMaps` will always plot both the heat map and the scale bar.
+In R this is considered as two plots (rasterImage scales). 
+
+As an example:
 
 ```{r, eval=FALSE, warnings = FALSE, echo=TRUE, fig.width=4, fig.height=10}
-plotOptimalHeatMaps(optimalParam, parameter="all")
+plotOptimalHeatMaps(optimalParam)
 ```
 
 
@@ -1484,6 +1492,7 @@ plotOccupancyProfile <- function(predictedProfile,
     chipProfile = NULL,
     DNAAccessibility = NULL,
     occupancy = NULL,
+    profileAccuracy=NULL,
     PWM=FALSE,    
     occupancyProfileParameters = NULL,
     geneRef = NULL,axis=TRUE,...)
@@ -1498,11 +1507,11 @@ This also means that the main title is left to the user discretion.
 The arguments described above should come in the following format:
 
 * `precitedProfile`, a GRanges object containing the predicted ChIP-seq
-like profile for one locus and one combination of `lambda`
+like profile for *one* locus and one combination of `lambda`
 and `boundMolecules`.
 * `setSequence`, a GRanges object containing the locus of interest.
 * `profileAccuracy`, the profile Accuracy estimate for one loci and
-for one combination of `lambda` and `boundMolecules`
+for *one* combination of `lambda` and `boundMolecules`
 * `chipProfile`, a vector containing ChIP-seq data for locus of interest.
 In previous functions, ChIP-seq data was stored in a named list.
 In this case, it is the individual numeric vector contained within that list.

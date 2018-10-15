@@ -11,7 +11,8 @@ will process and extract ChIP scores at a set of loci of interest.
 
 \usage{
 processingChIPseq(profile,loci=NULL,reduce=NULL,
-occupancyProfileParameters=NULL,peaks=NULL,Access=NULL,cores=1)
+occupancyProfileParameters=NULL,
+peaks=NULL,Access=NULL,noiseFilter=c("zero","mean","median","sigmoid"),cores=1)
 }
 
 \arguments{
@@ -52,6 +53,13 @@ occupancyProfileParameters=NULL,peaks=NULL,Access=NULL,cores=1)
     Accessible DNA. If provided, regions will be selected only if they
     contain accesible DNA.  Default=NULL
     }
+    \item{noiseFilter}{\code{noiseFilter}: Noise filtering method that
+    should be used on ChIP-seq data. Four methods are available: Zero, Mean,
+    Median and Sigmoid. Zero removes all ChIP-seq scores bellow zero, mean under
+    the mean score, median under median score and sigmoid assignes a weight
+    to each score based on a logistic regression curve. Mid point is set at 95
+    95 quantile of ChIP-seq scores. Below midpoint will receive a score between
+    0 and 1 , everything above will receive a score between 1 and 2}
     \item{cores}{
     \code{cores} is the number of cores used to extract ChIP scores. Default = 1
     }

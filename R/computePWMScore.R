@@ -47,12 +47,13 @@ computePWMScore <- function(DNASequenceSet,genomicProfileParameters,
     #Processing DNAAccessibility
     if(!is.null(DNAAccessibility)){
         if(length(DNAAccessibility$DNAAccessibility)<1){
-            DNAAccessibility$DNAAccessibility <-rep(1,length(DNAAccessibility))
+            DNAAccessibility$DNAAccessibility <- rep(1, length(DNAAccessibility))
         }
     }
 
     ### setSequence split
-    if(length(setSequence)>cores & cores!=1){
+
+    if(length(setSequence)>cores & cores>1){
         message("Multi Core Sequence Split")
         setSequence<-setSequence[which(width(setSequence)>2*ncol(PWM))]
         localSequence <- .splitDNARanges(setSequence,cores)
@@ -62,8 +63,7 @@ computePWMScore <- function(DNASequenceSet,genomicProfileParameters,
             DNASequenceSet=DNASequenceSet,
             DNAAccessibility=DNAAccessibility,
             PWM=PWM,PWMThresholdLocal=PWMThresholdLocal,minPWMScore=minPWMScore,
-            maxPWMScore=maxPWMScore,strand=strand,strandRule=strandRule,
-            mc.cores=cores)
+            maxPWMScore=maxPWMScore,strand=strand,strandRule=strandRule,mc.cores=cores)
 
         AccessibleSequence<-unlist(lapply(Scores,"[[",1))
         NoAcc<-unlist(lapply(Scores,"[[",2))

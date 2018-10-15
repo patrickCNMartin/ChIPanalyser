@@ -13,8 +13,7 @@ setClass("occupancyProfileParameters",
     chipSd = "numeric",
     chipSmooth = "vector",
     stepSize = "numeric",
-    removeBackground = "numeric",
-    thetaThreshold = "numeric"),
+    removeBackground = "numeric"),
 
     prototype = prototype(ploidy = 2 ,
     boundMolecules = 2000 ,
@@ -24,8 +23,7 @@ setClass("occupancyProfileParameters",
     chipSd = 200 ,
     chipSmooth = 250 ,
     stepSize = 10 ,
-    removeBackground = 0 ,
-    thetaThreshold = 0.1 ),
+    removeBackground = 0),
 
     validity = function(object){
     if(object@ploidy < 0){
@@ -56,20 +54,16 @@ setClass("occupancyProfileParameters",
     if(object@stepSize < 0){
     stop("Occupancy Profile Parameters: Step Size must be positive.")
     }
-    if(object@removeBackground < 0){
-    stop("Occupancy Profile Parameters:
-    removeBackground must be positive")
+    if(class(object@removeBackground)!="numeric"){
+    stop("removeBackground Must be numeric")
     }
-    if(object@thetaThreshold < 0){
-    stop("Occupancy Profile Parameters:
-    thetaThreshold must be positive")
-    }
+
     return(TRUE)
     }
 )
 
 ## Class Union for Genomic Profile Parameters slot
-setClassUnion("GRList",c("GRangesList","list"))
+setClassUnion("GRList",c("GRangesList","list","GRanges"))
 
 ## Genomic Profile Parameters
 setClass("genomicProfileParameters",
@@ -113,8 +107,8 @@ setClass("genomicProfileParameters",
     }
 
 
-    if(all(object@PFMFormat %in% c("raw","transfac","JASPAR","sequences",
-    "matrix")) ==FALSE ){
+    if(all(object@PFMFormat %in% c("raw","transfac","JASPAR","sequences","matrix"))
+    ==FALSE ){
         stop("Genomic Profile Parameters Validation:
         PFM file is not one of the following formats:
         raw,transfac,JASPAR,sequences or matrix.")
@@ -191,8 +185,7 @@ occupancyProfileParameters <- function(
     chipSd = 150 ,
     chipSmooth = 250 ,
     stepSize = 10 ,
-    removeBackground = 0 ,
-    thetaThreshold = 0.1){
+    removeBackground = 0){
     return(new("occupancyProfileParameters",
         ploidy = ploidy ,
         boundMolecules = boundMolecules ,
@@ -202,8 +195,6 @@ occupancyProfileParameters <- function(
         chipSd = chipSd ,
         chipSmooth = chipSmooth ,
         stepSize = stepSize ,
-        removeBackground = removeBackground ,
-        thetaThreshold = thetaThreshold))
-
-
+        removeBackground = removeBackground
+        ))
 }

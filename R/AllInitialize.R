@@ -144,8 +144,7 @@ setMethod(f="initialize",
         chipSd = .Object@chipSd,
         chipSmooth = .Object@chipSmooth,
         stepSize = .Object@stepSize,
-        removeBackground = .Object@removeBackground,
-        thetaThreshold = .Object@thetaThreshold){
+        removeBackground = .Object@removeBackground){
 
         if(length(ploidy)>0){
             if(class(ploidy)=="numeric"){
@@ -219,13 +218,7 @@ setMethod(f="initialize",
         } else {
         stop("removeBackground is not numeric")}}
 
-        if(length(thetaThreshold)>0){
-            if(class(thetaThreshold)=="numeric"){
-        NewthetaThreshold<-thetaThreshold
-        .Object@thetaThreshold <- NewthetaThreshold
-        validObject(.Object)
-        } else {
-        stop("thetaThreshold is not numeric")}}
+
 
     return(.Object)
     }

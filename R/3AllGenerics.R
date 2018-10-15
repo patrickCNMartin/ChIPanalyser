@@ -161,14 +161,9 @@ setGeneric("removeBackground",
 setGeneric("removeBackground<-",
     function(object, value) standardGeneric("removeBackground<-"))
 
+
 setGeneric("stepSize",
     function(object) standardGeneric("stepSize"))
 
 setGeneric("stepSize<-",
     function(object, value) standardGeneric("stepSize<-"))
-
-setGeneric("thetaThreshold",
-    function(object) standardGeneric("thetaThreshold"))
-
-setGeneric("thetaThreshold<-",
-    function(object, value) standardGeneric("thetaThreshold<-"))

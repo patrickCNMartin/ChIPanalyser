@@ -15,7 +15,7 @@ needed when using certain functions.
 occupancyProfileParameters(ploidy = 2 , boundMolecules = 1000 ,
     backgroundSignal = 0 ,  maxSignal = 1 , chipMean = 150 ,
     chipSd = 150 , chipSmooth = 250 , stepSize = 10 ,
-    removeBackground = 0 , thetaThreshold = 0.1 )
+    removeBackground = 0 )
 }
 
 \arguments{
@@ -44,11 +44,7 @@ occupancyProfileParameters(ploidy = 2 , boundMolecules = 1000 ,
     \item{removeBackground}{ \code{\link{removeBackground}}:
     A numeric value describing the value at which score should be removed.
     Defualt:0 (If negative scores then remove) }
-    \item{thetaThreshold}{ \code{\link{thetaThreshold}}:
-    A numeric value describing a threshold at which low ratios of correlation
-    over Mean Squared Error (for accuracy estimation) should be removed.
-    Default: 0.1
-    }
+
 
 }
 \details{
@@ -91,9 +87,6 @@ stepSize = 10
 
 
 removeBackground = 0
-
-
-thetaThreshold = 0.1
 
 
 }

@@ -40,18 +40,16 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
     #    ncol(PWMMat))]
     #}
 
-    # Extracting DNA Accessibility in parallel
+    # Extracting DNA Accessibility in parallel (still dont know why it chrashes with hg19)
     if(!is.null(DNAAccessibility)){
         ## Factor correction  and ID match
-        DNASequenceSet<-DNASequenceSet[unique(match(
-        as.character(seqnames(DNAAccessibility)), names(DNASequenceSet)))]
+        DNASequenceSet<-DNASequenceSet[unique(match(as.character(seqnames(DNAAccessibility)), names(DNASequenceSet)))]
         ## Split by Chromosome
         DNA<-split(DNASequenceSet,names(DNASequenceSet))
         Access<-split(DNAAccessibility, seqnames(DNAAccessibility))
 
         ## parallel Intersect for large genomes
-        DNASequenceSet<-parallel::mcmapply(.internalDNASequenceFromAccess,
-        DNA=DNA,Access=Access,mc.cores=cores)
+        DNASequenceSet<-parallel::mcmapply(.internalDNASequenceFromAccess,DNA=DNA,Access=Access,mc.cores=cores)
 
 
         # Rebuilding DNASequenceSet
@@ -65,12 +63,11 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
             DNASequenceSet<-DNASequenceSet[[1]]
         }
 
-        DNASequenceSet <- DNASequenceSet[which(width(DNASequenceSet) >
-        ncol(PWMMat))]
+        DNASequenceSet <- DNASequenceSet[which(width(DNASequenceSet) > ncol(PWMMat))]
 
     }
     # Computing DNA sequance Length
-    DNASequenceLength <- sum(width(DNASequenceSet))
+    DNASequenceLength <- sum(as.numeric(width(DNASequenceSet)))
 
     # Progress Messages when required.
     if(verbose){
@@ -93,8 +90,7 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
        strand=strand,strandRule=strandRule,mc.cores=cores)
 
 
-    DNASequenceScoreSetTotalAcces <- unlist(lapply(
-    DNASequenceScoreSetTotalAcces,"[[",1))
+    DNASequenceScoreSetTotalAcces <- unlist(lapply(DNASequenceScoreSetTotalAcces,"[[",1))
 
     #Message printing when required
     if(verbose){
@@ -110,8 +106,7 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
     ## Clean your parallel R script and comment it
 
     for(i in seq_along(lambda)){
-        sumExpPWMScoreLocal[i] <- sum(exp(DNASequenceScoreSetTotalAcces *
-        (1/lambda[i])))
+        sumExpPWMScoreLocal[i] <- sum(exp(DNASequenceScoreSetTotalAcces * (1/lambda[i])))
         averageExpPWMScore[i] <- sumExpPWMScoreLocal[i]/DNASequenceLength
     }
 

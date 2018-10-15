@@ -1,6 +1,6 @@
 computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
     LocusProfile,setSequence, DNAAccessibility = NULL,
-    occupancyProfileParameters = NULL,parameter = "all",
+    occupancyProfileParameters = NULL,optimalMethod = "all",
     peakMethod="moving_kernel",cores=1){
     #validity checking
 
@@ -17,6 +17,12 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
         }
     } else{
         occupancyProfileParameters <- occupancyProfileParameters()
+    }
+
+    ## Need to set a check for optimal method otherwise shit will fuck up
+    if(!any(optimalMethod %in% c("pearson","spearman","kendall","ks","geometric","fscore","all"))){
+        stop("Optimal method should be one of the following :
+        pearson,spearman,kendall,ks,geometric,fscore  or all")
     }
 
     #Setting Parameters for computation
@@ -48,7 +54,7 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
     message("Computing PWM Score at Loci & Extracting Sites Above Threshold")
     SiteSpecific <- computePWMScore(DNASequenceSet = DNASequenceSet,
         genomicProfileParameters = GenomeWide, setSequence = setSequence,
-        DNAAccessibility = DNAAccessibility, verbose = FALSE)
+        DNAAccessibility = DNAAccessibility,cores=cores, verbose = FALSE)
 
     message("Computing Occupancy")
     Occupancy <- computeOccupancy(AllSitesPWMScore = SiteSpecific,
@@ -65,59 +71,13 @@ computeOptimal <- function(DNASequenceSet,genomicProfileParameters,
     message("Computing Accuracy of Profile")
     ProfileAccuracy <- profileAccuracyEstimate(LocusProfile = LocusProfile,
         predictedProfile = PredictedProfile,
-        occupancyProfileParameters = occupancyProfileParameters)
-#browser()
+        occupancyProfileParameters = occupancyProfileParameters,method="all")
+
 
     #Extracting Optimal matrix from Profile AccuracyEstimate
-    AllMatrix <- vector("list",3)
-    AllParam <- vector("list",3)
-    Param <- c("meanCorr","meanMSE","meanTheta")
-    for(i in seq_len(3)){
-        AllParam[[i]] <- c(0,0)
-        AllMatrix[[i]] <- matrix(0,nrow=length(ScalingFactorPWM(
-            genomicProfileParameters)),
-            ncol=length(boundMolecules(occupancyProfileParameters)))
-        rownames(AllMatrix[[i]]) <- ScalingFactorPWM(genomicProfileParameters)
-        colnames(AllMatrix[[i]]) <- boundMolecules(occupancyProfileParameters)
 
-        ParamSplit <- lapply(ProfileAccuracy,function(x){x<-x[[1]][Param[i]]})
-        ParamSplit <- split(ParamSplit,1:length(boundMolecules(
-            occupancyProfileParameters)))
+    opti<-.optimalExtraction(genomicProfileParameters,occupancyProfileParameters,ProfileAccuracy,optimalMethod)
 
-        for(j in seq_along(ParamSplit)){
-            AllMatrix[[i]][,j] <- unname(unlist(unname(ParamSplit[[j]])))
-        }
-        if(Param[i]=="meanMSE"){
-            buffer <- which(AllMatrix[[i]]==min(AllMatrix[[i]]),arr.ind=TRUE)
-        }else{
-            buffer <- which(AllMatrix[[i]]==max(AllMatrix[[i]]),arr.ind=TRUE)
-        }
-
-        AllParam[[i]][1] <- rownames(AllMatrix[[i]])[buffer[,1]]
-        AllParam[[i]][2] <- colnames(AllMatrix[[i]])[buffer[,2]]
-    }
-
-    names(AllMatrix) <- Param
-    names(AllParam) <- Param
-    message("Extracting Optimal Set of Parameters")
-    if(parameter == "correlation"){
-        optimalParam <- AllParam[["meanCorr"]]
-        optimalMatrix <- AllMatrix[["meanCorr"]]
-    }
-    if(parameter == "MSE"){
-        optimalParam <- AllParam[["meanMSE"]]
-        optimalMatrix <- AllMatrix[["meanMSE"]]
-    }
-    if(parameter == "theta"){
-        optimalParam <- AllParam[["meanTheta"]]
-        optimalMatrix <- AllMatrix[["meanTheta"]]
-    }
-    if(parameter == "all"){
-        optimalParam <- AllParam
-        optimalMatrix <- AllMatrix
-    }
-    #,Occupancy,PredictedProfile,ProfileAccuracy)
-    return(list("Optimal Parameters" = optimalParam,
-    "Optimal Matrix" = optimalMatrix,"Parameter" = parameter))
-
+    #return(list(opti,Occupancy,PredictedProfile,ProfileAccuracy))
+    return(opti)
 }

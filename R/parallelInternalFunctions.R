@@ -4,18 +4,13 @@
 
 ##### computeChipProfile #####
 ### Looping over Loci###
-.internalChIPLoci <- function(profile,Occup,LocalSet,OccupancyVals,
-    chipMean=chipMean,chipSd=chipSd,
-    stepSize=stepSize,norm=norm,chipSmooth=chipSmooth,
-    peakSignificantThreshold=peakSignificantThreshold,
-    ZeroBackground=ZeroBackground,removeBackground=removeBackground,
-    method=method){
-
+.internalChIPLoci <- function(profile,Occup,LocalSet,OccupancyVals,chipMean=chipMean,chipSd=chipSd,
+  stepSize=stepSize,norm=norm,chipSmooth=chipSmooth,peakSignificantThreshold=peakSignificantThreshold,ZeroBackground=ZeroBackground,removeBackground=removeBackground,method=method){
+  #browser()
     stepIndex<-seq(from=1, to=width(LocalSet), by=stepSize)
     occupancyAbundanceChIPLocal<-rep(ZeroBackground,width(LocalSet))
 
-    occupancyAbundanceChIPLocal[(start(Occup) -
-    start(LocalSet) + 1)] <- OccupancyVals
+    occupancyAbundanceChIPLocal[(start(Occup) - start(LocalSet) + 1)] <- OccupancyVals
 
     occupancyAbundanceChIPLocal[which(occupancyAbundanceChIPLocal <
         removeBackground)] <- 0
@@ -41,58 +36,54 @@
 }
 ##### computeChipProfile #####
 ### Looping over Parameters ###
-.internalChIPParam <- function(SplitGRList,Occup,LocalSet,OccupancyVals,
-    chipMean=chipMean,chipSd=chipSd,
-    stepSize=stepSize,norm=norm,chipSmooth=chipSmooth,
-    peakSignificantThreshold=peakSignificantThreshold,
-    ZeroBackground=ZeroBackground,removeBackground=removeBackground,
-    method=method){
+.internalChIPParam <- function(SplitGRList,Occup,LocalSet,OccupancyVals,chipMean=chipMean,chipSd=chipSd,
+  stepSize=stepSize,norm=norm,chipSmooth=chipSmooth,peakSignificantThreshold=peakSignificantThreshold,ZeroBackground=ZeroBackground,removeBackground=removeBackground,method=method){
 
-    for(j in seq_along(Occup)){
-        stepIndex<-seq(from=1, to=width(LocalSet[[j]]), by=stepSize)
-        occupancyAbundanceChIPLocal<-rep(
-            ZeroBackground,width(LocalSet[[j]]))
-        occupancyAbundanceChIPLocal[(start(Occup[[j]]) -
-            start(LocalSet[[j]]) + 1)] <- OccupancyVals[[j]]
-        occupancyAbundanceChIPLocal[which(occupancyAbundanceChIPLocal <
-            removeBackground)] <- 0
-        if(any(method=="exact")){
-        occupancyAbundanceChIPLocal <- .generateChIPProfile(
-            occupancyAbundanceChIPLocal,chipMean,chipSd,
-            chipSmooth,norm=norm, quick=FALSE,
-            peakSignificantThreshold=peakSignificantThreshold)
-        }else if(any(method=="truncated_kernel")){
-        occupancyAbundanceChIPLocal <- .generateChIPProfile(
-            occupancyAbundanceChIPLocal,chipMean,chipSd,
-            chipSmooth,norm=norm, quick=TRUE,
-            peakSignificantThreshold=peakSignificantThreshold)
-        } else if(any(method=="moving_kernel")){
-        occupancyAbundanceChIPLocal <- .generateChIPProfileRcpp(
-            occupancyAbundanceChIPLocal, chipMean, chipSd, chipSmooth,
-            norm = norm,
-            peakSignificantThreshold=peakSignificantThreshold)
-        }
-        SplitGRList[[j]]$ChIP<-occupancyAbundanceChIPLocal[stepIndex]
+  for(j in seq_along(Occup)){
+      stepIndex<-seq(from=1, to=width(LocalSet[[j]]), by=stepSize)
+      occupancyAbundanceChIPLocal<-rep(
+          ZeroBackground,width(LocalSet[[j]]))
+      occupancyAbundanceChIPLocal[(start(Occup[[j]]) -
+          start(LocalSet[[j]]) + 1)] <- OccupancyVals[[j]]
+      occupancyAbundanceChIPLocal[which(occupancyAbundanceChIPLocal <
+          removeBackground)] <- 0
+      if(any(method=="exact")){
+      occupancyAbundanceChIPLocal <- .generateChIPProfile(
+          occupancyAbundanceChIPLocal,chipMean,chipSd,
+          chipSmooth,norm=norm, quick=FALSE,
+          peakSignificantThreshold=peakSignificantThreshold)
+      }else if(any(method=="truncated_kernel")){
+      occupancyAbundanceChIPLocal <- .generateChIPProfile(
+          occupancyAbundanceChIPLocal,chipMean,chipSd,
+          chipSmooth,norm=norm, quick=TRUE,
+          peakSignificantThreshold=peakSignificantThreshold)
+      } else if(any(method=="moving_kernel")){
+      occupancyAbundanceChIPLocal <- .generateChIPProfileRcpp(
+          occupancyAbundanceChIPLocal, chipMean, chipSd, chipSmooth,
+          norm = norm,
+          peakSignificantThreshold=peakSignificantThreshold)
+      }
+      SplitGRList[[j]]$ChIP<-occupancyAbundanceChIPLocal[stepIndex]
 
-    }
+  }
 
-    return(SplitGRList)
+  return(SplitGRList)
 }
 
 ##### computeChipProfile #####
 ### Split setSequence for parallel processing in computeChipProfile
 .internalChIPLociSplit<- function(LocalSet,stepSize){
 
-    stepIndex <- seq(from=1, to=width(LocalSet), by=stepSize)
-    SplitSeq <- GRanges(seqnames=S4Vectors::Rle(as.character(
-        seqnames(LocalSet)),
-        length(stepIndex)),
-        ranges = IRanges::IRanges(start = start(LocalSet)+
-            stepIndex-1,end =start(LocalSet)+stepIndex-1+(stepSize)),
-        strand = "*", ChIP=rep(0,length(stepIndex)))
+  stepIndex <- seq(from=1, to=width(LocalSet), by=stepSize)
+  SplitSeq <- GRanges(seqnames=S4Vectors::Rle(as.character(
+      seqnames(LocalSet)),
+      length(stepIndex)),
+      ranges = IRanges::IRanges(start = start(LocalSet)+
+          stepIndex-1,end =start(LocalSet)+stepIndex-1+(stepSize)),
+      strand = "*", ChIP=rep(0,length(stepIndex)))
 
-    names(SplitSeq) <- rep(names(LocalSet), length(SplitSeq))
-    return(SplitSeq)
+  names(SplitSeq) <- rep(names(LocalSet), length(SplitSeq))
+  return(SplitSeq)
 }
 
 ##### computeChipProfile #####
@@ -147,38 +138,40 @@
 ##### computePWMScore #####
 #### Scores Above threshold
 
-.internalPWMScoreExt<-function(setSequence,DNASequenceSet,DNAAccessibility,PWM,
-    PWMThresholdLocal,minPWMScore,maxPWMScore,strand,strandRule){
+.internalPWMScoreExt<-function(setSequence,DNASequenceSet,DNAAccessibility,PWM,PWMThresholdLocal,
+    minPWMScore,maxPWMScore,strand,strandRule){
 
     ## Building storage lists
     BufferSequence <- vector("list", length(setSequence))
     NoAccess <- c("-")
     ## Naming if names = NULL
     if(is.null(names(setSequence))){
-        names(setSequence)<-paste0(as.character(seqnames(setSequence)),":",
-        start(setSequence),"..",end(setSequence))
+        names(setSequence)<-paste0(as.character(seqnames(setSequence)),":",start(setSequence),"..",end(setSequence))
     }
+
+
+
+
+
+
 
     for(i in seq_along(setSequence)){
 
         ## ID matching
-        localDNASequenceSet <- DNASequenceSet[unique(match(as.character(
-            seqnames(setSequence))[i],
+        localDNASequenceSet <- DNASequenceSet[unique(match(as.character(seqnames(setSequence))[i],
             names(DNASequenceSet)))]
 
         ## Extracting Sequence
-
+        #BufferSequence[[i]]<-.internalDNASequenceFromAccess(localDNASequenceSet,setSequence[i],PWM)
         BufferSequence[[i]] <- DNAStringSet(localDNASequenceSet[[
             which(names(localDNASequenceSet)==(as.character(seqnames(
-                setSequence[i]))))]],start = start(setSequence[i]),
-                end = end(setSequence[i]))
+                setSequence[i]))))]],start = start(setSequence[i]),end = end(setSequence[i]))
 
         ## Scoring Sequence with PWM
         BufferSequence[[i]] <- .scoreDNAStringSet(PWM, BufferSequence[[i]],
         strand=strand,strandRule=strandRule)
         ## Extracting Sites Above Threshold
-        indexPWMThresholded <- .getIndexOfPWMThresholded(
-            BufferSequence[[i]][[1]],PWMThresholdLocal)[[1]]
+        indexPWMThresholded <- .getIndexOfPWMThresholded(BufferSequence[[i]][[1]],PWMThresholdLocal)[[1]]
 
         ## Extracting strand Information for sites above threshold
         if(strand == "+-" | strand == "-+"){
@@ -210,18 +203,20 @@
 
         names(GRLocal)<-rep(names(setSequence)[i],length(GRLocal))
         BufferSequence[[i]]<-GRLocal
+      #  } else {
+          #  GRLocal<-GRanges()
 
+          #  BufferSequence[[i]]<-GRLocal
+      #  }
 
         ## Intersection with DNA Accessibility
         if(!is.null(DNAAccessibility)){
-            AccessibleScore <- as.data.frame(findOverlaps(BufferSequence[[i]],
-            DNAAccessibility))
+            AccessibleScore <- as.data.frame(findOverlaps(BufferSequence[[i]],DNAAccessibility))
 
 
             BufferSequence[[i]]<-BufferSequence[[i]][AccessibleScore[,1]]
 
-            BufferSequence[[i]]$DNAAccessibility<-
-            DNAAccessibility$DNAAccessibility[AccessibleScore[,2]]
+            BufferSequence[[i]]$DNAAccessibility<-DNAAccessibility$DNAAccessibility[AccessibleScore[,2]]
             if(length(BufferSequence[[i]])<1){
                 NoAccess <-c(NoAccess,names(setSequence)[i])
             }
@@ -235,8 +230,7 @@
 
 ### Data processing extraction
 
-.internalExtraction<-function(setSequence,profile,maxSignal,removeBackground){
-    sub<-.extractOccupancyDataAtLoci(profile, setSequence, maxSignal=maxSignal,
-    removeBackground=removeBackground)
+.internalExtraction<-function(setSequence,profile,maxSignal,backgroundMethod){
+    sub<-.extractOccupancyDataAtLoci(profile, setSequence, maxSignal=maxSignal,backgroundMethod=backgroundMethod)
     return(sub)
 }
