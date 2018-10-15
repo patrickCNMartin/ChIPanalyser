@@ -79,8 +79,9 @@ PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 \donttest{
 if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
-    source("https://bioconductor.org/biocLite.R")
-    biocLite("BSgenome.Dmelanogaster.UCSC.dm3")
+    if (!requireNamespace("BiocManager", quietly=TRUE))
+        install.packages("BiocManager")
+    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
     }
 library(BSgenome.Dmelanogaster.UCSC.dm3)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
