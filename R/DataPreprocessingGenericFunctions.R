@@ -188,8 +188,8 @@
 									  reduce <-length(bufferPeaks)
 								}
 
-								sub<-sub[head(order(bufferEnrich,decreasing=T),reduce)]
-								setsub<-setSequence[head(order(bufferEnrich,decreasing=T),reduce)]
+								sub<-sub[head(order(bufferEnrich,bufferPeaks,decreasing=T),reduce)]
+								setsub<-setSequence[head(order(bufferEnrich,bufferPeaks,decreasing=T),reduce)]
 						}
 			  }
 
