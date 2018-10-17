@@ -942,7 +942,7 @@ If `peaks` is not NULL, regions with peaks *and* accessible DNA will be selected
 * `noiseFilter` is one of the following: zero, mean, median or sigmoid. The noise filter
 is the method by which noise is buffered. Zero will remove all score below 0. Mean and median
 will remove all score below the mean and median respectively. Finally, sigmoid will assign a weight
-to each score based on a logistic regression curve (midpoint = ChIP-seq score 95 quantile). All scores 
+to each score based on a logistic regression curve (midpoint = ChIP-seq score 95 quantile). All scores
 above the midpoint will receive a weight between 1 and 2. All score below will receive a score between 0 and 1.
 
 * `cores` is the number of course that should be used to process ChIP data.
@@ -1291,8 +1291,8 @@ profileAccuracyEstimate(LocusProfile,
 ### Input data - Accuracy Estimate
 `profileAccuracyEstimate` requires only two arguments. `precitedProfile`
 is the result of `computeChipProfile`. Finally, `LocusProfile`
-is a list containing actual ChIP-seq profiles. This list is the result of the 
-`processingChIPseq` function. 
+is a list containing actual ChIP-seq profiles. This list is the result of the
+`processingChIPseq` function.
 
 We also strongly recommend that each loci in `LocusProfile`
 (each element of the list) should be named in an identical manner
@@ -1334,12 +1334,12 @@ AccuracyEstimate
 This function returns a list of two elements. The first element represents lists containing
 the model quality assessments for every combination of parameters (Bound Molecules and lambda)
 for every genomic region. The second element of the list contains the result of the ROCR package:
-False positives, False Negative, etc... 
+False positives, False Negative, etc...
 
 
 Generally Speaking, we recommend to only use the first element of this list. However, we offer
-the possibility to choose from the other metrics available in the ROCR package by returning the 
-ROCR prediction object. 
+the possibility to choose from the other metrics available in the ROCR package by returning the
+ROCR prediction object.
 
 ## Finding optimal Parameters
 
@@ -1348,8 +1348,8 @@ set of parameters for `ScalingFactorPWM` and `boundMolecules`.
 `ChIPAnalyser` offers the possibility to backward infer the parameters
 using the `computeOptimal` function. By testing different combinations
 of `ScalingFactorPWM` and `boundMolecules`, the `computeOptimal` function will return
-a list of values that were the highest ranking parameter combination for each model quality assessment method 
-selected (see`profileAccuracyEstimate` above). This function will also return a list of matricies containing relevant scores 
+a list of values that were the highest ranking parameter combination for each model quality assessment method
+selected (see`profileAccuracyEstimate` above). This function will also return a list of matricies containing relevant scores
 for each combination.
 It is possible to run this functions and
 make use of multiple cores in order to decrease computational time.
@@ -1402,8 +1402,8 @@ Although optional, we strongly advise to tailor this object by using values
 directly extracted from `LocusProfile`
 
 `optimalMethod` defines which metric you wish to compute.
-There are four possible choices: *pearson*, *spearman*, *kendall*, *ks*, *geometric*, 
-*fscore* or *all* 
+There are four possible choices: *pearson*, *spearman*, *kendall*, *ks*, *geometric*,
+*fscore* or *all*
 It is imperative that the lists/GRanges are named with the name of
 the Loci of interest.
 `peakMethod`describes if you wish to use an approximation for ChIP-seq profile
@@ -1435,7 +1435,7 @@ optimalParam
 
 The `computeOptimal` function will return
 a list of values that were the highest ranking parameter combination for each model quality assessment method
-selected (see`profileAccuracyEstimate` above). This function will also return a list of matricies containing relevant scores 
+selected (see`profileAccuracyEstimate` above). This function will also return a list of matricies containing relevant scores
 for each combination.
 
 # Plotting Results
@@ -1465,7 +1465,7 @@ It should be noted that the color vector will be recycled if not enough colors a
 Standard layout will generate an individual heatmap for each matrix provided (`computeOptimal` result) with a heat map scale bar on the left.
 
 NOTE: If you use your own layout, you should be aware that the `plotOptimalHeatMaps` will always plot both the heat map and the scale bar.
-In R this is considered as two plots (rasterImage scales). 
+In R this is considered as two plots (rasterImage scales).
 
 As an example:
 
