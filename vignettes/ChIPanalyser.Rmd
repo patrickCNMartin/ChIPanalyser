@@ -76,11 +76,7 @@ data(ChIPanalyserData)
 
 
 # Loading DNASequenceSet from BSgenome object
-if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
-    if (!requireNamespace("BiocManager", quietly=TRUE))
-        install.packages("BiocManager")
-    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
-    }
+
 library(BSgenome.Dmelanogaster.UCSC.dm3)
 
 DNASequenceSet <-getSeq(BSgenome.Dmelanogaster.UCSC.dm3)

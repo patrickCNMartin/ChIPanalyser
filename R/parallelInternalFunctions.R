@@ -115,23 +115,28 @@
     return(splitDNASequenceSet)
 }
 
+
+##### computeGenomeWidePWMScore #####
+
+
+
+
+
 ##### computeGenomeWidePWMScore #####
 ## DNASequenceSet subset from Access
-.internalDNASequenceFromAccess<-function(DNA,Access,PWM=NULL){
-    ## level Check
-    #if(names(DNA)!=unique(as.character(seqnames(Access)))){
-       #stop("DNA Sequence Set names are not equal to seqnames in Access")
-    #}
+.internalDNASequenceFromAccess<-function(DNA,Access){
 
-    if(!is.null(PWM)){
-        localAccess<-GRanges(seqnames=as.character(seqnames(Access)),
-            ranges=IRanges(start(Access),end=end(Access)+(ncol(PWM)-1)))
-    } else{
-        localAccess<-GRanges(seqnames=as.character(seqnames(Access)),
-            ranges=IRanges(start(Access),end=end(Access)))
-    }
-    sub<-getSeq(DNA,localAccess)
+    ## Drop unneccesary levels
+    ## surprise surprise it was a factor problem
+    drop<-seqlevels(Access)[which(!seqlevels(Access) %in% seqnames(Access))]
+    Access<-dropSeqlevels(Access,drop)
+
+
+    ## Extract DNASequenceSet with respect to Accessibility
+    sub<-getSeq(DNA,Access)
     names(sub)<-as.character(seqnames(Access))
+
+
     return(sub)
 }
 

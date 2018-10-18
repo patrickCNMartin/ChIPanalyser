@@ -43,10 +43,15 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
     # Extracting DNA Accessibility in parallel (still dont know why it chrashes with hg19)
     if(!is.null(DNAAccessibility)){
         ## Factor correction  and ID match
-        DNASequenceSet<-DNASequenceSet[unique(match(as.character(seqnames(DNAAccessibility)), names(DNASequenceSet)))]
+
+        DNASequenceSet<-DNASequenceSet[which(names(DNASequenceSet) %in% as.character(seqnames(DNAAccessibility)))]
         ## Split by Chromosome
         DNA<-split(DNASequenceSet,names(DNASequenceSet))
         Access<-split(DNAAccessibility, seqnames(DNAAccessibility))
+
+        ## Matching seqlevels
+        Access<- Access[match(names(DNA), names(Access))]
+
 
         ## parallel Intersect for large genomes
         DNASequenceSet<-parallel::mcmapply(.internalDNASequenceFromAccess,DNA=DNA,Access=Access,mc.cores=cores)

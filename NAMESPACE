@@ -1,5 +1,5 @@
 import("GenomicRanges","Biostrings", "BSgenome","RcppRoll","parallel",
-    "rtracklayer","BiocManager")
+    "rtracklayer","BiocManager","GenomeInfoDb")
 
 importFrom("grDevices", "colorRampPalette", "heat.colors","as.raster","rainbow")
 importFrom("graphics", "axis", "box", "contour", "image", "lines",
@@ -13,6 +13,7 @@ importFrom("IRanges","IRanges")
 importFrom("rtracklayer","import")
 importFrom("S4Vectors","queryHits")
 importFrom("ROCR","prediction","performance")
+importFrom("GenomeInfoDb","seqlevels","dropSeqlevels")
 
 
 
