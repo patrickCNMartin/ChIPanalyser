@@ -11,7 +11,7 @@ Parameters and highlight the optimal combination of
 }
 
 \usage{
-plotOptimalHeatMaps(optimalParam,contour=TRUE,col=NULL,main=NULL,layout=TRUE)
+plotOptimalHeatMaps(optimalParam,contour=TRUE,col=NULL,main=NULL,layout=TRUE,overlay=FALSE)
 }
 \arguments{
     \item{optimalParam}{
@@ -31,6 +31,11 @@ plotOptimalHeatMaps(optimalParam,contour=TRUE,col=NULL,main=NULL,layout=TRUE)
     \item{layout}{\code{layout} is either TRUE or FALSE specifying if stadard
     layout should be used or not. If TRUE, each heat map will be plotted on
     an individual page with a heat map scale of the right side.}
+    \item{overlay}{\code{overlay} is either TRUE or FALSE specifying if an 
+    overlay plot should be produced. The overlay plot takes the top 10 percent 
+    of best performing parameters per scoring metric and overlays them in a 
+    single plot. The resulting plots shows the optimal set of paramters for all
+    metrics combined.}  
 }
 \details{
 Once the optimal set of Parameters ( \code{\link{ScalingFactorPWM}}
