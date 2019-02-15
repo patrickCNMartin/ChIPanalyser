@@ -281,7 +281,7 @@ plotOccupancyProfile<-function(predictedProfile,setSequence, chipProfile = NULL,
     ## setting up empty plot with and without Gene rangeBuffer
     if(!is.null(profileAccuracy)){
         par(xpd=T)
-        par(mar=c(4,2,4,10))
+        par(mar=c(6,2,4,10))
     }
 
     plot(0,type="n", axes=FALSE,xlab="",ylab="",ylim=param$ylim,xlim=param$xlim)
@@ -318,6 +318,7 @@ plotOccupancyProfile<-function(predictedProfile,setSequence, chipProfile = NULL,
                 col=param$colour[["occupancy"]],lwd=param$lineWidth[["occupancy"]])
 
         }else{
+
             OccupScaling <- occupancy[head(order(occupancy$Occupancy,decreasing=T), round(0.9*length(occupancy$Occupancy)))]
 
             ReScale<-(OccupScaling$Occupancy/max(OccupScaling$Occupancy))*(param$ylim[2]*0.5)

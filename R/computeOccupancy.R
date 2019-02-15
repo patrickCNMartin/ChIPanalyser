@@ -71,8 +71,7 @@ computeOccupancy <- function(AllSitesPWMScore, DNAAccessibility=NULL,
 
             PWMScore <- unlist(PWMGRList)$PWMScore
 
-            Access <- unlist(PWMGRList)$DNAAccessibility
-
+            Access <- unlist(PWMGRList)$DNAaffinity
 
             Occupancy <- rep(0,length(PWMScore))
             Occupancy <- (Access*boundMolecules[j]*exp((1/lambda[k])*PWMScore))/

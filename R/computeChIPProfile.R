@@ -25,10 +25,7 @@ computeChipProfile <- function(setSequence,occupancy,
     if(is.null(occupancyProfileParameters)){
     occupancyProfileParameters <- occupancyProfileParameters()
     }
-    if(cores > detectCores()){
-        message(paste0(detectCores(), " cores are available on this machine.
-        Tying to set higher number of cores than available"))
-    }
+
     # Extraction of Ocuupancy and associated values
     Occup <- AllSitesAboveThreshold(occupancy)
     ZeroBackground <- .ZeroBackground(occupancy)
@@ -52,12 +49,16 @@ computeChipProfile <- function(setSequence,occupancy,
     NoAccess <- names(setSequence)[(names(setSequence) %in%
         names(Occup[[1]])==FALSE)]
     if(length(NoAccess) > 0){
-        cat("No Profile for:",NoAccess,
+        message("No Profile for:",paste0(NoAccess,"\n"),
         "  --  Do Not Contain Accessible Sites","\n", sep=" ")
     }
 
     # SetSequence fragmentation
     #Spliting setSequence for Chip PRofile computing
+    if(!is.null(setSequence) & is.null(names(setSequence))){
+			  names(setSequence)<-paste0(seqnames(setSequence),":",
+				start(ranges(setSequence)),"..",end(ranges(setSequence)),sep="")
+		}
     setSequence <- setSequence[names(setSequence) %in% names(Occup[[1]])]
 
     LocalSet <- split(setSequence, seq_along(setSequence))
@@ -71,8 +72,6 @@ computeChipProfile <- function(setSequence,occupancy,
 
     names(SplitGRList) <- names(setSequence)
 
-    OccupancyVals <- lapply(Occup,function(x){x<-lapply(x,function(y){
-        y<-as.numeric(as.matrix(mcols(y)[,3]))})})
 
     ##method set
     if(length(Occup)>length(Occup[[1]])){

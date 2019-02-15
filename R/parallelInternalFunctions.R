@@ -90,14 +90,14 @@
 ### Extracting Occupancy in parallel computeChipProfile if using Parameters
 .internalChIPOccupValsParam <- function(Occup){
     OccupVals <- lapply(Occup, function(x){
-        y<-as.numeric(as.matrix(mcols(x)[,3]))})
+        x<-x$Occupancy})
     return(OccupVals)
 }
 
 ##### computeChipProfile #####
 ### Extracting Occupancy in parallel computeChipProfile if using Loci
 .internalChIPOccupValsLoci <- function(Occup){
-    OccupVals <- as.numeric(as.matrix(mcols(Occup)[,3]))
+    OccupVals <- Occup$Occupancy
     return(OccupVals)
 }
 
@@ -203,8 +203,7 @@
                 1 + ncol(PWM)-1)),
             strand = strandLocal[indexPWMThresholded],
             PWMScore=
-            BufferSequence[[i]][[1]][[1]][indexPWMThresholded],
-            DNAAccessibility=rep(1,length(indexPWMThresholded)))
+            BufferSequence[[i]][[1]][[1]][indexPWMThresholded])
 
         names(GRLocal)<-rep(names(setSequence)[i],length(GRLocal))
         BufferSequence[[i]]<-GRLocal
@@ -221,10 +220,12 @@
 
             BufferSequence[[i]]<-BufferSequence[[i]][AccessibleScore[,1]]
 
-            BufferSequence[[i]]$DNAAccessibility<-DNAAccessibility$DNAAccessibility[AccessibleScore[,2]]
+            BufferSequence[[i]]$DNAaffinity<-DNAAccessibility$DNAaffinity[AccessibleScore[,2]]
             if(length(BufferSequence[[i]])<1){
                 NoAccess <-c(NoAccess,names(setSequence)[i])
             }
+        } else {
+              BufferSequence[[i]]$DNAaffinity<-rep(0,length(BufferSequence[[i]]))
         }
 
     }

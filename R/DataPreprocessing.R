@@ -78,6 +78,8 @@ processingChIPseq <- function(profile,loci=NULL,reduce=NULL,occupancyProfilePara
     ChIPProfle<-.internalLociExtraction(profile=profile,
         setSequence=loci,reduce=reduce,occupancyProfileParameters=occupancyProfileParameters,
         noiseFilter=noiseFilter,peaks=peaks,Access=Access,cores=cores)
+
+
     if(!is.null(reduce)){
         names(ChIPProfle[[2]]) <- names(ChIPProfle[[1]])
         backgroundSignal(occupancyProfileParameters) <- mean(sapply(ChIPProfle[[1]],mean))

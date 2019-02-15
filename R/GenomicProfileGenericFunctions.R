@@ -584,9 +584,15 @@ searchSites <- function(Sites,ScalingFactor="all",
 
         localProfile<-rep(0,length(locusProfile))
         ## thresh extraction
-        localProfile[locusProfile>=subs[i]]<-1
 
-        matpred[,i]<-predicted
+        localProfile[locusProfile>=subs[i]]<-1
+        if(all(localProfile==1)){
+             localProfile[1]<-0
+        }
+        if(all(localProfile==0)){
+             localProfile[1]<-1
+        }
+        matpred[,i]<-factor(predicted)
         matloc[,i]<-factor(localProfile)
     }
 
@@ -597,12 +603,9 @@ searchSites <- function(Sites,ScalingFactor="all",
     fscore<-mean(sapply(performance(pred,"f")@y.values,mean,na.rm=T))
     acc<-mean(sapply(performance(pred,"acc")@y.values,mean,na.rm=T))
     mcc<-mean(sapply(performance(pred,"mat")@y.values,mean,na.rm=T))
-    if(class(try(mean(sapply(performance(pred,"auc")@y.values,mean,na.rm=T)),silent=T))=="try-error"){
-        auc<-NA
 
-    }else{
-        auc<-mean(sapply(performance(pred,"auc")@y.values,mean,na.rm=T))
-    }
+    auc<-mean(sapply(performance(pred,"auc")@y.values,mean,na.rm=T))
+if(is.na(auc)){browser()}
     return(list(c("precision"=prec,"recall"=rec,"f1"=fscore,"accuracy"=acc,"MCC"=mcc,"AUC"=auc),pred))
 }
 
@@ -782,10 +785,11 @@ searchSites <- function(Sites,ScalingFactor="all",
         mats[[i]]<-topmeth
 
       if(name[i] %in% c("geometricMean","MSEMean","ksMean")){
-
-        param[[i]]<-c("ScalingFactor"=rownames(topmeth)[which(topmeth==min(topmeth),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmeth)[which(topmeth==min(topmeth),arr.ind=T)[,2]])
+        minmeth<-which(topmeth==min(topmeth),arr.ind=T)
+        param[[i]]<-c("ScalingFactor"=rownames(topmeth)[minmeth[nrow(minmeth),1]],"BoundMolecules"=colnames(topmeth)[minmeth[nrow(minmeth),2]])
       } else{
-        param[[i]]<-c("ScalingFactor"=rownames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,2]])
+        maxmeth<-which(topmeth==max(topmeth),arr.ind=T)
+        param[[i]]<-c("ScalingFactor"=rownames(topmeth)[maxmeth[nrow(maxmeth),1]],"BoundMolecules"=colnames(topmeth)[maxmeth[nrow(maxmeth),2]])
       }
 
     }

@@ -1,4 +1,4 @@
-plotOptimalHeatMaps<-function(optimalParam,contour=TRUE,col=NULL,main=NULL,layout=TRUE){
+plotOptimalHeatMaps<-function(optimalParam,contour=TRUE,col=NULL,main=NULL,layout=TRUE,overlay=FALSE){
 
     # Parsing matricies if everthing is provided
     if(all(names(optimalParam)%in%c("Optimal Parameters","Optimal Matrix","method"))){
@@ -10,15 +10,68 @@ plotOptimalHeatMaps<-function(optimalParam,contour=TRUE,col=NULL,main=NULL,layou
     nans<-lapply(optimalParam, function(x){return(which(is.na(x), arr.ind=T))})
 
 
-    ## screw this
+    ## replacing NaN with min of max val
+    namevec<-names(optimalParam)
     for(i in seq_along(optimalParam)){
-        optimalParam[[i]][nans[[i]]]<-min(optimalParam[[i]],na.rm=TRUE)
+        if(length(grep(pattern=namevec[i],x=c("MSE","geometric","ks"),ignore.case=TRUE))>0){
+            optimalParam[[i]][nans[[i]]]<-max(optimalParam[[i]],na.rm=TRUE)
+        }else {
+            optimalParam[[i]][nans[[i]]]<-min(optimalParam[[i]],na.rm=TRUE)
+        }
     }
+    ## generting overlay
+    if(overlay){
+        if(!is.list(optimalParam)){
+          stop("plotOptimalHeatMaps cannot overlay one matrix -
+          Please Ensure that you have more than one matrix in a list")
+        }
+        over<-matrix(0,ncol=ncol(optimalParam[[1]]),nrow=nrow(optimalParam[[1]]))
+        for(k in seq_along(optimalParam)){
 
+            ## creating match idx vector
+            buffer<-optimalParam[[k]]
+            idx<-seq_along(as.vector(optimalParam[[k]]))
+
+
+            # define top hits
+            top<-head(idx,floor(length(idx)/10))
+
+            # Top hits
+            if(namevec[k] %in% c("geometricMean","MSEMean","ksMean","recallMean")){
+                ord<-order(buffer,decreasing=F)
+            } else{
+                ord<-order(buffer,decreasing=T)
+            }
+
+            ##creating a ordered value matrix
+            optimalMatrix<-matrix(match(idx,ord),ncol=17, nrow=14)
+
+            ## Location of top hits in ordered value matrix
+            topHits<-which(optimalMatrix<max(top),arr.ind=T)
+
+            # Creating empty matrix
+            mat<- matrix(0,ncol=ncol(optimalParam[[1]]),nrow=nrow(optimalParam[[1]]))
+
+            ## Keep in mind that there are more Similarity methods
+            ## This will pull it towards those optimal Parameters
+            ## For better results balence it
+            ## or only take two Parameters
+
+            ## Overlaying top hits
+            mat[topHits]<-1
+
+
+            ## Adding top hits to matrix
+            over<-over+mat
+
+        }
+
+        optimalParam$Overlay<-over
+    }
 
     #Setting up some paramters
     if(class(optimalParam)!="list"){
-        optimalParam[]
+
         if(is.null(main)){
             mainTitle<-"Optimal Paramters"
         } else{
@@ -72,8 +125,8 @@ plotOptimalHeatMaps<-function(optimalParam,contour=TRUE,col=NULL,main=NULL,layou
         text(seq_along(xlabs),y =(-0.2), srt = 45, adj = 1,labels = xlabs, xpd = TRUE,cex=1.15)
         axis(LEFT <-2, at=1:length(ylabs), labels=ylabs,las= HORIZONTAL<-1,cex.axis=1.15)
         if(contour){
-          contour(1:length(xlabs),1:length(ylabs), t(log10(
-          optimalParam[[i]]*1000)),nlevels=7, drawlabels=FALSE,
+          contour(1:length(xlabs),1:length(ylabs), t(
+          optimalParam[[i]]),nlevels=7, drawlabels=FALSE,
           add = TRUE, col = "black", lwd=1, labcex = 1.0)
         }
 

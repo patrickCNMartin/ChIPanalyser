@@ -32,13 +32,7 @@ computeGenomeWidePWMScore<-function(DNASequenceSet,
     strand <- whichstrand(genomicProfileParameters)
     strandRule <- strandRule(genomicProfileParameters)
 
-    # Extracting DNA Accessibility
-    #if(!is.null(DNAAccessibility)){
-    #DNASequenceSet <- getSeq(DNASequenceSet,DNAAccessibility)
-    #names(DNASequenceSet) <- seqnames(DNAAccessibility)
-    #DNASequenceSet <- DNASequenceSet[which(sapply(DNASequenceSet,length) >
-    #    ncol(PWMMat))]
-    #}
+
 
     # Extracting DNA Accessibility in parallel (still dont know why it chrashes with hg19)
     if(!is.null(DNAAccessibility)){

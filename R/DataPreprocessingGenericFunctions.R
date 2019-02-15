@@ -2,19 +2,38 @@
 ##### Pre-processing Generic Functions #####
 ############################################
 .vectorSmooth <- function(x, smooth=NULL,norm=FALSE) {
-	  originalMax=max(x)
-	  result=x
-	  if(!is.null(smooth)){
-        if((smooth %% 2) == 0){smooth = smooth - 1}
-        mid = round(smooth/2,0) + 1
-        d = smooth - mid
-        localSmoothing <- roll_mean(x,smooth,align="center")
-				result[mid:(length(x)-d)]<-localSmoothing
-    }
+    # validity checks for this as it seems to crash a built
 
-	  if(norm){
-		    result=originalMax*result/max(result)
-	  }
+
+
+			  ## checking if all values are 0
+				## Otherwise it tends to crash
+				## RcppRoll doesnt work well with just zeroes
+				if(all(x!=0)){
+					  # smoothing the vector
+					  if(!is.null(smooth)){
+							  result<-x
+						  	if((smooth %% 2) == 0){
+							  		smooth = smooth - 1
+						  	}
+							  mid = round(smooth/2,0) + 1
+							  d = smooth - mid
+							  localSmoothing <- roll_mean(x,smooth,align="center")
+							  result[mid:(length(x)-d)]<-localSmoothing
+					  }
+						#normalising the vector
+						# norm only works if it NOT all zeroes
+						# 0/0 ain't possible fam
+						if(norm) {
+					      originalMax <- max(x)
+				        result <- originalMax*result/max(result)
+			      }
+				} else{
+					  result<-x
+				}
+
+
+
     return(result)
 }
 
@@ -38,7 +57,7 @@
 
 	  # create a list with the occupancy at each loci
 	  occupancyNorm = vector("list",length(setSequence))
-	  if(!is.null(setSequence) & length(names(setSequence))>0){
+		if(!is.null(setSequence) & length(names(setSequence))>0){
 			  name<-names(setSequence)
 		    names(occupancyNorm)<-name
 	  } else{
@@ -46,7 +65,6 @@
 				start(ranges(setSequence)),"..",end(ranges(setSequence)),sep="")
 		    names(occupancyNorm)<-name
 	  }
-
 	  for(gr in 1:length(setSequence)){
 		    chr=as.vector(seqnames(setSequence))[gr]
 		    range=ranges(setSequence)
@@ -107,6 +125,7 @@
 
 
 		# Filtering background
+
 		occupancyNorm<-lapply(occupancyNorm, function(x){x[x < Background]<-0;return(x)})
     names(occupancyNorm)<-name
 
@@ -122,7 +141,11 @@
 		chipSmooth<-chipSmooth(occupancyProfileParameters)
 	  ## split for parralle
     subProfile<-.splitDNARanges(setSequence,cores)
-
+    # checking for names
+		if(!is.null(setSequence) & is.null(names(setSequence))){
+			  names(setSequence)<-paste0(seqnames(setSequence),":",
+				start(ranges(setSequence)),"..",end(ranges(setSequence)),sep="")
+		}
     ## parallel
 		sub<-parallel::mclapply(subProfile,FUN=.internalExtraction,profile=profile,maxSignal=maxSignal,backgroundMethod=backgroundMethod,mc.cores=cores)
     #sub<-.extractOccupancyDataAtLoci(profile, setSequence, maxSignal=maxSignal, removeBackground=removeBackground)
@@ -131,12 +154,16 @@
 
     ## Vector Smoothing if required
     if(!is.null(chipSmooth) & is.null(reduce)){
-        for(subset in seq_along(sub)){
-
+        for(subs in seq_along(sub)){
+            if(!is.null(sub[[subs]])){
             #sub[[subset]][which(sub[[subset]]< removeBackground)]<-removeBackground
-            sub[[subset]]<-.vectorSmooth(sub[[subset]],chipSmooth,TRUE)
+            sub[[subs]]<-.vectorSmooth(sub[[subs]],chipSmooth,TRUE)
+          } else{
+             next
+          }
         }
-				sub<-sub[match(names(setSequence),names(sub))]
+				seqMatch <- match(names(setSequence),names(sub))
+				sub<-sub[seqMatch[which(!is.na(seqMatch))]]
     }
 
     ## If reduce is not NULL only take top hits as defined by reduce
@@ -194,9 +221,12 @@
 			  }
 
         if(!is.null(chipSmooth)){
-            for(subset in seq_along(sub)){
-            #sub[[subset]][which(sub[[subset]]< removeBackground)]<-0
-            sub[[subset]]<-.vectorSmooth(sub[[subset]],chipSmooth,TRUE)
+            for(subs in seq_along(sub)){
+                if(!is.null(sub[subs])){
+                   sub[[subs]]<-.vectorSmooth(sub[[subs]],chipSmooth,TRUE)
+                } else{
+                    next
+                }
             }
         }
         # Replacing NA by zero (vector smooth arifact)

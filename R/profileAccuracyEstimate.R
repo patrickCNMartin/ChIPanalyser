@@ -16,7 +16,7 @@ profileAccuracyEstimate <- function(LocusProfile,predictedProfile,
     NoAccess<-names(LocusProfile)[(names(LocusProfile) %in%
         names(predictedProfile[[1]])==FALSE)]
     if(length(NoAccess)>0){
-    cat("No Profile for:",NoAccess,
+    cat("No Profile for:\n",paste0(NoAccess,"\n"),
     "  --  Do Not Contain Accessible Sites","\n", sep=" ")
     }
     #Reduce ChipProfile to only contain sequences present in predictedProfile

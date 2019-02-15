@@ -46,8 +46,8 @@ computePWMScore <- function(DNASequenceSet,genomicProfileParameters,
 
     #Processing DNAAccessibility
     if(!is.null(DNAAccessibility)){
-        if(length(DNAAccessibility$DNAAccessibility)<1){
-            DNAAccessibility$DNAAccessibility <- rep(1, length(DNAAccessibility))
+        if(length(DNAAccessibility$DNAaffinity)<1){
+            DNAAccessibility$DNAaffinity <- rep(1, length(DNAAccessibility))
         }
     }
 
@@ -78,6 +78,7 @@ computePWMScore <- function(DNASequenceSet,genomicProfileParameters,
             PWM=PWM,PWMThresholdLocal=PWMThresholdLocal,minPWMScore=minPWMScore,
             maxPWMScore=maxPWMScore,strand=strand,strandRule=strandRule)
         AccessibleSequence<-Scores[[1]]
+
         NoAcc<-Scores[[2]]
     }
 

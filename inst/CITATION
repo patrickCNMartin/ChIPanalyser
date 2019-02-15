@@ -1,0 +1,16 @@
+citEntry(entry="article",
+	author = "Zabet NR & Adryan B",
+	doi = "10.1093/nar/gku1269",
+	journal = "Nucleic Acids Research",
+	pages = "",
+	pmc = "",
+	pmid = "",
+	title = "Estimating binding properties of transcription factors from genome-wide binding profiles",
+	volume = "",
+	year = "2015",
+	textVersion = paste("Zabet NR & Adryan B.",
+	 "Estimating binding properties of transcription factors from genome-wide binding profiles.",
+	 "Nucleic Acids Research, gku1269, https://dx.doi.org/10.1093%2Fnar%2Fgku1269 (2015).")
+)
+
+
