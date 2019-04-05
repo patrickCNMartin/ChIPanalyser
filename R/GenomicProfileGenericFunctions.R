@@ -706,7 +706,7 @@ if(is.na(auc)){browser()}
         ## the plots look really weird as if the were not built as the should have
         #dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
             #length(boundMolecules(occupancyProfileParameters)))
-        topmeth<-matrix(topmeth, ncol=17, nrow=14, byrow=T)
+        topmeth<-matrix(topmeth, ncol=length(boundMolecules(occupancyProfileParameters)), nrow=length(ScalingFactorPWM(genomicProfileParameters)), byrow=T)
         rownames(topmeth) <- ScalingFactorPWM(genomicProfileParameters)
         colnames(topmeth) <- boundMolecules(occupancyProfileParameters)
         mats[[1]]<-topmeth
@@ -718,7 +718,7 @@ if(is.na(auc)){browser()}
         })
         #dim(topmse)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
         #    length(boundMolecules(occupancyProfileParameters)))
-        topmse<-matrix(topmse, ncol=17, nrow=14, byrow=T)
+        topmse<-matrix(topmse,ncol=length(boundMolecules(occupancyProfileParameters)), nrow=length(ScalingFactorPWM(genomicProfileParameters)), byrow=T)
         rownames(topmse) <- ScalingFactorPWM(genomicProfileParameters)
         colnames(topmse) <- boundMolecules(occupancyProfileParameters)
         mats[[2]]<-topmse
@@ -779,7 +779,7 @@ if(is.na(auc)){browser()}
         })
         #dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
           #  length(boundMolecules(occupancyProfileParameters)))
-          topmeth<-matrix(topmeth, ncol=17, nrow=14, byrow=T)
+          topmeth<-matrix(topmeth,ncol=length(boundMolecules(occupancyProfileParameters)), nrow=length(ScalingFactorPWM(genomicProfileParameters)), byrow=T)
         rownames(topmeth) <- ScalingFactorPWM(genomicProfileParameters)
         colnames(topmeth) <- boundMolecules(occupancyProfileParameters)
         mats[[i]]<-topmeth

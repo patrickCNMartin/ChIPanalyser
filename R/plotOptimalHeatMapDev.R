@@ -44,7 +44,7 @@ plotOptimalHeatMaps<-function(optimalParam,contour=TRUE,col=NULL,main=NULL,layou
             }
 
             ##creating a ordered value matrix
-            optimalMatrix<-matrix(match(idx,ord),ncol=17, nrow=14)
+            optimalMatrix<-matrix(match(idx,ord),ncol=ncol(optimalParam[[1]]), nrow=nrow(optimalParam[[1]]))
 
             ## Location of top hits in ordered value matrix
             topHits<-which(optimalMatrix<max(top),arr.ind=T)
