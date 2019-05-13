@@ -93,6 +93,7 @@ setClass("genomicProfileParameters",
     BPFrequency = rep(0.25,4),
     naturalLog = FALSE,
     PWMThreshold = 0.7,
+    AllSitesAboveThreshold = GRangesList(),
     strandRule = "max",
     whichstrand = "+-"),
 
