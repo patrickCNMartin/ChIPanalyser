@@ -1,15 +1,15 @@
 \name{removeBackground<-}
-\alias{removeBackground<-}
-\alias{removeBackground<--methods}
 
+
+\alias{removeBackground<-}
 
 \title{
 Setter Method for the \code{removeBackground} slot in a
-\code{occupancyProfileParameters} object
+\code{parameterOptions} object
 }
 \description{
 Setter Method for the \code{removeBackground} slot in a
-\code{occupancyProfileParameters} object
+\code{parameterOptions} object
 }
 \usage{
 removeBackground(object) <-value
@@ -17,11 +17,11 @@ removeBackground(object) <-value
 %- maybe also 'usage' for other objects documented here.
 \arguments{
     \item{object}{
-    \code{object} is  an \code{\link{occupancyProfileParameters}} object
+    \code{object} is  an \code{\link{parameterOptions}} object
     }
     \item{value}{
     \code{value} is positive numerical value to be assigned to the
-    \code{removeBackground} slot in a \code{\link{occupancyProfileParameters}}
+    \code{removeBackground} slot in a \code{\link{parameterOptions}}
     object. Default is set a 0.
     }
 }
@@ -32,7 +32,7 @@ when computing \code{\link{computeOccupancy}}
 (see \code{\link{computeOccupancy}} function)
 }
 \value{
-Returns an \code{\link{occupancyProfileParameters}} object  with an updated
+Returns an \code{\link{parameterOptions}} object  with an updated
 value for the \code{removeBackground} slot
 }
 \references{
@@ -44,8 +44,8 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 }
 
 \examples{
-#Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+#Building parameterOptions object
+OPP <- parameterOptions()
 #Setting new Value for removeBackground
 removeBackground(OPP) <- 0.1
 }

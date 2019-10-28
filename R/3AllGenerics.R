@@ -6,8 +6,8 @@
 
 #### Genomic Profile Parameters ####
 
-setGeneric(".initialize",
-    function(object) standardGeneric(".initialize"))
+#setGeneric(".initialize",
+    #function(object) standardGeneric(".initialize"))
 
 setGeneric(".generatePWM",
     function(object) standardGeneric(".generatePWM"))
@@ -30,11 +30,11 @@ setGeneric("PFMFormat",
 setGeneric("PFMFormat<-",
     function(object, value) standardGeneric("PFMFormat<-"))
 
-setGeneric("ScalingFactorPWM",
-    function(object) standardGeneric("ScalingFactorPWM"))
+setGeneric("lambdaPWM",
+    function(object) standardGeneric("lambdaPWM"))
 
-setGeneric("ScalingFactorPWM<-",
-    function(object, value) standardGeneric("ScalingFactorPWM<-"))
+setGeneric("lambdaPWM<-",
+    function(object, value) standardGeneric("lambdaPWM<-"))
 
 setGeneric("noOfSites",
     function(object) standardGeneric("noOfSites"))
@@ -62,11 +62,18 @@ setGeneric("naturalLog<-",
 
 setGeneric("minPWMScore",
     function(object) standardGeneric("minPWMScore"))
+setGeneric(".minPWMScore<-",
+      function(object,value)standardGeneric(".minPWMScore<-"))
 
 setGeneric("maxPWMScore",
     function(object) standardGeneric("maxPWMScore"))
+setGeneric(".maxPWMScore<-",
+     function(object,value)standardGeneric(".maxPWMScore<-"))
 
-
+setGeneric(".tags",
+      function(object) standardGeneric(".tags"))
+setGeneric(".tags<-",
+      function(object,value) standardGeneric(".tags<-"))
 
 setGeneric("PWMThreshold",
     function(object) standardGeneric("PWMThreshold"))
@@ -74,20 +81,22 @@ setGeneric("PWMThreshold",
 setGeneric("PWMThreshold<-",
     function(object, value) standardGeneric("PWMThreshold<-"))
 
-setGeneric("AllSitesAboveThreshold",
-    function(object) standardGeneric("AllSitesAboveThreshold"))
+setGeneric("profiles",
+    function(object) standardGeneric("profiles"))
+setGeneric(".profiles<-",function(object,value)standardGeneric(".profiles<-"))
 
 
 
 setGeneric("DNASequenceLength",
     function(object) standardGeneric("DNASequenceLength"))
 
-setGeneric("DNASequenceLength<-",
-    function(object, value) standardGeneric("DNASequenceLength<-"))
+setGeneric(".DNASequenceLength<-",
+    function(object, value) standardGeneric(".DNASequenceLength<-"))
 
 setGeneric("averageExpPWMScore",
     function(object) standardGeneric("averageExpPWMScore"))
-
+setGeneric(".averageExpPWMScore<-",
+    function(object,value) standardGeneric(".averageExpPWMScore<-"))
 
 
 setGeneric("strandRule",
@@ -102,13 +111,18 @@ setGeneric("whichstrand",
 setGeneric("whichstrand<-",
     function(object,value) standardGeneric("whichstrand<-"))
 
-setGeneric("NoAccess",
-    function(object) standardGeneric("NoAccess"))
 
 
+setGeneric(".ZeroBackground",
+    function(object) standardGeneric(".ZeroBackground"))
+setGeneric(".ZeroBackground<-",
+    function(object,value) standardGeneric(".ZeroBackground<-"))
 
+setGeneric(".drop<-",
+    function(object,value) standardGeneric(".drop<-"))
 
-#### Occupancy Profile Parameters ####
+setGeneric("drop",
+    function(object) standardGeneric("drop"))
 
 
 
@@ -167,3 +181,31 @@ setGeneric("stepSize",
 
 setGeneric("stepSize<-",
     function(object, value) standardGeneric("stepSize<-"))
+
+setGeneric("lociWidth",
+        function(object) standardGeneric("lociWidth"))
+
+setGeneric("lociWidth<-",
+        function(object, value) standardGeneric("lociWidth<-"))
+
+setGeneric("noiseFilter",
+          function(object) standardGeneric("noiseFilter"))
+
+setGeneric("noiseFilter<-",
+        function(object, value) standardGeneric("noiseFilter<-"))
+
+setGeneric(".paramTag",
+      function(object) standardGeneric(".paramTag"))
+setGeneric(".paramTag<-",
+      function(object,value) standardGeneric(".paramTag<-"))
+
+
+setGeneric("loci",
+      function(object) standardGeneric("loci"))
+setGeneric(".loci<-",
+      function(object,value) standardGeneric(".loci<-"))
+
+setGeneric("scores",
+      function(object) standardGeneric("scores"))
+setGeneric(".scores<-",
+      function(object,value) standardGeneric(".scores<-"))

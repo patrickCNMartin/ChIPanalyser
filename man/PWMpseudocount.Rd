@@ -1,14 +1,14 @@
 \name{PWMpseudocount}
-\alias{PWMpseudocount}
-\alias{PWMpseudocount-methods}
 
+
+\alias{PWMpseudocount}
 \title{
 Accessor Method for a \code{PWMpseudocount} slot in a
-\code{\link{genomicProfileParameters}}
+\code{\link{parameterOptions}}
 }
 \description{
 Accessor Method for a \code{PWMpseudocount} slot in a
-\code{\link{genomicProfileParameters}}
+\code{\link{parameterOptions}}
 }
 \usage{
 PWMpseudocount(object)
@@ -16,7 +16,7 @@ PWMpseudocount(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object.
+    \code{object} is a \code{\link{parameterOptions}} object.
     }
 }
 \details{
@@ -31,7 +31,7 @@ mathematical issues such as infinities or zero division. Default is set at 1.
 }
 \value{
 Returns the value assigned to a \code{PWMpseudocount} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -44,10 +44,9 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM, PWMpseudocount=0)
+GPP <- parameterOptions(PWMpseudocount=0)
 #Accessing slot value
 PWMpseudocount(GPP)
 }

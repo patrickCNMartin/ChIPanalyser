@@ -1,14 +1,14 @@
 \name{whichstrand<-}
-\alias{whichstrand<-}
-\alias{whichstrand<--methods}
 
+
+\alias{whichstrand<-}
 \title{
 Setter method for the \code{whichstrand} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\linkS4class{parameterOptions}} object
 }
 \description{
 Setter method for the \code{whichstrand} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\linkS4class{parameterOptions}} object
 }
 \usage{
 whichstrand(object) <- value
@@ -16,7 +16,7 @@ whichstrand(object) <- value
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\linkS4class{parameterOptions}} object
     }
     \item{value}{
     \code{value} is a character string specifying which strand should be
@@ -29,7 +29,7 @@ PWM Score may be computed on either the positive strand ("+"),
 the negative strand ("-") or on both strands ("+-").
 }
 \value{
-Returns a \code{\link{genomicProfileParameters}} object with an updated
+Returns a \code{\linkS4class{parameterOptions}} object with an updated
 value for the \code{whichstrand} slot
 }
 \references{
@@ -43,10 +43,9 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM, whichstrand="+-")
+GPP <- parameterOptions( whichstrand="+-")
 #Setting New Value for whichstrand
 whichstrand(GPP) <- "+"
 }

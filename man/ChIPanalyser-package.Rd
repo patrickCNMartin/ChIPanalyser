@@ -50,27 +50,29 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
 library(BSgenome.Dmelanogaster.UCSC.dm3)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM,BPFrequency=DNASequenceSet)
-OPP <- occupancyProfileParameters()
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw",BPFrequency=DNASequenceSet)
 
+eveLocusChip<-processingChIP(eveLocusChip,eveLocus)
 # Computing Genome Wide
-GenomeWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GPP)
+GenomeWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,
+    genomicsProfiles = GPP)
 
 #Compute PWM Scores
-PWMScores <- computePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GenomeWide,
-    setSequence = eveLocus, DNAAccessibility = Access)
+PWMScores <- computePWMScore(genomicsProfiles = GenomeWide,
+    DNASequenceSet = DNASequenceSet,
+    loci = eveLocus, chromatinState = Access)
 #Compute Occupnacy
-Occupancy <- computeOccupancy(AllSitesPWMScore = PWMScores,
-    occupancyProfileParameters = OPP)
+Occupancy <- computeOccupancy(genomicsProfiles = PWMScores,
+    parameterOptions = OPP)
 
 #Compute ChIP profiles
-chipProfile <- computeChipProfile(setSequence = eveLocus,
-    occupancy = Occupancy, occupancyProfileParameters = OPP)
+chipProfile <- computeChIPProfile(genomicProfiles = Occupancy,
+     loci = eveLocus,
+    parameterOptions = OPP)
 #Estimating accuracy estimate
-AccuracyEstimate <- profileAccuracyEstimate(LocusProfile = eveLocusChip,
-    predictedProfile = chipProfile, occupancyProfileParameters = OPP)
+AccuracyEstimate <- profileAccuracyEstimate(genomicProfiles = chipProfile,
+     ChIPScore = eveLocusChip,
+     parameterOptions = OPP)
 
     }
 }

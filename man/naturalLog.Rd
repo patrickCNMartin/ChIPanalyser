@@ -1,15 +1,16 @@
 \name{naturalLog}
+
+
 \alias{naturalLog}
-\alias{naturalLog-methods}
 
 
 \title{
 Accessor method the \code{naturalLog} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \description{
 Accessor method the \code{naturalLog} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 
 }
 \usage{
@@ -17,7 +18,7 @@ naturalLog(object)
 }
 \arguments{
     \item{object}{
-    \code{object} is \code{\link{genomicProfileParameters}} object.
+    \code{object} is \code{\link{parameterOptions}} object.
     }
 }
 \details{
@@ -26,12 +27,12 @@ Position Probability Matrix (derived from a Position Frequency Matrix)
 is log transformed. This parameter provides whcih "log transform" will be used.
 If TRUE, the Natural Log will bu used (ln). If FALSE, log2 will be used.
 We strongly encourage to set values when building a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 
 }
 \value{
 Returns the value assigned to the \code{naturalLog} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -43,10 +44,9 @@ Patrick C.N. Martin <p.martin@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM,naturalLog=TRUE)
+GPP <- parameterOptions(naturalLog=TRUE)
 #Setting new Value for naturalLog
 naturalLog(GPP)
 }

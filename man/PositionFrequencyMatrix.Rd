@@ -1,14 +1,15 @@
 \name{PositionFrequencyMatrix}
+
+
 \alias{PositionFrequencyMatrix}
-\alias{PositionFrequencyMatrix-methods}
 
 \title{
 Accessor method for the \code{PFM} slot in a
-\code{genomicProfileParameters} object
+\code{genomicProfiles} object
 }
 \description{
 Accessor method for the \code{PFM} slot in a
-\code{genomicProfileParameters} object
+\code{genomicProfiles} object
 }
 \usage{
 PositionFrequencyMatrix(object)
@@ -16,20 +17,20 @@ PositionFrequencyMatrix(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\link{genomicProfiles}} object
     }
 }
 \details{
-After creating a \code{\link{genomicProfileParameters}} object,
+After creating a \code{\link{genomicProfiles}} object,
 it is possible to access the Position Frequency Matrix slot.
-However this slot will be empty if the \code{\link{genomicProfileParameters}}
+However this slot will be empty if the \code{\link{genomicProfiles}}
 object was built using directly a Position Weight Matrix.
-See \code{\link{genomicProfileParameters}}
+See \code{\link{genomicProfiles}}
 }
 \value{
 Returns the Position Frequency Matrix (\code{PFM} slot) used to compute the
 \code{\link{PositionWeightMatrix}} in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{genomicProfiles}} object
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -46,8 +47,8 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 data(ChIPanalyserData)
 #Loading PFM files
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
-#Building genomicProfileParameters object
-GPP<-genomicProfileParameters(PFM=PFM)
+#Building genomicProfiles object
+GPP<-genomicProfiles(PFM=PFM,PFMFormat="raw")
 # Accessing Slot
 PositionFrequencyMatrix(GPP)
 }

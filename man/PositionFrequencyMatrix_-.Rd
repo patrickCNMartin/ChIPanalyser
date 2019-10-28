@@ -1,15 +1,15 @@
 \name{PositionFrequencyMatrix<-}
-\alias{PositionFrequencyMatrix<-}
-\alias{PositionFrequencyMatrix<--methods}
 
+
+\alias{PositionFrequencyMatrix<-}
 
 \title{
 Setter method for the \code{PFM} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{genomicProfiles}} object
 }
 \description{
 Setter method for the \code{PFM} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{genomicProfiles}} object
 }
 \usage{
 PositionFrequencyMatrix(object)<- value
@@ -17,7 +17,7 @@ PositionFrequencyMatrix(object)<- value
 %- maybe also 'usage' for other objects documented here.
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\link{genomicProfiles}} object
     }
     \item{value}{
     \code{value} can be of two forms. Either a matrix in the form of a
@@ -26,8 +26,8 @@ PositionFrequencyMatrix(object)<- value
 }
 \details{
 The Position Frequency Matrix is one of the fundamental object that needs
-to be supplied to  a \code{\link{genomicProfileParameters}}.
-If after building a \code{\link{genomicProfileParameters}},
+to be supplied to  a \code{\link{genomicProfiles}}.
+If after building a \code{\link{genomicProfiles}},
 only the Position Frequency Matrix needs to be modified then it is
 possible to manually update the value of this matrix using the function above.
 There are two options for the type of data that may be supplied to the
@@ -37,12 +37,12 @@ columns equal to the number of sites in the binding site), or it is
 possible (also recommended) to provide a path to the file containing the
 Position Frequency Matrix. This Position Frequency Matrix file may come
 in multiple form such as RAW, Transfac or JASPAR.
-WARNING: if a genomicProfileParameters object has already been created
+WARNING: if a genomicProfiles object has already been created
 and only the PFM is supplied/updated ,
 then the Positon Weight Matrix will automatically updated as well.
 }
 \value{
-Returns a \code{\link{genomicProfileParameters}} with an updated \code{PFM}
+Returns a \code{\link{genomicProfiles}} with an updated \code{PFM}
 slot (as described above this will lead to an updated PositionWeightMatrix).
 }
 \references{
@@ -56,8 +56,8 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>}
 data(ChIPanalyserData)
 #Loading PFM files
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
-#Building genomicProfileParameters object
-GPP<-genomicProfileParameters()
+#Building genomicProfiles object
+GPP<-genomicProfiles()
 #Setting PFM
 PositionFrequencyMatrix(GPP) <- PFM
 }

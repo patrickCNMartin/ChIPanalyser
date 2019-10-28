@@ -1,14 +1,14 @@
 \name{whichstrand}
-\alias{whichstrand}
-\alias{whichstrand-methods}
 
+
+\alias{whichstrand}
 \title{
 Accessor method for the \code{whichstrand} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\linkS4class{parameterOptions}} object
 }
 \description{
 Accessor method for the \code{whichstrand} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\linkS4class{parameterOptions}} object
 }
 \usage{
 whichstrand(object)
@@ -16,7 +16,7 @@ whichstrand(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\linkS4class{parameterOptions}} object
     }
 }
 \details{
@@ -25,7 +25,7 @@ the negative strand ("-") or on both strands ("+-").
 }
 \value{
 Returns on which strand PWM Scores should be computed
-( \code{whichstrand} in a \code{\link{genomicProfileParameters}} object)
+( \code{whichstrand} in a \code{\linkS4class{parameterOptions}} object)
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -37,10 +37,9 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM, whichstrand="+-")
+GPP <- parameterOptions( whichstrand="+-")
 #Setting New Value for whichstrand
 whichstrand(GPP)
 }

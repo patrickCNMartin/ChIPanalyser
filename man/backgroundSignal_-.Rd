@@ -1,14 +1,14 @@
 \name{backgroundSignal<-}
-\alias{backgroundSignal<-}
-\alias{backgroundSignal<--methods}
 
+
+\alias{backgroundSignal<-}
 \title{
 Setter method for \code{backgroundSignal} slot in a
-\code{\link{occupancyProfileParameters}}
+\code{\link{parameterOptions}}
 }
 \description{
 Setter method for \code{backgroundSignal} slot in a
-\code{\link{occupancyProfileParameters}}
+\code{\link{parameterOptions}}
 
 }
 \usage{
@@ -17,12 +17,12 @@ backgroundSignal(object)<-value
 
 \arguments{
     \item{object}{
-    \code{object} is an \code{\link{occupancyProfileParameters}} object.
+    \code{object} is an \code{\link{parameterOptions}} object.
     }
     \item{value}{
     \code{value} is the value to be assigned to the \code{backgroundSignal}
     slot in
-    \code{\link{occupancyProfileParameters}}.
+    \code{\link{parameterOptions}}.
     \code{backgroundSignal} should be a positive value.
     Defualt value is 0.
     }
@@ -37,16 +37,16 @@ is also used to nomalise occupancies to maxOccupancy.
 The \code{backgroundSignal} usually comes from
 experimental data and is provided by user. As a general rule,
 if ChIP-seq data is available and will be used in
-\code{\link{computeChipProfile}}
+\code{\link{computeChIPProfile}}
 , \code{\link{profileAccuracyEstimate}} or
 \code{\link{plotOccupancyProfile}}, it is advised to use
 the \code{backgroundSignal} from this data.
 We strongly encourage to set values when building a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \value{
-Returns a \code{\link{occupancyProfileParameters}} object with a new
-\code{value} assigned to the \code{averageExpPWMScore} slot.
+Returns a \code{\link{parameterOptions}} object with a new
+\code{value} assigned to the \code{backgroundSignal} slot.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -58,7 +58,7 @@ Patrick C.N. Martin <pm16057@essex.ac.uk>
 
 \examples{
 # Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+OPP <- parameterOptions()
 # Setting new value for backgroundSignal
 backgroundSignal(OPP) <- 0.2
 # Viewing whole object with new updated value

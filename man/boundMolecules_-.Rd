@@ -1,15 +1,16 @@
 \name{boundMolecules<-}
+
+
 \alias{boundMolecules<-}
-\alias{boundMolecules<--methods}
 
 
 \title{
 Setter method for the \code{boundMolecules} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \description{
 Setter method for the \code{boundMolecules} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \usage{
 boundMolecules(object)<-value
@@ -17,7 +18,7 @@ boundMolecules(object)<-value
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{occupancyProfileParameters}} object.
+    \code{object} is a \code{\link{parameterOptions}} object.
     }
     \item{value}{
     \code{value} is a positive integer or vector of positive
@@ -30,14 +31,14 @@ Default value: 1000
 When computing occupancy (\code{\link{computeOccupancy}}),
 a value for the number of bound Molecules to DNA is needed.
 This value can be updated and set in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 If the number of molecules is unknown,
 it is possible to infer this value with \code{\link{computeOptimal}}.
 We strongly encourage to set values when building a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \value{
-Returns a \code{\link{occupancyProfileParameters}} object with an updated
+Returns a \code{\link{parameterOptions}} object with an updated
 value for \code{boundMolecules}.
 }
 \references{
@@ -49,8 +50,8 @@ Patrick C.N. Martin <pm16057@essex.ac.uk>
 }
 
 \examples{
-# Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+# Building parameterOptions object
+OPP <- parameterOptions()
 # Setting new boundMolecules value in OPP
 boundMolecules(OPP) <- 5000
 #Checking value in whole object

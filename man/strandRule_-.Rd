@@ -1,15 +1,15 @@
 \name{strandRule<-}
-\alias{strandRule<-}
-\alias{strandRule<--methods}
 
+
+\alias{strandRule<-}
 
 \title{
 Setter method for the \code{strandRule} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\linkS4class{parameterOptions}} object.
 }
 \description{
 Setter method for the \code{strandRule} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\linkS4class{parameterOptions}} object.
 }
 \usage{
 strandRule(object) <- value
@@ -17,7 +17,7 @@ strandRule(object) <- value
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\linkS4class{parameterOptions}} object
     }
     \item{value}{
     \code{value} is a character string and can be one of the following
@@ -35,7 +35,7 @@ will sum both score together.
 Default set at `max'
 }
 \value{
-Returns a \code{\link{genomicProfileParameters}} object with an updated
+Returns a \code{\linkS4class{parameterOptions}} object with an updated
 value for the \code{strandRule} slot
 }
 \references{
@@ -49,10 +49,9 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM, strandRule="max")
+GPP <- parameterOptions(strandRule="max")
 #Setting New Value for strandRule
 strandRule(GPP) <- "mean"
 }

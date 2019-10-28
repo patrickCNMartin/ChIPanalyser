@@ -1,15 +1,15 @@
 \name{chipSd}
-\alias{chipSd}
-\alias{chipSd-methods}
 
+
+\alias{chipSd}
 
 \title{
 Accessor method for \code{chipSd} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \description{
 Access or Extract \code{chipSd} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \usage{
 chipSd(object)
@@ -17,11 +17,11 @@ chipSd(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{occupancyProfileParameters}}
+    \code{object} is a \code{\link{parameterOptions}}
     }
 }
 \details{
-When computing ChIP-seq like profiles (\code{\link{computeChipProfile}},
+When computing ChIP-seq like profiles (\code{\link{computeChIPProfile}},
 the occupancy values given by \code{computeOccupancy} are transformed into
 ChIP-seq like profiles.
 The average size of a ChIP-seq peak was described by Kaplan
@@ -30,11 +30,11 @@ variation. This variation is accounted for with \code{chipSd}.
 It is advised to use the standard deviation of ChIP peak width from actual
 ChIP-seq data.
 We strongly encourage to set values when building a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 
 }
 \value{
-Returns a \code{\link{occupancyProfileParameters}} object with an
+Returns a \code{\link{parameterOptions}} object with an
 updated value for \code{chipSd}.
 }
 \references{
@@ -53,8 +53,8 @@ Patrick C.N. Martin <pm16057@essex.ac.uk>
 }
 
 \examples{
-# Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+# Building parameterOptions object
+OPP <- parameterOptions()
 # Accessing chipSd slot
 chipSd(OPP)
 

@@ -3,65 +3,83 @@
 #######################################################################
 
 
-computeChipProfile <- function(setSequence,occupancy,
-    occupancyProfileParameters = NULL,
+computeChIPProfile <- function(genomicProfiles,loci=NULL,
+    parameterOptions = NULL,
     norm = TRUE, method = c("moving_kernel","truncated_kernel","exact"),
     peakSignificantThreshold = NULL,cores=1, verbose = TRUE){
 
     # Validity checking
-    if(class(setSequence)!="GRanges"){
-    stop(paste0(deparse(substitute(SetSequence)),
-    " must be a GRanges Object"))
+    if(!is.null(loci)){
+        if(class(loci)=="ChIPScore"){
+          chipMean(genomicProfiles)<-chipMean(loci)
+          chipSd(genomicProfiles)<-chipSd(loci)
+          chipSmooth(genomicProfiles)<-chipSmooth(loci)
+          maxSignal(genomicProfiles)<-maxSignal(loci)
+          backgroundSignal(genomicProfiles)<-backgroundSignal(loci)
+          loci<-loci(loci)
+
+
+        } else if(class(loci)=="Granges") {
+           loci <-loci
+        }
+    } else {
+        stop(paste("Please provide a set of loci to be analysed \n",
+                   "If you have used processingChIP, you can parse that object \n",
+                   "Otherwise, you can provide your own loci as a GRanges. "))
     }
-    if(!.is.genomicProfileParameter(occupancy)){
-    stop(paste0(deparse(substitute(occupancy)),
-    " is not a Genomic Profile Paramter Object"))
+    if(!.is.genomicProfiles(genomicProfiles)){
+    stop(paste0(deparse(substitute(genomicProfiles)),
+    " is not a Genomic Profiles Object"))
     }
-    if(!.is.occupancyProfileParameters(occupancyProfileParameters) &
-    !is.null(occupancyProfileParameters)){
-    stop(paste0(deparse(substitute(OPP)),
-    " is not an occupancyProfileParamaters Object."))
+    if(!.is.parameterOptions(parameterOptions) &
+    !is.null(parameterOptions)){
+    stop(paste0(deparse(substitute(parameterOptions)),
+    " is not an parameterOptions Object."))
     }
-    if(is.null(occupancyProfileParameters)){
-    occupancyProfileParameters <- occupancyProfileParameters()
+
+    if(!is.null(parameterOptions)){
+        genomicProfiles<-.updateGenomicProfiles(genomicProfiles,parameterOptions)
     }
 
     # Extraction of Ocuupancy and associated values
-    Occup <- AllSitesAboveThreshold(occupancy)
-    ZeroBackground <- .ZeroBackground(occupancy)
+    Occup <- profiles(genomicProfiles)
+    ZeroBackground <- .ZeroBackground(genomicProfiles)
 
     #Extraction of Occupancy Profile Parameters
-    stepSize <- stepSize(occupancyProfileParameters)
-    backgroundSignal <- backgroundSignal(occupancyProfileParameters)
-    removeBackground <- removeBackground(occupancyProfileParameters)
-    chipMean <- chipMean(occupancyProfileParameters)
-    chipSd <- chipSd(occupancyProfileParameters)
-
-    if(!is.null(chipSmooth(occupancyProfileParameters))){
-        chipSmooth <- chipSmooth(occupancyProfileParameters)
+    stepSize <- stepSize(genomicProfiles)
+    backgroundSignal <- backgroundSignal(genomicProfiles)
+    removeBackground <- removeBackground(genomicProfiles)
+    chipMean <- chipMean(genomicProfiles)
+    chipSd <- chipSd(genomicProfiles)
+    dropLoci<-drop(genomicProfiles)
+    if(!is.null(chipSmooth(genomicProfiles))){
+        chipSmooth <- chipSmooth(genomicProfiles)
     } else {
         chipSmooth <- NULL
     }
-    maxSignal <- maxSignal(occupancyProfileParameters)
+    maxSignal <- maxSignal(genomicProfiles)
 
 
     # Extracting names of sequences with no accesible DNA
-    NoAccess <- names(setSequence)[(names(setSequence) %in%
-        names(Occup[[1]])==FALSE)]
-    if(length(NoAccess) > 0){
-        message("No Profile for:",paste0(NoAccess,"\n"),
-        "  --  Do Not Contain Accessible Sites","\n", sep=" ")
+
+    if(dropLoci!="No loci dropped"){
+      widthDisplay<-round(options()$width*0.5)
+      cat("No Accessible DNA in: ",paste(rep(" ",
+         times=(widthDisplay-nchar("StepSize: ")-nchar(dropLoci[1]))),collapse=''),
+         dropLoci,"\n","\n")
     }
 
-    # SetSequence fragmentation
-    #Spliting setSequence for Chip PRofile computing
-    if(!is.null(setSequence) & is.null(names(setSequence))){
-			  names(setSequence)<-paste0(seqnames(setSequence),":",
-				start(ranges(setSequence)),"..",end(ranges(setSequence)),sep="")
+    # loci fragmentation
+    #Spliting loci for Chip PRofile computing
+    if(!is.null(loci) & is.null(names(loci))){
+			  names(loci)<-paste0(seqnames(loci),":",
+				start(ranges(loci)),"..",end(ranges(loci)),sep="")
 		}
-    setSequence <- setSequence[names(setSequence) %in% names(Occup[[1]])]
 
-    LocalSet <- split(setSequence, seq_along(setSequence))
+
+    LocalSet <- split(loci, names(loci))
+    LocalSet <-LocalSet[match(names(Occup[[1]]),names(LocalSet))]
+
 
     #Computing Chip like profile
     if(verbose){
@@ -70,12 +88,13 @@ computeChipProfile <- function(setSequence,occupancy,
 
     SplitGRList <-parallel::mclapply(LocalSet,.internalChIPLociSplit,stepSize,mc.cores=cores)
 
-    names(SplitGRList) <- names(setSequence)
+    names(SplitGRList) <- names(LocalSet)
 
 
     ##method set
     if(length(Occup)>length(Occup[[1]])){
         OccupancyVals <- parallel::mclapply(Occup,.internalChIPOccupValsParam,mc.cores=cores)
+
         profile <- parallel::mcmapply(.internalChIPParam,Occup=Occup,
         OccupancyVals=OccupancyVals,
         MoreArgs=list(SplitGRList=SplitGRList,LocalSet=LocalSet,
@@ -90,6 +109,7 @@ computeChipProfile <- function(setSequence,occupancy,
     OccupancyVals <- vector("list", length(Occup))
     for(i in seq_along(Occup)){
         OccupancyVals[[i]]<- parallel::mclapply(Occup[[i]],.internalChIPOccupValsLoci,mc.cores=cores)
+
         profile[[i]]<-SplitGRList
         profile[[i]] <- parallel::mcmapply(.internalChIPLoci,
         profile=profile[[i]],Occup=Occup[[i]],LocalSet=LocalSet,
@@ -102,8 +122,13 @@ computeChipProfile <- function(setSequence,occupancy,
 
     }
     }
+    ### GRlist output
 
+    profile <-lapply(profile,GRangesList)
     names(profile)<-names(Occup)
-    return(profile)
+
+    .profiles(genomicProfiles)<-profile
+    .tags(genomicProfiles)<-"ChIPProfile"
+    return(genomicProfiles)
 
 }

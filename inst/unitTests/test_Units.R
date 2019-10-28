@@ -20,17 +20,17 @@ DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
 load(file.path(path.package("ChIPanalyser"), "unitTests", "GPPWithPFM.rda"))
 # S4 Class testing
 
-test_genomicProfileParametersBuild <- function(){
-    GPP <- genomicProfileParameters()
-    checkTrue(class(GPP)=="genomicProfileParameters",
-    "Class Build genomicProfileParameters: OK")
-}
+#test_genomicProfileParametersBuild <- function(){
+  #  GPP <- genomicProfileParameters()
+  #  checkTrue(class(GPP)=="genomicProfileParameters",
+#    #"Class Build genomicProfileParameters: OK")
+#}
 
-test_occupancyProfileParametersBuild <- function(){
-    OPP <- occupancyProfileParameters()
-    checkTrue(class(OPP)=="occupancyProfileParameters",
-    "Class Build occupancyProfileParameters: OK")
-}
+#test_occupancyProfileParametersBuild <- function(){
+#    OPP <- occupancyProfileParameters()
+#    checkTrue(class(OPP)=="occupancyProfileParameters",
+#    "Class Build occupancyProfileParameters: OK")
+#}
 
 # PFM to PWM in genomicProfileParameters object
 

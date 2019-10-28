@@ -1,15 +1,16 @@
 \name{backgroundSignal}
+
+
 \alias{backgroundSignal}
-\alias{backgroundSignal-methods}
 
 
 \title{
 Accessor method for the \code{backgroundSignal} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \description{
 Extract or access the \code{backgroundSignal} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \usage{
 backgroundSignal(object)
@@ -17,7 +18,7 @@ backgroundSignal(object)
 
 \arguments{
     \item{object}{
-    \code{object} is an \code{\link{occupancyProfileParameters}}
+    \code{object} is an \code{\link{parameterOptions}}
     }
 }
 \details{
@@ -31,15 +32,15 @@ is also used to nomalise occupancies against maxOccupancy.
 The \code{backgroundSignal} usually comes from
 experimental data and is provided by user. As a general rule,
 if ChIP-seq data is available and will be used in
-\code{\link{computeChipProfile}}
+\code{\link{computeChIPProfile}}
 , \code{\link{profileAccuracyEstimate}} or \code{\link{plotOccupancyProfile}},
 it is advised to use the \code{backgroundSignal} from this data.
 We strongly encourage to set values when building a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \value{
 Returns a \code{backgroundSignal} of a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -50,7 +51,7 @@ Patrick C.N. Martin <pm16057@essex.ac.uk>
 }
 \examples{
 # Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+OPP <- parameterOptions()
 #Viewing single value in object
 backgroundSignal(OPP)
 

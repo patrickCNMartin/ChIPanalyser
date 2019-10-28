@@ -1,14 +1,14 @@
 \name{removeBackground}
-\alias{removeBackground}
-\alias{removeBackground-methods}
 
+
+\alias{removeBackground}
 \title{
 Accessor Method for the \code{removeBackground} slot in a
-\code{\link{occupancyProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \description{
 Accessor Method for the \code{removeBackground} slot in a
-\code{\link{occupancyProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \usage{
 removeBackground(object)
@@ -16,7 +16,7 @@ removeBackground(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{occupancyProfileParameters}} object
+    \code{object} is a \code{\link{parameterOptions}} object
     }
 }
 \details{
@@ -27,7 +27,7 @@ when computing \code{\link{computeOccupancy}}
 }
 \value{
 Returns the value assigned to the \code{removeBackground} slot in a
-\code{\link{occupancyProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -38,8 +38,8 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 
 }
 \examples{
-#Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+#Building parameterOptions object
+OPP <- parameterOptions()
 #Accessing  Value for removeBackground
 removeBackground(OPP)
 

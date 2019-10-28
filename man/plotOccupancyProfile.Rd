@@ -7,41 +7,34 @@ Plot Occupancy Profiles
 \description{
 \code{plotOccupancyProfile} plots the predicted profiles.
 If provided, this functions will also plot ChIP-seq profiles,
-PWMScores, DNAAccessibility, accuracy estimates and gene information.
+PWMScores (or Occupancy), chromatin States, Goodness of Fit estimates and gene information.
 }
 \usage{
-plotOccupancyProfile(predictedProfile,setSequence,
-    chipProfile = NULL,DNAAccessibility = NULL, occupancy = NULL,
-    profileAccuracy = NULL,PWM=FALSE,
-    occupancyProfileParameters = NULL,geneRef = NULL,axis=TRUE,...)
+  plotOccupancyProfile(predictedProfile, ChIPScore = NULL,chromatinState = NULL
+      ,occupancy = NULL,goodnessOfFit = NULL,PWM=FALSE,
+      geneRef = NULL,axis=TRUE,...)
 }
 
 \arguments{
     \item{predictedProfile}{
-    \code{predictedProfile} is a \code{\link[GenomicRanges]{GRanges}}
-    containing predicted ChIP-seq scores for ONE loci and ONE
-    combination of \code{lambda}
-    ( See \code{\link{ScalingFactorPWM}} ) and \code{\link{boundMolecules}}.
+    \code{predictedProfile} is a either \code{\link[GenomicRanges]{GRanges}}
+     containing the predicted profiles for one loci, all loci selected for one paramter,
+     or all loci selected for all parameter combinations selected. (see \code{\link{searchSites}})
     }
-    \item{setSequence}{
-    \code{setSequence} is a \code{\link[GenomicRanges]{GRanges}} containing the
-    locus of interest. This locus MUST be named.
+    \item{ChIPScore}{
+    \code{ChIPScore} is a \code{ChIPscore} object containing ChIPscore (or
+    a list of numeric values representing ChIP scores (Experimental ChIP))
     }
-
-    \item{chipProfile}{
-    \code{chipProfile} is a numeric vector containing real ChIP-seq scores.
-    }
-    \item{DNAAccessibility}{
-    \code{DNAAccessibility} is a \code{\link[GenomicRanges]{GRanges}}
-    containing accesible DNA sites
+    \item{chromatinState}{
+    \code{chromatinState} is a \code{\link[GenomicRanges]{GRanges}}
+    containing accesible DNA sites or chromatin States.
     }
 
     \item{occupancy}{
-    \code{occupancy} is a \code{\link[GenomicRanges]{GRanges}} containing PWM
-    Score and predicted Occupancies.
+    \code{occupancy} is a \code{\link[GenomicRanges]{GRanges}} or a \code{genomicProfiles}
+    object contaning PWM scores and Occupancy ( see \code{computeOccupancy})
     }
-    \item{profileAccuracy}{ \code{profileAccuracy} a vector containing accuracy
-    metrics. Metrics are computed using the
+    \item{goodnessOfFit}{ \code{goodnessOfFit} results of the
     \code{\link{profileAccuracyEstimate}} function.}
 
     \item{PWM}{
@@ -49,11 +42,7 @@ plotOccupancyProfile(predictedProfile,setSequence,
     provided which of occupancy scores of PWM scores hsould be plotted.
     Default set at FALSE
     }
-    \item{occupancyProfileParameters}{
-    \code{\link{occupancyProfileParameters}} is
-    \code{\link{occupancyProfileParameters}} object containing parameters
-    used for previous computations (see vignette for pipeline/function order)
-    }
+
     \item{geneRef}{
     \code{geneRef} is a \code{\link[GenomicRanges]{GRanges}}
     containing gene information on exons,introns, UTR's, enhancers or any
@@ -73,15 +62,10 @@ plotOccupancyProfile(predictedProfile,setSequence,
 }
 \details{
 Once the predicted ChIP-seq like profiles have been computed,
-it is possible to plot these profiles. The important aspect to keep in mind
-with \code{plotOccupancyProfile} is that in only computes one profile
-at a time. This means that the output of previous functions should be
-subsetted carefully. This leaves to the user more flexibility in what
-and how profiles should be plotted. Keep in mind that the output of
-different function are more or less nested.
+it is possible to plot these profiles.
 }
 \value{
-Returns a porfile plot with "Occupancy" on the y axis and DNA position on
+Returns a profile plot with "Occupancy" on the y axis and DNA position on
 the the X- axis. If the orange line is the predicted profile, the grey
 shaded area represents real ChIP-seq data. The yellow boxes represent
 regions on NON-accessible DNA. On the lower part of the plot, gene
@@ -90,6 +74,9 @@ Finally, the blue vertical lines represent sites of either high Occupancy
 or high PWM score depending on which had been selected. The minimal plot
 will only contain the predicted profile.
 The more data is provided the more will be plotted.
+IMPORTANT: the colours described above represent the default colour values.
+If colours are provided by the user, they will be updated in plotting order or
+if the argument has been speicified assigned to said argument.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -114,56 +101,49 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
 library(BSgenome.Dmelanogaster.UCSC.dm3)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM,BPFrequency=DNASequenceSet)
-OPP <- occupancyProfileParameters()
+GPP <- genomicProfiles(PFM=PFM,BPFrequency=DNASequenceSet)
+
 
 # Computing Genome Wide
-GenomeWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GPP)
+GenomeWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,
+    genomicProfiles = GPP)
 
 #Compute PWM Scores
 PWMScores <- computePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GenomeWide,
-    setSequence = eveLocus, DNAAccessibility = Access)
+    genomicProfiles = GenomeWide,
+    loci = eveLocus, chromatinState = Access)
 #Compute Occupnacy
-Occupancy <- computeOccupancy(AllSitesPWMScore = PWMScores,
-    occupancyProfileParameters = OPP)
+Occupancy <- computeOccupancy(genomicProfiles = PWMScores)
 
 #Compute ChIP profiles
-chipProfile <- computeChipProfile(setSequence = eveLocus,
-    occupancy = Occupancy, occupancyProfileParameters = OPP)
+chipProfile <- computeChipProfile(loci = eveLocus,
+    genomicProfiles = Occupancy)
 
 
 #Plotting Profile
-plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
-    setSequence=eveLocus,
-    chipProfile = eveLocusChip[[1]],
-    DNAAccessibility = Access,
-    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
-    occupancyProfileParameters = OPP,
+plotOccupancyProfile(predictedProfile=chipProfile,
+    ChIPScore = eveLocusChip,
+    chromatinState = Access,
+    occupancy = Occupancy,
     geneRef =geneRef)
 
 ## Changing graphical Parameters
 
 #### In this examples ####
-### predictedProfile will be reduce
+### predictedProfile will be red
 ### chipProfile will be blue
 ### and DNAAccessibility will be green
-plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
-    setSequence=eveLocus,
-    chipProfile = eveLocusChip[[1]],
-    DNAAccessibility = Access,
-    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
-    occupancyProfileParameters = OPP,
+plotOccupancyProfile(predictedProfile=chipProfile,
+    ChIPScore = eveLocusChip,
+    chromatinState = Access,
+    occupancy = Occupancy,
     geneRef =geneRef,col=c("red","blue","green"))
 
 ### If name is specified
-plotOccupancyProfile(predictedProfile=chipProfile[[1]][[1]],
-    setSequence=eveLocus,
-    chipProfile = eveLocusChip[[1]],
-    DNAAccessibility = Access,
-    occupancy = AllSitesAboveThreshold(Occupancy)[[1]][[1]],
-    occupancyProfileParameters = OPP,
+plotOccupancyProfile(predictedProfile=chipProfile,
+    ChIPScore = eveLocusChip,
+    chromatinState = Access,
+    occupancy = Occupancy,
     geneRef =geneRef,col=c("DNAAccessibility"="red","blue","green"))
 
 }

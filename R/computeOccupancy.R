@@ -3,58 +3,70 @@
 #######################################################################
 
 
-computeOccupancy <- function(AllSitesPWMScore, DNAAccessibility=NULL,
-    occupancyProfileParameters=NULL,
-    norm=TRUE,verbose=TRUE) {
+computeOccupancy <- function(genomicProfiles ,
+     parameterOptions=NULL,norm=TRUE,verbose=TRUE) {
     # Validity checking
-    if(!.is.occupancyProfileParameters(occupancyProfileParameters) &
-    !is.null(occupancyProfileParameters)){
-    stop(paste0(deparse(substitute(occupancyProfileParameters)),
+    if(!.is.parameterOptions(parameterOptions) &
+    !is.null(parameterOptions)){
+    stop(paste0(deparse(substitute(parameterOptions)),
     "is not an occupancyProfileParamaters Object."))
     }
-    if (!.is.genomicProfileParameter(AllSitesPWMScore)){
-    stop(paste0(deparse(substitute(AllSitesPWMScore)),
+    if (!.is.genomicProfiles(genomicProfiles)){
+    stop(paste0(deparse(substitute(genomicProfiles)),
     " is not a Genomic Profile Paramter object."))
     }
-    if(!.is.PWMScoreComputed(AllSitesPWMScore)){
-    stop(paste0("PWM Score at sites higher than threshold " ,
-    "have not yet been computed in",
-    deparse(substitute(AllSitesPWMScore))))
-    }
-    #Generating occupancyProfileParamters if not given by user.
+
+    #Generating parameterOptions if not given by user.
     #All Value will be defaut settings
-    if(is.null(occupancyProfileParameters)){
-    occupancyProfileParameters <- occupancyProfileParameters()
+
+    if(!is.null(parameterOptions)){
+        genomicProfiles<-.updateGenomicProfiles(genomicProfiles,parameterOptions)
     }
+    # GenomicProfiles parameter Extraction
+  
+    PWMGRList <- GRangesList(profiles(genomicProfiles))
+    DNALength <- as.numeric(DNASequenceLength(genomicProfiles))
+    averageExpPWMScore <- averageExpPWMScore(genomicProfiles)
+    lambda <- lambdaPWM(genomicProfiles)
 
-    # GenomicProfileParameter Parameter Extraction
-    PWMGRList <- AllSitesAboveThreshold(AllSitesPWMScore)
-    DNALength <- as.numeric(DNASequenceLength(AllSitesPWMScore))
-    averageExpPWMScore <- averageExpPWMScore(AllSitesPWMScore)
-    lambda <- ScalingFactorPWM(AllSitesPWMScore)
-
-    #Occupancy Profile Parameter Extraction
-    ploidy <- as.numeric(ploidy(occupancyProfileParameters))
-    boundMolecules <- boundMolecules(occupancyProfileParameters)
-    backgroundSignal <- backgroundSignal(occupancyProfileParameters)
-    maxSignal <- maxSignal(occupancyProfileParameters)
+    ploidy <- as.numeric(ploidy(genomicProfiles))
+    boundMolecules <- boundMolecules(genomicProfiles)
+    backgroundSignal <- backgroundSignal(genomicProfiles)
+    maxSignal <- maxSignal(genomicProfiles)
 
 
 
     # Computing Occupancy at sites higher than threshold
     MultiParam <- vector("list", (length(lambda)*length(boundMolecules)))
     PWMScore <- vector("list", length(PWMGRList))
-    # Extracting names of regions
-    #name <- c()
-  #  for(i in seq_along(PWMGRList)){
-      #  name <- c(name,rep(names(PWMGRList)[[i]],length(PWMGRList[[i]])))
-    #}
-    name<-rep(names(PWMGRList),times=sapply(PWMGRList, length))
 
-    # DNAAccessibility if not continuous Data
+    ### Essentially making sure that if regions dont have accessible DNA
+    ## They will still be kept it will make things easier later down the line
+    ## Also you just return a big fat falt line anyway
+
+    dropLoci<-drop(genomicProfiles)
+    if(dropLoci!="No loci dropped"){
+      widthDisplay<-round(options()$width*0.5)
+      cat("No Accessible DNA in: ",paste(rep(" ",
+         times=(widthDisplay-nchar("StepSize: ")-nchar(dropLoci[1]))),collapse=''),
+         dropLoci,"\n","\n")
+      chr<-sapply(strsplit(dropLoci,":"),"[[",1)
+      start<-sapply(strsplit(sapply(strsplit(dropLoci,":"),"[[",2),"\\.."),"[[",1)
+      end<-sapply(strsplit(sapply(strsplit(dropLoci,":"),"[[",2),"\\.."),"[[",2)
+      LocalDrop<-GRanges(seqnames=chr,ranges=IRanges(as.numeric(start), as.numeric(end)),
+                          PWMScore=rep(0,length(chr)),
+                          DNAaffinity=rep(0,length(chr)),
+                          Occupancy=rep(0,length(chr)))
+      name<-c(rep(names(PWMGRList),times=sapply(PWMGRList, length)),dropLoci)
+    } else{
+      name<-rep(names(PWMGRList),times=sapply(PWMGRList, length))
+    }
+
+
+    # chromatinState if not continuous Data
 
     Occupancy <- vector("list",length(PWMGRList))
-    names(Occupancy) <- names(PWMGRList)
+    #names(Occupancy) <- names(PWMGRList)
     result <- list()
     emptyGR <- GRanges()
     # Progress message when required
@@ -92,11 +104,15 @@ computeOccupancy <- function(AllSitesPWMScore, DNAAccessibility=NULL,
             buffer <- unlist(PWMGRList)
 
             buffer$Occupancy <- Occupancy
+            if(dropLoci!="No loci dropped"){
+               buffer<-c(buffer,LocalDrop)
+            }
     # Extracting and pasting names of Parameters
             names(buffer) <- name
             if(length(name > 1)){
                 level <- factor(names(buffer),levels=unique(name))
                 result <- split(buffer,level)
+
             } else {
                 result <-  buffer
             }
@@ -107,13 +123,13 @@ computeOccupancy <- function(AllSitesPWMScore, DNAAccessibility=NULL,
             "boundMolecules = ",boundMolecules[j]))
         }
     }
+
     # ReBuilding GenomicProfileParameters
     names(MultiParam) <- ParaVal
 
-    AllSitesPWMScore<-.ZeroBackgroundReplace(AllSitesPWMScore,
-        ZeroBackground)
-    AllSitesPWMScore<-.AllSitesAboveThresholdReplace(AllSitesPWMScore,
-        MultiParam)
-
-    return(AllSitesPWMScore)
+    .ZeroBackground(genomicProfiles)<- ZeroBackground
+    .profiles(genomicProfiles)<-MultiParam
+    .tags(genomicProfiles)<-"Occupancy"
+    .paramTag(genomicProfiles)<-"Occupancy"
+    return(genomicProfiles)
 }

@@ -1,14 +1,15 @@
 \name{PFMFormat<-}
+
+
 \alias{PFMFormat<-}
-\alias{PFMFormat<--methods}
 
 \title{
 Setter method for the \code{PFMFormat} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{genomicProfiles}} object
 }
 \description{
 Setter method for the \code{PFMFormat} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{genomicProfiles}} object
 }
 \usage{
 PFMFormat(object) <- value
@@ -18,7 +19,7 @@ PFMFormat(object) <- value
 %- maybe also 'usage' for other objects documented here.
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\link{genomicProfiles}} object
     }
     \item{value}{
     \code{value} is character string of one of the following:
@@ -33,12 +34,12 @@ If loading a
 of the file should be specified. Default is raw. Please keep in mind that
 this argument is used when parsing the
 \code{\link{PositionFrequencyMatrix}} file. IF this argument is changed
-after building the \code{\link{genomicProfileParameters}} with
+after building the \code{\link{genomicProfiles}} with
 a PositionFrequencyMatrix file, this
-will not influence the parsing of the file. 
+will not influence the parsing of the file.
 }
 \value{
-Returns a \code{\link{genomicProfileParameters}} object with an updated
+Returns a \code{\link{genomicProfiles}} object with an updated
 value for the \code{PFMFormat} slot.
 }
 \references{
@@ -56,7 +57,7 @@ data(ChIPanalyserData)
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
 #Building data objects
 #### THIS IS THE PREFFERED METHOD FOR SETTING PFMFormat
-GPP <- genomicProfileParameters(PFM=PFM,PFMFormat="raw")
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
 #Setting New value for PFMFormat
 PFMFormat(GPP) <- "raw"
 }

@@ -1,15 +1,16 @@
 \name{maxPWMScore}
+
+
 \alias{maxPWMScore}
-\alias{maxPWMScore-methods}
 
 
 \title{
 Accessor function for \code{maxPWMScore} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \description{
 Accessor function for \code{maxPWMScore} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \usage{
 maxPWMScore(object)
@@ -17,19 +18,19 @@ maxPWMScore(object)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object.
+    \code{object} is a \code{\link{genomicProfiles}} object.
     }
 }
 \details{
 \code{maxPWMScore} is a numerical value that can be described as the
 highest PWM score computed at a genome wide scale.
 This value is computed and updated in the
-\code{\link{genomicProfileParameters}} object after using the
-\code{\link{computeGenomeWidePWMScore}}.
+\code{\link{genomicProfiles}} object after using the
+\code{\link{computeGenomeWideScores}}.
 }
 \value{
 Returns the value of assigned to the \code{maxPWMScore} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -56,11 +57,11 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
 library(BSgenome.Dmelanogaster.UCSC.dm3)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
 
 # Computing Genome Wide
-GenomeWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GPP)
+GenomeWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,
+    genomicProfiles = GPP)
 maxPWMScore(GenomeWide)
 ## If used before computeGenomeWidePWMScore, will return NULL
 }

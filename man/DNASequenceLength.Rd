@@ -1,15 +1,15 @@
 \name{DNASequenceLength}
-\alias{DNASequenceLength}
-\alias{DNASequenceLength-methods}
 
+
+\alias{DNASequenceLength}
 
 \title{
 Accessor method for \code{DNASequenceLength} slot in a
-\code{\link{genomicProfileParameters}}
+\code{\link{genomicProfiles}}
 }
 \description{
 Accessor method for \code{DNASequenceLength} slot in a
-\code{\link{genomicProfileParameters}}
+\code{\link{genomicProfiles}}
 
 }
 \usage{
@@ -18,7 +18,7 @@ DNASequenceLength(object)
 
 \arguments{
     \item{object}{
-    \code{object} is  a \code{\link{genomicProfileParameters}}
+    \code{object} is  a \code{\link{genomicProfiles}}
     }
 }
 \details{
@@ -29,7 +29,7 @@ or the the Accessible DNA at a genome wide scale.
 }
 \value{
 Returns \code{DNASequenceLength} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -55,11 +55,11 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
 library(BSgenome.Dmelanogaster.UCSC.dm3)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
 
-#Building genomicProfileParameters object
-GPP <- genomicProfileParameters(PFM=PFM,BPFrequency=DNASequenceSet)
+#Building genomicProfiles object
+GPP <- genomicProfiles(PFM=PFM,BPFrequency=DNASequenceSet)
 # Computing Genome Wide
-GenomceWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GPP)
+GenomceWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,
+    genomicProfiles = GPP)
 
 DNASequenceLength(GenomceWide)
 

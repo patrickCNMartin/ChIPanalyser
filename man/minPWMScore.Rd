@@ -1,14 +1,14 @@
 \name{minPWMScore}
 \alias{minPWMScore}
-\alias{minPWMScore-methods}
+
 
 \title{
 Accessor method the \code{minPWMScore} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{genomicProfiles}} object
 }
 \description{
 Accessor method the \code{minPWMScore} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{genomicProfiles}} object
 }
 \usage{
 minPWMScore(object)
@@ -16,7 +16,7 @@ minPWMScore(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object.
+    \code{object} is a \code{\link{genomicProfiles}} object.
     }
 }
 \details{
@@ -24,11 +24,11 @@ minPWMScore(object)
 a genome wide scale. Although it is possible to assigne a value
 to \code{minPWMScore}, we strongly advise to use the value
 computed and assigned internally. This value is computed in the
-\code{\link{computeGenomeWidePWMScore}} function.
+\code{\link{computeGenomeWideScores}} function.
 }
 \value{
 Returns the value assigned to the \code{minPWMScore} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -52,11 +52,11 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
 library(BSgenome.Dmelanogaster.UCSC.dm3)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
 
 # Computing Genome Wide
-GenomceWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GPP)
+GenomceWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,
+    genomicProfiles = GPP)
 minPWMScore(GenomceWide)
 
 ## If used before computeGenomeWidePWMScore, will return NULL

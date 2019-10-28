@@ -1,15 +1,16 @@
 \name{chipMean}
+
+
 \alias{chipMean}
-\alias{chipMean-methods}
 
 
 \title{
 Accessor method for \code{\link{chipMean}} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \description{
 Accessor method for \code{\link{chipMean}} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 
 }
 \usage{
@@ -18,24 +19,24 @@ chipMean(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{occupancyProfileParameters}}
+    \code{object} is a \code{\link{parameterOptions}}
     }
 }
 \details{
 Default vlaue : 150
-When computing ChIP-seq like profiles (\code{\link{computeChipProfile}},
+When computing ChIP-seq like profiles (\code{\link{computeChIPProfile}},
 the occupancy values given by \code{computeOccupancy} are transformed
 into ChIP-seq like profiles.
 The average size of a ChIP-seq peak was described by Kaplan
 (Kaplan et al. , 2011). It is advised to use the average
 width of ChIP peaks from actual ChIP-seq data.
 We strongly encourage to set values when building a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 
 \value{
 Returns \code{chipMean} slot from a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -53,8 +54,8 @@ Patrick C.N. Martin <pm16057@essex.ac.uk>
 }
 
 \examples{
-# Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+# Building parameterOptions object
+OPP <- parameterOptions()
 #Accessing chipMean slot in OPP
 chipMean(OPP)
 

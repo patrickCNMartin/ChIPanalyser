@@ -1,14 +1,15 @@
 \name{PWMpseudocount<-}
+
+
 \alias{PWMpseudocount<-}
-\alias{PWMpseudocount<--methods}
 
 \title{
 Setter Method for the \code{pseudocount} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \description{
 Setter Method for the \code{pseudocount} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \usage{
 PWMpseudocount(object) <- value
@@ -16,7 +17,7 @@ PWMpseudocount(object) <- value
 %- maybe also 'usage' for other objects documented here.
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\link{parameterOptions}} object
     }
     \item{value}{
     \code{value} is a numeric value that will be assigned to the
@@ -33,7 +34,7 @@ assigned will not influence the model nor will create mathematical issues
 such as infinities or zero division.
 }
 \value{
-Returns a \code{genomicProfileParameters} object with an updated value for
+Returns a \code{parameterOptions} object with an updated value for
 the \code{pseudocount} slot.
 }
 \references{
@@ -47,10 +48,9 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM, PWMpseudocount=0)
+GPP <- parameterOptions( PWMpseudocount=0)
 #Setting Value for new PWMpseudocount
 PWMpseudocount(GPP) <- 1
 }

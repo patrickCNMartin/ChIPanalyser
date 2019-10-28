@@ -22,21 +22,21 @@
 
 
 
-.parameterShuffle<-function(args,geneRefColour,chrinfo){
+.parameterShuffle<-function(args,geneRefColour,chrinfo,set){
     ## Setting Plot order for name retrieval
-    #argsOrder<-c("DNAAccessibility","chipProfile","predictedProfile","occupancy","text",names(GeneRefColour))
-    argsOrder<-c("predictedProfile","chipProfile","DNAAccessibility","occupancy","text",names(geneRefColour))
+    #argsOrder<-c("chromatinState","chipProfile","predictedProfile","occupancy","text",names(GeneRefColour))
+    argsOrder<-c("predictedProfile","chipProfile","chromatinState","occupancy","text",names(geneRefColour))
     ## Setting Defaults for color argument
     colour<-c("#D55E00","#999999","#F0E442","#56B4E9","black",geneRefColour)
     names(colour)<-argsOrder
 
     ## Setting default for density
     density<-c(NA,NA,rep(NA,length(geneRefColour)))
-    names(density)<-c("chipProfile","DNAAccessibility",names(geneRefColour))
+    names(density)<-c("chipProfile","chromatinState",names(geneRefColour))
 
     ## Setting default borders
     border<-c(NA,NA,rep(NA,length(geneRefColour)))
-    names(border)<-c("chipProfile","DNAAccessibility",names(geneRefColour))
+    names(border)<-c("chipProfile","chromatinState",names(geneRefColour))
 
     ## Setting Default for line type
     lineType<-c(1,1,1,1,1,rep(1,length(geneRefColour)))
@@ -55,20 +55,25 @@
 
     ## Setting up labels
     main<-"Occupancy Profile"
-    xlab<-paste("DNA Position",chrinfo[[1]],paste(chrinfo[[2]],":",chrinfo[[4]],sep=""),sep=" ")
+    xlab<-paste("DNA Position",chrinfo[[1]][set],paste(chrinfo[[2]][set],":",chrinfo[[4]][set],sep=""),sep=" ")
     ylab<-"Occupancy"
 
 
     ## reshaping localPredcitedPropfile to remove 0 on the endPos
 
-    ## Axis set up
-    xaxislabels<-round(seq(from=chrinfo[[2]],to=chrinfo[[4]], length.out=10))
 
 
     lableOri<-c(1,1)
     names(lableOri)<-c("xaxis","yaxis")
     ## plot limit set up
-    xlim<-c(chrinfo[[2]], chrinfo[[4]])
+
+    xlim<-c(chrinfo[[2]][set], chrinfo[[4]][set])
+    xaxislabels<-round(seq(from=xlim[1],to=xlim[2], length.out=10))
+
+
+    ## Axis set up
+
+
 
     if(any(geneRefColour=="None")){
         ylim<-c(0,1)
@@ -146,9 +151,11 @@
         ylab<-args$ylab
     }
     if(any(names(args)=="xlim")){
+
         buffer<-args$xlim
         xlim[seq_along(buffer)]<-buffer
         xaxislabels<-round(seq(from=xlim[1],to=xlim[2], length.out=10))
+
     }
     if(any(names(args)=="ylim")){
         buffer<-args$ylim
@@ -209,52 +216,66 @@
 ###### Plotiing occupancy Profile #######
 
 
-plotOccupancyProfile<-function(predictedProfile,setSequence, chipProfile = NULL,DNAAccessibility = NULL
-    ,occupancy = NULL,profileAccuracy = NULL,PWM=FALSE,
-    occupancyProfileParameters = NULL, geneRef = NULL,axis=TRUE,...){
+plotOccupancyProfile<-function(predictedProfile, ChIPScore = NULL,chromatinState = NULL
+    ,occupancy = NULL,goodnessOfFit = NULL,PWM=FALSE,
+    geneRef = NULL,axis=TRUE,...){
 
-    # restricting setSequence to sequences present in profile
-    ##( case of non accessible DNA)
+     ### handling paramter checks and building up object for plotting
+     buffer<- .what.is.predictedProfile(predictedProfile)
+     lociLocal<-buffer$loci
+     predictedProfileLocal<-buffer$predictedProfile
+     stepSize<-buffer$stepSize
+     .cleanUpAfterYourself(buffer)
+
+     ## Extracting Chromosome information
+     chromosome <- as.character(seqnames(lociLocal))
+     startPoint <- start(lociLocal)
+     ranges <- ranges(lociLocal)
+     endPoint <- end(lociLocal)
+     widthSeq <- width(lociLocal)
+     chrinfo<-list(chromosome,startPoint,ranges,endPoint,widthSeq)
 
 
-    if(!is.null(DNAAccessibility)){
-        localAccessibility <- .AccessExtract(setSequence, DNAAccessibility)[[1]]
+
+     if(!is.null(occupancy)){
+        occupancyLocal<-.what.is.occupancy(occupancy)
+     }
+
+
+     if(!is.null(ChIPScore)){
+         ChIPScoreLocal<-.what.is.ChIPScore(ChIPScore)
+
+         ChIPScoreLocal<-rep(ChIPScoreLocal,length(predictedProfileLocal)/length(ChIPScoreLocal))
+     }
+
+     if(!is.null(goodnessOfFit)){
+        goodnessOfFitLocal<-.what.is.goodnessOfFit(goodnessOfFit)
+     }
+
+    if(!is.null(chromatinState)){
+        localchromatineState <- .AccessExtract(lociLocal, chromatinState)
     } else {
-        localAccessibility <- setSequence
-        names(localAccessibility)<-names(setSequence)
+        localchromatineState <- lociLocal
+        names(localchromatineState)<-names(lociLocal)
     }
 
-    ## OPP
-    if(is.null(occupancyProfileParameters)){
-        occupancyProfileParameters <- occupancyProfileParameters()
-    }
+
 
     ## Graphical Parameters set up!
     args<-list(...)
 
-    ## Extracting Chromosome information
-    chromosome <- as.character(seqnames(setSequence))
-    startPoint <- start(setSequence)
-    ranges <- ranges(setSequence)
-    endPoint <- end(setSequence)
-    widthSeq <- width(setSequence)
-
-    stepSize <- stepSize(occupancyProfileParameters)
-    chrinfo<-list(chromosome,startPoint,ranges,endPoint,widthSeq)
 
     ## Parsing gene ref if present
-
-
 
     if(!is.null(geneRef) & is(geneRef,"GRanges")){
         ##Seting Graphical bounderies
 
         # Selecting genes in regions of Interest
-        genes <- geneRef[queryHits(findOverlaps(geneRef, setSequence))]
+        genes <- geneRef[queryHits(findOverlaps(geneRef, lociLocal))]
 
         # Fitting to window
-        start(genes) <- pmax(start(genes), start(setSequence))
-        end(genes) <- pmin(end(genes), end(setSequence))
+        start(genes) <- pmax(start(genes), start(lociLocal))
+        end(genes) <- pmin(end(genes), end(lociLocal))
         geneRefColour<-heat.colors(length(unique(genes$type)))
         names(geneRefColour)<-unique(genes$type)
         elementBuffer<-split(genes,genes$type)
@@ -265,26 +286,26 @@ plotOccupancyProfile<-function(predictedProfile,setSequence, chipProfile = NULL,
     }
 
 
-
+    for(i in seq_along(predictedProfileLocal)){
     ### Extracting data to be plotted
 
-    stepIndex <- seq(1, width(setSequence),by=stepSize)
-    localPosition<-seq(start(setSequence), end(setSequence),by=stepSize)
+    stepIndex <- seq(1, width(lociLocal[i]),by=stepSize)
+    localPosition<-seq(start(lociLocal[i]), end(lociLocal[i]),by=stepSize)
     localPosition<-c(localPosition[1]-1,localPosition,localPosition[length(localPosition)]+1)
-    localPredcitedPropfile <- predictedProfile$ChIP
+    localPredcitedPropfile <- predictedProfileLocal[[i]]
     localPredcitedPropfile <- c(0,localPredcitedPropfile,0)
 
     ## Setting Defaults
 
-    param<-.parameterShuffle(args,geneRefColour,chrinfo)
+    param<-.parameterShuffle(args,geneRefColour,chrinfo,i)
 
     ## setting up empty plot with and without Gene rangeBuffer
-    if(!is.null(profileAccuracy)){
+    if(!is.null(goodnessOfFit)){
         par(xpd=T)
         par(mar=c(6,2,4,10))
     }
-
-    plot(0,type="n", axes=FALSE,xlab="",ylab="",ylim=param$ylim,xlim=param$xlim)
+    par(family="mono")
+    plot(0,type="n", axes=FALSE,xlab="",ylab="",ylim=param$ylim,xlim=c(param$xlim[1],param$xlim[2]))
     title(xlab=param$xlab, cex.lab=param$fontsSizePlot["xlab"])
     title(ylab=param$ylab, cex.lab=param$fontsSizePlot["ylab"],line=0.8)
     title(param$main)
@@ -294,22 +315,30 @@ plotOccupancyProfile<-function(predictedProfile,setSequence, chipProfile = NULL,
 
 
     ## Accesibility plotting
-    if(!is.null(DNAAccessibility)){
+    if(!is.null(chromatinState)){
+        localAccessibility<-localchromatineState[[i]]
+
         for(localAccess in seq_len(nrow(localAccessibility))){
             rect(localAccessibility[localAccess,"start"],0,localAccessibility[localAccess,"end"],param$ylim[2],
-            col=param$colour[["DNAAccessibility"]],density=param$density[["DNAAccessibility"]], border=param$borders[["DNAAccessibility"]],lwd=param$lineWidth[["DNAAccessibility"]],lty=param$lineType[["DNAAccessibility"]])
+            col=param$colour[["chromatinState"]],density=param$density[["chromatinState"]], border=param$borders[["chromatinState"]],lwd=param$lineWidth[["chromatinState"]],lty=param$lineType[["chromatinState"]])
         }
     }
     ## ChIP Profile Plotting
-    if(!is.null(chipProfile)){
+    if(!is.null(ChIPScore)){
+
+        chipProfile<-ChIPScoreLocal[[i]]
+
         localchipProfile <- c(0,chipProfile[stepIndex],0)
         polygon(localPosition,localchipProfile,col=param$colour[["chipProfile"]],density=param$density[["chipProfile"]],border=param$border[["chipProfile"]],lty=param$lineType[["chipProfile"]])
     }
     ## Predicted Profile plotting
+
     lines(localPosition,localPredcitedPropfile,type="l",col=param$colour[["predictedProfile"]],lwd=param$lineWidth[["predictedProfile"]],lty=param$lineType[["predictedProfile"]])
 
     ## Occupancy or PWM Scores
     if(!is.null(occupancy)){
+        occupancy<-occupancyLocal[[i]]
+
         if(PWM){
             PWMScaling <- occupancy[head(order(occupancy$PWMScore,decreasing=T), round(0.9*length(occupancy$PWMScore)))]
             ReScale<-((PWMScaling$PWMScore+abs(min(PWMScaling$PWMScore)))/(max(PWMScaling$PWMScore)+abs(min(PWMScaling$PWMScore))))*(param$ylim[2]*0.5)
@@ -328,15 +357,16 @@ plotOccupancyProfile<-function(predictedProfile,setSequence, chipProfile = NULL,
         }
     }
     ## Adding accuracy estimate
-    if(!is.null(profileAccuracy)){
-
-      leg<-paste(names(profileAccuracy),"=",signif(profileAccuracy,4))
-      legend(x=(max(param$xlim)+0.06*(max(param$xlim)-min(param$xlim))),y=max(param$ylim),
+    if(!is.null(goodnessOfFit)){
+      goodnessOfFit<-goodnessOfFitLocal[[i]]
+#param$xlim[i,1],param$xlim[i,2]
+      leg<-paste(names(goodnessOfFit),"=",signif(goodnessOfFit,4))
+      legend(x=(param$xlim[2])+0.06*((param$xlim[2])-(param$xlim[1])),y=max(param$ylim)+0.2,
       legend=leg,cex=0.68)
 
 
       #legend(x=(max(param$xlim)+0.01*(max(param$xlim)-min(param$xlim))),y=max(param$ylim),
-      #legend=c(paste0("Correlation = ",round(profileAccuracy[1],digits=5)," "),paste0("MSE = ",round(profileAccuracy[2],digits=6))),cex=0.7)
+      #legend=c(paste0("Correlation = ",round(goodnessOfFit[1],digits=5)," "),paste0("MSE = ",round(goodnessOfFit[2],digits=6))),cex=0.7)
     }
 
     ## Plotting geneRef
@@ -404,4 +434,5 @@ plotOccupancyProfile<-function(predictedProfile,setSequence, chipProfile = NULL,
             }
         }
     }
+  }
 }

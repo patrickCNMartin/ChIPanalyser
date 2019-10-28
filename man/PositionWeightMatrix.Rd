@@ -1,14 +1,14 @@
 \name{PositionWeightMatrix}
-\alias{PositionWeightMatrix}
-\alias{PositionWeightMatrix-methods}
 
+
+\alias{PositionWeightMatrix}
 \title{
 Accessor Method for the \code{PWM} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{genomicProfiles}} object
 }
 \description{
 Accessor Method for the \code{PWM} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{genomicProfiles}} object
 }
 \usage{
 PositionWeightMatrix(object)
@@ -16,11 +16,11 @@ PositionWeightMatrix(object)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}}
+    \code{object} is a \code{\link{genomicProfiles}}
     }
 }
 \details{
-After creating a \code{\link{genomicProfileParameters}} object,
+After creating a \code{\link{genomicProfiles}} object,
 it is possible to access the Position Weight Matrix stored in this slot.
 This slot should always contain something. This slot is either supplied by
 user or directly computed from a Position Frequency Matrix when supplied.
@@ -41,8 +41,8 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 data(ChIPanalyserData)
 #Loading PFM files
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
-#Building genomicProfileParameters object
-GPP<-genomicProfileParameters(PFM=PFM)
+#Building genomicProfiles object
+GPP<-genomicProfiles(PFM=PFM,PFMFormat="raw")
 # Accessing Slot
 PositionWeightMatrix(GPP)
 }

@@ -1,14 +1,15 @@
 \name{noOfSites<-}
+
+
 \alias{noOfSites<-}
-\alias{noOfSites<--methods}
 
 \title{
 Setter Method for the \code{noOfSites} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \description{
 Setter Method for the \code{noOfSites} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 
 }
 \usage{
@@ -17,7 +18,7 @@ noOfSites(object) <- value
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object.
+    \code{object} is a \code{\link{parameterOptions}} object.
     }
     \item{value}{
     \code{value} is a positive integer that will be assigned to the
@@ -27,11 +28,11 @@ noOfSites(object) <- value
 \details{
 While computing Position Weight Matricies (PWM) from
 Position Frequency Matricies (PFM), it is possible to restrict the number
-of sites that will be used to compute the PWM. The default is set at 0.
+of sites that will be used to compute the PWM. The default is set at "all".
 In this case, all sites will be used to compute the PWM.
 }
 \value{
-Returns a \code{\link{genomicProfileParameters}} object with an updated
+Returns a \code{\link{parameterOptions}} object with an updated
 value for the \code{noOfSites} slot.
 }
 \references{
@@ -45,10 +46,9 @@ Patrick C.N. Martin <p.martin@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM,noOfSites=0)
+GPP <- parameterOptions(noOfSites=0)
 #Setting new Value for naturalLog
 noOfSites(GPP) <- 8
 

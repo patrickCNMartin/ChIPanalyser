@@ -1,14 +1,14 @@
 \name{PWMThreshold<-}
-\alias{PWMThreshold<-}
-\alias{PWMThreshold<--methods}
 
+
+\alias{PWMThreshold<-}
 \title{
 Setter Method for the \code{PWMThreshold} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \description{
 Setter Method for the \code{PWMThreshold} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \usage{
 PWMThreshold(object) <- value
@@ -16,12 +16,12 @@ PWMThreshold(object) <- value
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\link{parameterOptions}} object
     }
     \item{value}{
     \code{value} is a numeric value (between 0 and 1) to be assigned to
     the \code{PWMThreshold} slot in
-    \code{\link{genomicProfileParameters}} object.
+    \code{\link{parameterOptions}} object.
     Default is set at 0.7
     }
 }
@@ -34,7 +34,7 @@ then 70 \% of PWM Score (and by extension binding sites) will be IGNORED.
 The top 30 \% will be selected.
 }
 \value{
-Returns  \code{\link{genomicProfileParameters}} objetc with an updated value
+Returns  \code{\link{parameterOptions}} objetc with an updated value
 for the \code{PWMThreshold} slot
 }
 \references{
@@ -47,10 +47,9 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM, PWMThreshold=0.7)
+GPP <- parameterOptions(PWMThreshold=0.7)
 #Setting Value for new PWMThreshold
 PWMThreshold(GPP) <- 0.8
 }

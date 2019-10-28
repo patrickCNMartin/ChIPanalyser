@@ -1,17 +1,17 @@
 \name{BPFrequency<-}
+
 \alias{BPFrequency<-}
-\alias{BPFrequency<--methods}
 
 
 
 
 \title{
 Setter method for \code{BPFrequency} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \description{
 Setter method for \code{BPFrequency} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 If base pair frequency is unknown, \code{BPFrequency} will compute base pair
 frequency from a DNA sequence.
 }
@@ -22,7 +22,7 @@ BPFrequency(object)<-value
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object.
+    \code{object} is a \code{\link{genomicProfiles}} object.
     }
     \item{value}{
     \code{value} can three different objects:
@@ -35,12 +35,12 @@ BPFrequency(object)<-value
 
     A \code{BSgenome} of the organism of interest. The base pair frequency will
     automatically be computed and updated in
-    \code{\link{genomicProfileParameters}}.
+    \code{\link{genomicProfiles}}.
 
 
     A \code{\link[Biostrings]{DNAStringSet}} of the organisme of interest.
     The base pair frequency will automatically be computed and updated
-    in \code{\link{genomicProfileParameters}} (Prefered method).
+    in \code{\link{genomicProfiles}} (Prefered method).
     }
 }
 
@@ -54,13 +54,13 @@ set custom values for \code{BPFrequency} with a vector of length 4
 containing the probability of occurrence of each base pair (A,C,G,T) in order.
 If Base pair frequency is unknown, \code{BPFrequency} will compute base pair
 frequency from a DNA sequence when building a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 The nature of this sequence can be a\code{BSgenome} object or a
 \code{\link[Biostrings]{DNAStringSet}}. In order to decrease run time,
 it is advised to use \code{\link[Biostrings]{DNAStringSet}}.
 }
 \value{
-Returns a \code{\link{genomicProfileParameters}} object with an updated
+Returns a \code{\link{genomicProfiles}} object with an updated
 value for \code{BPFrequency}.
 }
 \references{
@@ -85,8 +85,8 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
     }
 library(BSgenome.Dmelanogaster.UCSC.dm3)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
-# Building genomicProfileParameters object
-GPP <- genomicProfileParameters(PFM=PFM, BPFrequency=DNASequenceSet)
+# Building genomicProfiles object
+GPP <- genomicProfiles(PFM=PFM, BPFrequency=DNASequenceSet)
 # Updating BPFrequency
 ## !! Note!! BPFrequency is used to compute PWM from PFM
 ## IF updated after building GPP, then it will not influence PWM

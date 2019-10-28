@@ -1,14 +1,15 @@
 \name{BPFrequency}
+
 \alias{BPFrequency}
-\alias{BPFrequency-methods}
+
 
 \title{
 Accessor method for \code{BPFrequency} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \description{
 Extract or Access \code{BPFrequency} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \usage{
 BPFrequency(object)
@@ -16,7 +17,7 @@ BPFrequency(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}}
+    \code{object} is a \code{\link{genomicProfiles}}
     }
 }
 \details{
@@ -35,7 +36,7 @@ In order to decrease run time, it is advised to use
 }
 \value{
 Returns \code{BPFrequency} slot in
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -49,8 +50,8 @@ Patrick C.N. Martin <pm16057@essex.ac.uk>
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
-# Building genomicProfileParameters object
-GPP <- genomicProfileParameters(PFM=PFM)
+# Building genomicProfiles object
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
 #Extracting BPFrequency slot
 BPFrequency(GPP)
 }

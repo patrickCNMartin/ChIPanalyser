@@ -1,14 +1,14 @@
 \name{PWMThreshold}
-\alias{PWMThreshold}
-\alias{PWMThreshold-methods}
 
+
+\alias{PWMThreshold}
 \title{
 Accessor method for the \code{PWMThreshold} slot in  a
-\code{\link{genomicProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \description{
 Accessor method for the \code{PWMThreshold} slot in  a
-\code{\link{genomicProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \usage{
 PWMThreshold(object)
@@ -16,7 +16,7 @@ PWMThreshold(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\link{parameterOptions}} object
     }
 }
 \details{
@@ -29,7 +29,7 @@ The top 30 \% will be selected.
 }
 \value{
 Returns the value assinged to the \code{PWMThreshold} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -42,10 +42,9 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM, PWMThreshold=0.7)
+GPP <- parameterOptions(PWMThreshold=0.7)
 #Accessing Value for  PWMThreshold
 PWMThreshold(GPP)
 }

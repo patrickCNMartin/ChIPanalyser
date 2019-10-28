@@ -5,7 +5,7 @@
 \title{Class \code{"GRList"}}
 \description{
 Virutal Class to handle multiple data types for one slot
-( \code{\link{AllSitesAboveThreshold}})
+( \code{\link{profiles}})
 }
 \section{Objects from the Class}{A virtual Class:
 No objects may be created from it.}

@@ -1,14 +1,14 @@
 \name{strandRule}
-\alias{strandRule}
-\alias{strandRule-methods}
 
+
+\alias{strandRule}
 \title{
 Accessor Method for the \code{strandRule} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\linkS4class{parameterOptions}} object
 }
 \description{
 Accessor Method for the \code{strandRule} slot in a
-\code{\link{genomicProfileParameters}} object
+\code{\linkS4class{parameterOptions}} object
 }
 \usage{
 strandRule(object)
@@ -16,7 +16,7 @@ strandRule(object)
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{genomicProfileParameters}} object
+    \code{object} is a \code{\linkS4class{parameterOptions}} object
     }
 }
 \details{
@@ -29,7 +29,7 @@ will sum both score together.  Default set at "max"
 }
 \value{
 Returns the value assigned to \code{strandRule} slot (one of three options :
-"mean", "max", "sum") in a \code{\link{genomicProfileParameters}} object
+"mean", "max", "sum") in a \code{\linkS4class{parameterOptions}} object
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -42,10 +42,9 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 \examples{
 # Loading data
 data(ChIPanalyserData)
-#Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM, strandRule="max")
+GPP <- parameterOptions( strandRule="max")
 #Accesssing Value for strandRule
 strandRule(GPP)
 }

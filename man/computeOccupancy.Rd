@@ -13,28 +13,22 @@ This function will compute occupancy using the
 values assigned to each variable.
 }
 \usage{
-computeOccupancy(AllSitesPWMScore,DNAAccessibility=NULL,
-    occupancyProfileParameters = NULL,
+computeOccupancy(genomicProfiles,parameterOptions = NULL,
     norm = TRUE, verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-    \item{AllSitesPWMScore}{
-    \code{AllSitesPWMScore} is a a \code{\link{genomicProfileParameters}}
+    \item{genomicProfiles}{
+    \code{genomicProfiles} is a a \code{\link{genomicProfiles}}
     object resulting from \code{\link{computePWMScore}}.
     IT is important to use this resulting object as the occuapancy will only be
     computed for sites above a threshold.
     }
-    \item{DNAAccessibility}{
-    \code{DNAAccessibility} is a GRanges object containing Ranges of accesible
-    sequences. This object ccould also contain a DNA affinity score as a
-    metadata column.
-    }
-    \item{occupancyProfileParameters}{
-    \code{occupancyProfileParameters} is a
-    \code{\link{occupancyProfileParameters}} object containing the adequate
+    \item{parameterOptions}{
+    \code{parameterOptions} is a
+    \code{\link{parameterOptions}} object containing the adequate
     values assigned to each Parameter. If not Supplied
-    (\code{occupancyProfileParamters} = NULL),a new object will be created
+    (\code{parameterOptions} = NULL), a new object will be created
     internally using default values.
     }
     \item{norm}{
@@ -55,7 +49,7 @@ the number of bound molecules and a sclaing factor of
 Transcription Factor specificty.
 This function will compute occupancy using the values assigned
 to each variable. It should also be noted that the
-\code{\link{occupancyProfileParameters}}
+\code{\link{parameterOptions}}
 object contains a set of parameters used to compute Occupancy
 (not only restricted to this ). These parameters are often dependant on
 real ChIP-Seq data and will influence
@@ -66,16 +60,16 @@ real world biological data.
 
 }
 \value{
-\code{computeOccupancy} will return a \code{\link{genomicProfileParameters}}.
+\code{computeOccupancy} will return a \code{\link{genomicProfiles}}.
 The main difference will reside in the
-\code{\link{AllSitesAboveThreshold}} slot.
+\code{\link{profiles}} slot.
 This slot is generally a list or \code{\link[GenomicRanges]{GRangesList}}.
 Within these list type structures are enclosed
 \code{\link[GenomicRanges]{GRanges}} containing the positions of site
 above threshold, PWMScores and Occupancy for each site.
 The series of GRanges  will depend on the number of loci that are
 tested and the number of element in the list will depend on the various
-combinations of \code{ScalingFactorPWM} and \code{boundMolecules}.
+combinations of \code{lambdaPWM} and \code{boundMolecules}.
 
 
 }
@@ -106,19 +100,20 @@ library(BSgenome.Dmelanogaster.UCSC.dm3)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
 
 #Building data objects
-GPP <- genomicProfileParameters(PFM=PFM,BPFrequency=DNASequenceSet)
-OPP <- occupancyProfileParameters()
+GPP <- genomicProfiles(PFM=PFM,BPFrequency=DNASequenceSet)
+OPP <- parameterOptions()
 # Computing Genome Wide
-GenomeWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GPP)
+GenomeWide <- computeGenomeWideScores(genomicProfiles = GPP,
+    DNASequenceSet = DNASequenceSet)
 
 #Compute PWM Scores
-PWMScores <- computePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GenomeWide, setSequence = eveLocus,
-    DNAAccessibility = Access)
+PWMScores <- computePWMScore(genomicProfiles = GenomeWide,
+    DNASequenceSet = DNASequenceSet,
+    loci = eveLocus,
+    chromatinState = Access)
 #Compute Occupnacy
-Occupancy <- computeOccupancy(AllSitesPWMScore = PWMScores,
-    occupancyProfileParameters = OPP)
+Occupancy <- computeOccupancy(genomicProfiles = PWMScores,
+    parameterOptions = OPP)
 Occupancy
 
 }

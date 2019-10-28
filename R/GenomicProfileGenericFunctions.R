@@ -210,6 +210,7 @@
         sequenceLength <- (length(DNASequenceSet[[i]]) - ncol(PWM) + 1)
         scorePositive <- NULL
         scoreNegative <- NULL
+
         if(length(grep("+",strand))){
         ## Warnings from BioStrings Package
         scorePositive <- PWMscoreStartingAt(PWM,DNASequenceSet[[i]],
@@ -250,44 +251,11 @@
     }
     return(list(scoreSet,IndexPositive,IndexNegative))
 }
-# ZeroBackground setting and accessing
-.ZeroBackground <- function(object){
-    object@ZeroBackground
-}
 
-.ZeroBackgroundReplace <- function(object,value){
-    object@ZeroBackground <- value
-    return(object)
-}
-# AllSitesAboveThreshold setting
-.AllSitesAboveThresholdReplace <- function(object,value){
-    object@AllSitesAboveThreshold <- value
-    return(object)
-}
-#NoAccess setting
-.NoAccessReplace <- function(object,value){
-    object@NoAccess <- value
-    return(object)
-}
-#averageExpPWMScore setting
-.averageExpPWMScoreReplace <- function(object,value){
-    object@averageExpPWMScore <- value
-    return(object)
-}
-#maxPWMScore setting
-.maxPWMScoreReplace <- function(object,value){
-    object@maxPWMScore <- value
-    return(object)
-}
-#minPWMScore setting
-.minPWMScoreReplace <- function(object,value){
-    object@minPWMScore <- value
-    return(object)
-}
 
 # Validity check function for Genomic Profile Parameters
-.is.genomicProfileParameter <- function(object){
-    if(class(object) == "genomicProfileParameters"){
+.is.genomicProfiles<- function(object){
+    if(class(object) == "genomicProfiles"){
         return(TRUE)
     } else {
         return(FALSE)
@@ -295,33 +263,26 @@
 }
 
 # Validity check function for occupancy Profile Parameters
-.is.occupancyProfileParameters <- function(object){
-    if(class(object) == "occupancyProfileParameters"){
+.is.parameterOptions <- function(object){
+    if(class(object) == "parameterOptions"){
         return(TRUE)
     } else {
         return(FALSE)
     }
 }
 
-# Validity check for updated genomic Profile Paramter before
-#computing computePWMScore
-.is.genomeWideComputed <- function(object){
-    if (length(maxPWMScore(object)) > 0 & length(minPWMScore(object)) > 0){
-        return(TRUE)
-    } else {
-        return(FALSE)
-    }
+.updateGenomicProfiles<-function(genomicProfiles,parameterOptions){
+    slots<-slotNames(parameterOptions)
+    localEnvir<-environment()
+    lapply(slots,function(slots){
+
+           if(!any(slot(genomicProfiles,slots)%in%slot(parameterOptions,slots))){
+           slot(genomicProfiles,slots,check=TRUE)<-slot(parameterOptions,slots)
+           assign("genomicProfiles",genomicProfiles,envir=localEnvir)
+         }})
+    return(genomicProfiles)
 }
 
-# Validity check for updated genomic Profile Paramter before
-#computing computeOccupancy
-.is.PWMScoreComputed <- function(object){
-    if(length(AllSitesAboveThreshold(object)) > 0){
-        return(TRUE)
-    } else {
-        return(FALSE)
-    }
-}
 # Extracting and computing Base Pair frequency from BSGenome when
 #contructing genomicProfileParamter
 .computeBPFrequency <- function(object){
@@ -466,18 +427,32 @@
 ## Search sites in occupancy and Chip if a lot of them
 ## wow that is some good english right there
 
-searchSites <- function(Sites,ScalingFactor="all",
+searchSites <- function(Sites,lambdaPWM="all",
     BoundMolecules="all",Locus="all"){
 
-    #Validity check
-    if(class(Sites)!="list" & class(Sites)!="genomicProfileParameters"){
-        stop(paste0(deparse(substitute(Sites)),
-        " must be a list or a genomicProfileParameters object."))
-    }
+    if(!is.null(names(Sites)) & all(names(Sites) %in%c("Optimal","Occupancy","ChIPProfiles","goodnessOfFit"))){
 
-    if(class(Sites)=="genomicProfileParameters"){
-        Sites <- AllSitesAboveThreshold(Sites)
-    }
+       bufferSites<-list("Optimal"=Sites[[1]],
+                         "Occupancy"=searchSites(unname(Sites$Occupancy),lambdaPWM=lambdaPWM,
+                                                 BoundMolecules=BoundMolecules,
+                                                 Locus=Locus),
+                         "ChIPProfiles"=searchSites(unname(Sites$ChIPProfile),lambdaPWM=lambdaPWM,
+                                                  BoundMolecules=BoundMolecules,
+                                                  Locus=Locus),
+                          "goodnessOfFit"=searchSites(unname(Sites$goodnessOfFit),lambdaPWM=lambdaPWM,
+                                                  BoundMolecules=BoundMolecules,
+                                                  Locus=Locus))
+       return(bufferSites)
+    }else if(class(Sites)=="genomicProfiles" | class(Sites)=="list"){
+
+        if(class(Sites)=="genomicProfiles"){
+            Sites <- profiles(Sites)
+        }
+
+
+
+
+
 
     #Setting Up for search
 
@@ -488,14 +463,14 @@ searchSites <- function(Sites,ScalingFactor="all",
     bufferSites <- Sites
 
     #Search for Scaling Factor
-    if(all(ScalingFactor=="all")){
+    if(all(lambdaPWM=="all")){
         bufferSites <- bufferSites
         buffer <- 0
     } else {
         localNames <- sapply(strsplit(sapply(strsplit(names(bufferSites)," &"),
         "[[",1),lambda),"[[",2)
-        for( i in seq_along(ScalingFactor)){
-            buffer <- c(buffer,grep(paste0("^",ScalingFactor[i],"$"),
+        for( i in seq_along(lambdaPWM)){
+            buffer <- c(buffer,grep(paste0("^",lambdaPWM[i],"$"),
             localNames))
 
         }
@@ -540,7 +515,9 @@ searchSites <- function(Sites,ScalingFactor="all",
         }
     }
     return(bufferSites)
-
+  } else{
+    stop("Oops Something went wrong. We are not sure what you are parsing to Sites")
+  }
 }
 
 ### Extracting Non Accesible DNA
@@ -554,6 +531,58 @@ searchSites <- function(Sites,ScalingFactor="all",
     names(setLocal)<-names(subject)
     return(setLocal)
 }
+
+
+#### building a skelton object for accuracy estimates
+
+.cleanGoF <- function(genomicProfiles,ValidationSet,stepSize=10){
+     #just in case it needs some reordering
+
+     ValidationSet<-ValidationSet[match(names(genomicProfiles[[1]]),names(ValidationSet))]
+
+     setUpGoF<-lapply(genomicProfiles,function(gp,chip,stepSize){
+
+                      predicted <-lapply(gp,function(x){
+                                         return(x$ChIP)})
+
+                      idx<-lapply(gp,function(x){
+                                  return(floor(seq(1,sum(width(x)),length.out=length(x))))})
+                      validation<-mapply(function(x,idx){
+                                  return(x[idx])},x=chip,idx=idx,SIMPLIFY=FALSE)
+                      ## internalCheck
+                      internalCheck <- all.equal(sapply(predicted,length),sapply(validation,length))
+                      if(!internalCheck){
+                         stop("predicted and valdiation set are not the same length")
+                      }
+
+                      paralleValues<-mapply(function(x,y){
+                                     local<-list("prediction"=x,"validation"=y)},
+                                     predicted,validation,SIMPLIFY=FALSE)
+                      return(paralleValues)
+       },ValidationSet,stepSize)
+
+       return(setUpGoF)
+
+}
+
+
+.meanGoFScore <-function(GoF){
+    tags<-names(GoF[[1]])
+    idx<-seq_along(tags)
+
+    meanGoF <- sapply(idx,function(idx,GoF){
+                      res<-mean(sapply(GoF,"[[",idx),na.rm=TRUE)
+                      return(res)
+    },GoF=GoF)
+    names(meanGoF)<-paste0(tags,"Mean")
+
+
+    for(i in seq_along(GoF)){
+       GoF[[i]]<-c(GoF[[i]],meanGoF)
+    }
+    return(GoF)
+}
+
 
 
 ## Fscore computation for all regions
@@ -605,8 +634,9 @@ searchSites <- function(Sites,ScalingFactor="all",
     mcc<-mean(sapply(performance(pred,"mat")@y.values,mean,na.rm=T))
 
     auc<-mean(sapply(performance(pred,"auc")@y.values,mean,na.rm=T))
-if(is.na(auc)){browser()}
-    return(list(c("precision"=prec,"recall"=rec,"f1"=fscore,"accuracy"=acc,"MCC"=mcc,"AUC"=auc),pred))
+
+
+    return(c("precision"=prec,"recall"=rec,"f1"=fscore,"accuracy"=acc,"MCC"=mcc,"AUC"=auc))
 }
 
 ##### geometricRatio
@@ -635,7 +665,8 @@ if(is.na(auc)){browser()}
         if(sum(areaShared)!=0){
             area<-sum(areaDiff)/sum(areaShared)
         } else {
-            area<-NA
+
+            area<-sum(areaDiff)
         }
 
     return(area)
@@ -647,6 +678,7 @@ if(is.na(auc)){browser()}
 
 .allMetrics<-function(predicted,locusProfile,stepSize){
     # Checking for bullshit and doing some correlation stuff
+
     if((sd(predicted,na.rm=TRUE)==0) | (sd(locusProfile,na.rm=TRUE)==0)){
         corrP<-0
         corrS<-0
@@ -664,7 +696,6 @@ if(is.na(auc)){browser()}
     ## ks distance
     ks<-ks.test(predicted,locusProfile)
     D<-unname(ks[[1]])
-    pval<-ks[[2]]
 
     ## Geometric
     geo<-.geometricRatio(predicted,locusProfile,stepSize)
@@ -676,127 +707,304 @@ if(is.na(auc)){browser()}
         "spearman"=corrS,
         "kendall"=corrK,
         "KsDist"=D,
-        "KsPval"=pval,
         "geometric"=geo,
-         AUC[[1]])
-    return(list(metrics,AUC[[2]]))
+         AUC)
+    return(metrics)
+}
+
+
+
+## rankBased method
+.OptimalFormatConversion<-function(goodnessOfFit){
+     ## for some reason arrays return this weird thing..
+     ## things are reordered but not in the way i want them
+     ## Im not entirely sure how they work
+     ## For now we will use this method
+     ## just easier to build
+     fitVec<-seq_along(goodnessOfFit[[1]][[1]])
+     lociVec<-seq_along(goodnessOfFit[[1]])
+     paramVec<-seq_along(goodnessOfFit)
+
+     convertedFormat<-lapply(fitVec,function(fitVec,lociVec,paramVec,goodnessOfFit){
+
+
+                            param<-lapply(paramVec,function(paramVec,fitVec,lociVec,goodnessOfFit){
+                                      loci<-sapply(goodnessOfFit[[paramVec]],"[[",fitVec)
+                                      return(loci)
+
+                            },fitVec,lociVec,goodnessOfFit)
+                            mat<-do.call("rbind",param)
+                            rownames(mat)<-names(goodnessOfFit)
+                            return(mat)
+     },lociVec,paramVec,goodnessOfFit)
+     names(convertedFormat)<-names(goodnessOfFit[[1]][[1]])
+     return(convertedFormat)
 }
 
 
 ### Processing optimal matricies and parameters
 
-.optimalExtraction<-function(genomicProfileParameters,occupancyProfileParameters,ProfileAccuracy,method){
+
+.optimalExtraction <-function(goodnessOfFit,rank=FALSE){
+
+    accu<-profiles(goodnessOfFit)
+    bm<-boundMolecules(goodnessOfFit)
+    lambda<-lambdaPWM(goodnessOfFit)
+
+    ## converting format
+    metrics<-.OptimalFormatConversion(accu)
 
 
-    if(class(ProfileAccuracy)!="list"){
-        methodsMean<-grepl("Mean",names(ProfileAccuracy[[1]][[1]])) & !grepl("MSE", names(ProfileAccuracy[[1]][[1]]))
+    if(rank){
+         metrics<-metrics[!grepl("Mean",names(metrics))]
+         tag<-names(metrics)
+         idx<-seq_along(tag)
+
+         # extracting Rank based matrics
+         metrics<-lapply(idx,function(idx,metrics,tag){
+                              local<-metrics[[idx]]
+                              localTag<-tag[idx]
+                              internalIdx<-seq_len(ncol(local))
+                              TopHits<-lapply(internalIdx,function(idx,met,tags){
+                                              if(tags %in% c("geometric","MSE","KsDist")){
+                                                 best<-which(met[,idx]==min(met[,idx]))
+                                                 buffer<-as.vector(met[best,idx])
+                                                 names(buffer)<-rownames(met)[best]
 
 
-        mats<-vector("list",3)
-        param<-vector("list",3)
-        name<-names(ProfileAccuracy[[1]][[1]])[methodsMean]
-        names(mats)<-c(name,"MSE","Overlay")
-        names(param)<-c(name,"MSE","Overlay")
+                                              }else{
+                                                best<-which(met[,idx]==max(met[,idx]))
+                                                buffer<-as.vector(met[best,idx])
+                                                names(buffer)<-rownames(met)[best]
+                                              }
+                                              return(buffer)
+                              },local,localTag)
+                              #names(TopHits)<-colnames(local)
+                              TopHits<-sort(table(names(unlist(TopHits))),decreasing=TRUE)
+                              return(TopHits)},metrics,tag)
+          ## extracting optimal parameter
+          optimalParama<-mapply(function(met,tags){
+                              unpacked<-.unpackMetrics(met)
+                              if(tags %in% c("geometric","MSE","KsDist")){
+                                  optimal<-unpacked[which(unpacked[,"score"]==min(unpacked[,"score"])),c("lambda","boundMolecules")]
+                              } else{
+                                  optimal<-unpacked[which(unpacked[,"score"]==max(unpacked[,"score"])),c("lambda","boundMolecules")]
+                              }
+                              return(optimal)
 
-        topmeth<-sapply(ProfileAccuracy, function(x){
-            x<-x[[1]][grep(paste0(names(ProfileAccuracy[[1]][[1]])[methodsMean],"Mean"),names(x[[1]]))]
-            return(x)
+          },met=metrics,tags=tag,SIMPLIFY=FALSE)
+          names(optimalParama)<-tag
+
+          # building rank based matricies
+          mattemp<-matrix(0,ncol=length(bm),nrow=length(lambda))
+          rownames(mattemp)<-lambda
+          colnames(mattemp)<-bm
+          Loc<-lapply(metrics,function(met,mattemp){
+                      unpacked<-.unpackMetrics(met)
+
+                      idx<-seq_len(nrow(unpacked))
+
+
+                      for(i in idx){
+                        mattemp[as.character(unpacked[i,"lambda"]),as.character(unpacked[i,"boundMolecules"])]<-as.numeric(unpacked[i,"score"])
+                      }
+
+                      return(mattemp)},mattemp)
+          names(Loc)<-tag
+
+          FinalOptimalBuild<-list("OptimalParameters"=optimalParama,"OptimalMatrix"=Loc,"method"="rank")
+
+    } else {
+        metrics<-metrics[!grepl("Mean",names(metrics))]
+        tag<-names(metrics)
+        idx<-seq_along(tag)
+        metrics<-lapply(metrics,function(met){
+                        return(apply(met,1,mean))
         })
-        ##something is wrong with the way you rebuild the matrix.. should make a comparison
-        ## the plots look really weird as if the were not built as the should have
-        #dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
-            #length(boundMolecules(occupancyProfileParameters)))
-        topmeth<-matrix(topmeth, ncol=length(boundMolecules(occupancyProfileParameters)), nrow=length(ScalingFactorPWM(genomicProfileParameters)), byrow=T)
-        rownames(topmeth) <- ScalingFactorPWM(genomicProfileParameters)
-        colnames(topmeth) <- boundMolecules(occupancyProfileParameters)
-        mats[[1]]<-topmeth
 
-        ## MSE Extracting
-        topmse<-sapply(ProfileAccuracy, function(x){
-            x<-x[[1]][grep("meanMSE",names(x[[1]]))]
-            return(x)
-        })
-        #dim(topmse)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
-        #    length(boundMolecules(occupancyProfileParameters)))
-        topmse<-matrix(topmse,ncol=length(boundMolecules(occupancyProfileParameters)), nrow=length(ScalingFactorPWM(genomicProfileParameters)), byrow=T)
-        rownames(topmse) <- ScalingFactorPWM(genomicProfileParameters)
-        colnames(topmse) <- boundMolecules(occupancyProfileParameters)
-        mats[[2]]<-topmse
+        ## Optimal Paramters
+        optimalParama<-mapply(function(met,tag){
+                              unpacked<-.unpackMetrics(met)
+                              if(tag %in% c("geometric","MSE","KsDist")){
+                                  optimal<-unpacked[which(unpacked[,"score"]==min(unpacked[,"score"])),c("lambda","boundMolecules")]
+                              } else{
+                                  optimal<-unpacked[which(unpacked[,"score"]==max(unpacked[,"score"])),c("lambda","boundMolecules")]
+                              }
+                              return(optimal) },met=metrics,tag=tag,SIMPLIFY=FALSE)
+       ## building matricies
+       mattemp<-matrix(0,ncol=length(bm),nrow=length(lambda))
+       rownames(mattemp)<-lambda
+       colnames(mattemp)<-bm
+       Loc<-lapply(metrics,function(met,mattemp){
+                   unpacked<-.unpackMetrics(met)
 
-        ## Overlay
-        # Setting up objects
-        over<-matrix(0,nrow=length(ScalingFactorPWM(genomicProfileParameters)),
-            ncol=length(boundMolecules(occupancyProfileParameters)))
-        matmethod<-matrix(0,nrow=length(ScalingFactorPWM(genomicProfileParameters)),
-            ncol=length(boundMolecules(occupancyProfileParameters)))
-        matmse<-matrix(0,nrow=length(ScalingFactorPWM(genomicProfileParameters)),
-              ncol=length(boundMolecules(occupancyProfileParameters)))
-        idx<-seq_len(length(over))
-        tops<-round(length(over))
+                   idx<-seq_len(nrow(unpacked))
 
-        # ordering and re shoving the ordered vec into a matrix
-        # Why you ask? Well because order doesn't work well with matricies
-        topmse<-match(idx,order(topmse,decreasing=F))
-        dim(topmse)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
-            length(boundMolecules(occupancyProfileParameters)))
-        if(any(method %in% c("pearson","spearman","kendall"))){
-            param[[1]]<-c("ScalingFactor"=rownames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)][,2])
-            param[[2]]<-c("ScalingFactor"=rownames(topmse)[which(topmse==min(topmse),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmse)[which(topmse==min(topmse),arr.ind=T)][,2])
-            topmeth<-match(idx,order(topmeth,decreasing=T))
-            dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
-                length(boundMolecules(occupancyProfileParameters)))
 
-        } else{
-            param[[1]]<-c("ScalingFactor"=rownames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmeth)[which(topmeth==max(topmeth),arr.ind=T)[,2]])
-            param[[2]]<-c("ScalingFactor"=rownames(topmse)[which(topmse==min(topmse),arr.ind=T)[,1]],"BoundMolecules"=colnames(topmse)[which(topmse==min(topmse),arr.ind=T)[,2]])
-            topmeth<-match(idx,order(topmeth,decreasing=F))
-            dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
-                length(boundMolecules(occupancyProfileParameters)))
-        }
-        ## Creating the overlay
-        matmethod[which(topmeth>=tops, arr.ind=T)]<-1
-        matmse[which(topmse>=tops, arr.ind=T)]<-1
-        mats[[3]]<-over+matmethod+matmse
-        optimalOver<-which(mats[[3]]==2,arr.ind=T)
-        if(length(optimalOver)!=0){
-            param[[3]]<-c("lowScaling"=min(optimalOver[,1]),"highScaling"=max(optimalOver[,1]),"lowBoundMol"=min(optimalOver[,2]),"highBoundMol"=max(optimalOver[,2]))
-        } else {
-            param[[3]]<-"No overlay for top 10% of hits"
-        }
+                   for(i in idx){
+                      mattemp[as.character(unpacked[i,"lambda"]),as.character(unpacked[i,"boundMolecules"])]<-as.numeric(unpacked[i,"score"])
+                   }
 
+                   return(mattemp)},mattemp)
+       names(Loc)<-tag
+
+       FinalOptimalBuild<-list("OptimalParameters"=optimalParama,"OptimalMatrix"=Loc,"method"="MeanScore")
+    }
+
+   return(FinalOptimalBuild)
+
+
+}
+
+.unpackMetrics<-function(metrics){
+
+      lambda <- "lambda = "
+      bound <- "boundMolecules = "
+      lambdaLoc <- sapply(strsplit(sapply(strsplit(names(metrics)," &"),
+      "[[",1),lambda),"[[",2)
+      bmLoc <- sapply(strsplit(sapply(strsplit(names(metrics)," &"),
+      "[[",2),bound),"[[",2)
+
+      unpacked<-cbind("lambda"=as.numeric(lambdaLoc),"boundMolecules"=as.numeric(bmLoc),"score"=as.numeric(metrics))
+
+      return(unpacked)
+}
+
+
+
+
+## cleaning function to drop unneccesary objects
+
+.cleanUpAfterYourself<-function(...){
+    args<-list(...)
+    rm(args)
+    gc()
+}
+
+### So for some reason unlist
+.internalUnlist<-function(object){
+    localList<-GRangesList()
+    for(i in seq_along(object)){
+      localList<-c(localList,object[[i]])
+    }
+    return(localList)
+}
+
+
+
+####
+
+.what.is.predictedProfile<-function(predictedProfile){
+    if(.is.genomicProfiles(predictedProfile)){
+       if(.tags(predictedProfile)=="ChIPProfile"){
+         predictedProfile <-profiles(predictedProfile)
+    }
+  }
+
+    if(class(predictedProfile)=="list" &
+              any(grepl("lambda",names(predictedProfile)))){
+        stepSize<-unique(width(predictedProfile[[1]][[1]]))
+        loci <- unique(unlist(GRangesList(lapply(predictedProfile[[1]], function(x){
+                return(GRanges(seqnames=as.character(seqnames(x)),
+                               ranges=IRanges(start(x)[1], end(x)[length(x)])))
+        }))))
+
+         loci<-rep(loci,length(predictedProfile))
+
+         predictedProfile<-.internalUnlist(predictedProfile)
+         predictedProfile<-lapply(predictedProfile, function(x){return(x$ChIP)})
+
+         #warning("No Parameter Combination selected - We will just plot everything",immediate.=TRUE)
+    } else if(class(predictedProfile)=="list" &
+              any(!grepl("lambda",names(predictedProfile)))){
+           stepSize<-unique(width(predictedProfile[[1]]))
+           loci <- unique(unlist(GRangesList(lapply(predictedProfile, function(x){
+                   return(GRanges(seqnames=as.character(seqnames(x)),
+                                  ranges=IRanges(start(x)[1], end(x)[length(x)])))
+           }))))
+           predictedProfile <- lapply(predictedProfile, function(x){return(x$ChIP)})
+    } else if(class(predictedProfile)=="GRanges"){
+         stepSize<-unique(width(predictedProfile))
+         loci<- GRanges(seqnames=as.character(predictedProfile),
+                        ranges=IRanges(start(predictedProfile)[1],end(predictedProfile)[length(predictedProfile)]))
+         predictedProfiles<-list(predictedProfile$ChIP)
     } else{
-      methodsMeanLoc<-grep("Mean",names(ProfileAccuracy[[1]][[1]][[1]]))
+       stop("Oops Somthing went wrong. We are not sure what your are parsing to predictedProfile")
+    }
+    # building loci from predicted
+    return(list("loci"=loci,"predictedProfile"=predictedProfile,"stepSize"=stepSize))
+}
 
-      mats<-vector("list", length(methodsMeanLoc))
-      param<-vector("list", length(methodsMeanLoc))
-      names(mats)<-names(ProfileAccuracy[[1]][[1]][[1]])[methodsMeanLoc]
-      names(param)<-names(ProfileAccuracy[[1]][[1]][[1]])[methodsMeanLoc]
-      name<-names(ProfileAccuracy[[1]][[1]][[1]])[methodsMeanLoc]
-      for(i in seq_along(methodsMeanLoc)){
-        topmeth<-sapply(ProfileAccuracy, function(x){
-            x<-x[[1]][[1]][methodsMeanLoc[i]]
-            return(x)
-        })
-        #dim(topmeth)<-c(length(ScalingFactorPWM(genomicProfileParameters)),
-          #  length(boundMolecules(occupancyProfileParameters)))
-          topmeth<-matrix(topmeth,ncol=length(boundMolecules(occupancyProfileParameters)), nrow=length(ScalingFactorPWM(genomicProfileParameters)), byrow=T)
-        rownames(topmeth) <- ScalingFactorPWM(genomicProfileParameters)
-        colnames(topmeth) <- boundMolecules(occupancyProfileParameters)
-        mats[[i]]<-topmeth
 
-      if(name[i] %in% c("geometricMean","MSEMean","ksMean")){
-        minmeth<-which(topmeth==min(topmeth),arr.ind=T)
-        param[[i]]<-c("ScalingFactor"=rownames(topmeth)[minmeth[nrow(minmeth),1]],"BoundMolecules"=colnames(topmeth)[minmeth[nrow(minmeth),2]])
+.what.is.occupancy<-function(occupancy,PWM=FALSE){
+  if(.is.genomicProfiles(occupancy)){
+     if(.tags(occupancy)=="Occupancy"){
+       occupancy <-profiles(occupancy)
+  }
+}
+
+    if(class(occupancy)=="list" &
+       any(grepl("lambda",names(occupancy)))){
+            occupancy<-.internalUnlist(occupancy)
+
+           #warning("No Parameter Combination selected - We will just plot everything",immediate.=TRUE)
+      } else if(class(occupancy)=="list" &
+                any(!grepl("lambda",names(occupancy)))){
+
+
+          occupancy-occupancy
+      } else if(class(occupancy)=="GRanges"){
+
+           occupancy<-list(occupancy)
       } else{
-        maxmeth<-which(topmeth==max(topmeth),arr.ind=T)
-        param[[i]]<-c("ScalingFactor"=rownames(topmeth)[maxmeth[nrow(maxmeth),1]],"BoundMolecules"=colnames(topmeth)[maxmeth[nrow(maxmeth),2]])
+         stop("Oops Somthing went wrong. We are not sure what your are parsing to predictedProfile")
       }
 
-    }
+    return(occupancy)
+}
+
+
+
+.what.is.ChIPScore <- function(ChIPScore){
+    if(class(ChIPScore)=="ChIPScore"){
+
+        ChIPScore<-scores(ChIPScore)
 
 
     }
 
-    return(list("Optimal Parameters"=param,"Optimal Matrix"=mats,"method"=method))
+      ## once un packed we can move twords checking the other elements
+    if(class(ChIPScore)=="list"){
+         ChIPScore<-ChIPScore
+    } else if(class(ChIPScore)=="numeric"){
+          ChIPScore<-list(ChIPScore)
+    }else{
+       stop("Oops Somthing went wrong. We are not sure what you are parsing to ChIPScore")
+    }
+    return(ChIPScore)
+}
 
+
+.what.is.goodnessOfFit<-function(goodnessOfFit){
+  if(.is.genomicProfiles(goodnessOfFit)){
+     if(.tags(goodnessOfFit)=="GoF"){
+       goodnessOfFit <-profiles(goodnessOfFit)
+  }
+}
+
+    if(class(goodnessOfFit)=="list" &
+       any(grepl("lambda",names(goodnessOfFit)))){
+
+                  goodnessOfFit<-unlist(goodnessOfFit,recursive=FALSE)
+
+           #warning("No Parameter Combination selected - We will just plot everything",immediate.=TRUE)
+      } else if(class(goodnessOfFit)=="list" &
+                any(!grepl("lambda",names(goodnessOfFit)))){
+          goodnessOfFit<-goodnessOfFit
+
+      } else if(class(goodnessOfFit)=="numeric") {
+           goodnessOfFit <-list(goodnessOfFit)
+      } else{
+         stop("Oops Somthing went wrong. We are not sure what your are parsing to predictedProfile")
+      }
 }

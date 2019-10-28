@@ -7,21 +7,19 @@ Searching function for Sites above threshold and predicted ChIP-seq Profiles
 }
 \description{
 \code{searchSites} is function enabling quick extraction and search for
-the \code{\link{genomicProfileParameters}}'s
-\code{\link{AllSitesAboveThreshold}}
-slot or  a list resulting from \code{\link{computeChipProfile}}.
+parameter combinations and/or loci in any \code{\link{genomicProfiles}} object
+from computeOccupancy onwards.
 }
 \usage{
-searchSites(Sites,ScalingFactor="all",BoundMolecules="all", Locus="all")
+searchSites(Sites,lambdaPWM="all",BoundMolecules="all", Locus="all")
 }
 
 \arguments{
     \item{Sites}{
-    \code{Sites} is either a \code{\link{genomicProfileParameters}} object
-    or a list ( result of \code{\link{computeChipProfile}})
+    \code{Sites} is either a \code{\link{genomicProfiles}} or the result of \code{computeOptimal}
     }
-    \item{ScalingFactor}{
-    \code{ScalingFactor} is a numeric vector describing the ScalingFactors
+    \item{lambdaPWM}{
+    \code{lambdaPWM} is a numeric vector describing the ScalingFactors
     that should be searched within \code{Sites}.
     }
     \item{BoundMolecules}{
@@ -34,19 +32,16 @@ searchSites(Sites,ScalingFactor="all",BoundMolecules="all", Locus="all")
     }
 }
 \details{
-After PWM Scores and/or occupancy have been computed
-(see \code{\link{computePWMScore}} and \code{\link{computeOccupancy}},
-it is possible to extract and search the
-\code{\link{AllSitesAboveThreshold}} slot. As this
-slot may be fairly large it can become difficult to navigate.
+When testing numerous combinations of lambdaPWM and boundMolecules on top of many loci, it can
+become challenging to navigate the large data output
 \code{searchSites} will make searching in this slot a lot easier.
 If all arguments are left at their default value of "all", then all Parameters
 will be searched thus returning the full list of Sites above
-threshold.
-\code{searchSites} also works on the result of \code{computeChipProfile}.
+threshold. If a value for lambdaPWM is user provided then only this lambdaPWM will be selected (all boundMolecules and loci will also be selected).
+\code{searchSites} also works on the result of \code{computeOptimal}.
 }
 \value{
-Returns a list or \code{GRangesList}.
+Returns object of same time as parsed to this function with only the parameters and/or loci selected.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -63,39 +58,43 @@ data(ChIPanalyserData)
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 \donttest{
-if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
-    if (!requireNamespace("BiocManager", quietly=TRUE))
-        install.packages("BiocManager")
-    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
-    }
-library(BSgenome.Dmelanogaster.UCSC.dm3)
-DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+  if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
+      if (!requireNamespace("BiocManager", quietly=TRUE))
+          install.packages("BiocManager")
+      BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
+      }
+  library(BSgenome.Dmelanogaster.UCSC.dm3)
+  DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+  # Building genomicProfiles object
+  GPP <- genomicProfiles(PFM=PFM, BPFrequency=DNASequenceSet)
 
-#Building data objects
-GPP <- genomicProfileParameters(PFM=PFM,BPFrequency=DNASequenceSet,
-    ScalingFactorPWM=c(1,2,3,4))
-OPP <- occupancyProfileParameters(boundMolecules=c(1,10,100))
 
-# Computing Genome Wide
-GenomeWide <- computeGenomeWidePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GPP)
+  # Computing Genome Wide
+  GenomeWide <- computeGenomeWideScore(genomicProfiles = GPP,
+      DNASequenceSet = DNASequenceSet)
 
-#Compute PWM Scores
-PWMScores <- computePWMScore(DNASequenceSet = DNASequenceSet,
-    genomicProfileParameters = GenomeWide,
-    setSequence = eveLocus, DNAAccessibility = Access)
-#Compute Occupnacy
-Occupancy <- computeOccupancy(AllSitesPWMScore = PWMScores,
-    occupancyProfileParameters = OPP)
-# Search on occupancy
-searchSites(Occupancy,ScalingFactor=c(1,4), BoundMolecules = c(1,100))
-#Compute ChIP profiles
-chipProfile <- computeChipProfile(setSequence = eveLocus,
-    occupancy = Occupancy,
-    occupancyProfileParameters = OPP)
+  #Compute PWM Scores
+  PWMScores <- computePWMScore(genomicProfiles = GenomeWide,
+       DNASequenceSet = DNASequenceSet, loci = eveLocus, chromatinState = Access)
+  #Compute Occupnacy
+  Occupancy <- computeOccupancy(genomicProfiles = PWMScores)
+  searchSites(Occupancy,ScalingFactor=c(1,4), BoundMolecules = c(1,100),
+      Locus="eve")
 
-## Search on chipProfile
-searchSites(Occupancy,ScalingFactor=c(1,4), BoundMolecules = c(1,100),
+  #Compute ChIP profiles
+  chipProfile <- computeChIPProfile(genomicProfiles=Occupancy,loci=eveLocus)
+  searchSites(chipProfile,ScalingFactor=c(1,4), BoundMolecules = c(1,100),
+      Locus="eve")
+
+optimalParam <- computeOptimal(genomicProfiles = GPP,
+        DNASequenceSet = DNASequenceSet,
+        ChIPScore = eveLocusChip,
+        chromatinState = Access,
+        parameterOptions = OPP,
+        parameter = "all",
+        peakMethod="moving_kernel")
+
+searchSites(optimalParam,ScalingFactor=c(1,4), BoundMolecules = c(1,100),
     Locus="eve")
 
 }

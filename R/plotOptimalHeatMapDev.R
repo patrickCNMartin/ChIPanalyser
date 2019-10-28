@@ -1,9 +1,26 @@
 plotOptimalHeatMaps<-function(optimalParam,contour=TRUE,col=NULL,main=NULL,layout=TRUE,overlay=FALSE){
 
-    # Parsing matricies if everthing is provided
-    if(all(names(optimalParam)%in%c("Optimal Parameters","Optimal Matrix","method"))){
-        optimalParam<-optimalParam[[2]]
+
+    ## parsng data depending on what is being parser
+    ## Dont know if i should just pars this to a genomic profile object or not.
+    ## I feel that in this case it will be to redundant.
+    ##
+
+    if(all(names(optimalParam) %in% c("Optimal","Occupancy","ChIPProfiles","goodnessOfFit"))){
+       optimalParam<-optimalParam[[1]][[2]]
+    } else if(all(names(optimalParam) %in% c("OptimalParameters","OptimalMatrix","method"))){
+       optimalParam<-optimalParam[[2]]
+    } else if(class(optimalParam)=="list"){
+       optimalParam<-optimalParam
+
+    } else if(class(optimalParam)=="matrix"){
+      optimalParam<-list(optimalParam)
+    } else{
+      stop("Oops Sonthing went wrong. Please enusre that you are parsing the right object.
+      We are not sure what what to do now. ")
+
     }
+
     ## replacing NA or NAN by 0 because it messes things up for the plotting
     ## It be annoying
 
@@ -93,7 +110,7 @@ plotOptimalHeatMaps<-function(optimalParam,contour=TRUE,col=NULL,main=NULL,layou
         }
         ylabs<-as.numeric(rownames(optimalParam[[1]]))
         xlabs<-as.numeric(colnames(optimalParam[[1]]))
-        ifelse(is.null(col),cols<-rainbow(length(optimalParam)),cols<-col)
+        ifelse(is.null(col),cols<-rainbow(length(optimalParam),s=0.7),cols<-col)
         if(length(cols)!=length(optimalParam)){
             cols<-rep(cols,ceiling(length(optimalParam)/length(cols)))
         }
@@ -114,6 +131,7 @@ plotOptimalHeatMaps<-function(optimalParam,contour=TRUE,col=NULL,main=NULL,layou
         Colors <- colfunc(20)
         legend_image<-as.raster(matrix(rev(Colors),ncol=1))
         par(mar=c(5.5,5.5,4.5, 0.5)+0.1)
+        par(family="mono")
 
         graphics::image(1:length(xlabs),1:length(ylabs),t(optimalParam[[i]]),
             axes = FALSE, xlab=" ", ylab=" ",col=Colors)

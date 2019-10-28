@@ -1,37 +1,37 @@
 \name{averageExpPWMScore}
 \alias{averageExpPWMScore}
-\alias{averageExpPWMScore-methods}
+
 
 \title{
 Accessor for \code{averageExpPWMScore} slot in a
-\code{\link{genomicProfileParameters}} object.
+\code{\link{genomicProfiles}} object.
 }
 \description{
 Extract or Access \code{averageExpPWMScore} slot in a
-\code{\link{genomicProfileParameters}}
+\code{\link{genomicProfiles}}
 }
 \usage{
 averageExpPWMScore(object)
 }
 \arguments{
     \item{object}{
-    \code{object} is a \code{genomicProfileParameters}
+    \code{object} is a \code{genomicProfiles}
     }
 }
 \details{
 As a general rule, \code{averageExpPWMScore} is computed and updated
-internally by \code{\link{computeGenomeWidePWMScore}}.
+internally by \code{\link{computeGenomeWideScores}}.
 Idealy, this slot should not be updated by user.
 The \code{averageExpPWMScore} is the sum of the exponential of every PWM score
 for a given DNA sequence and divided by the length of the said DNA sequence
 (\code{\link{DNASequenceLength}}). This can either be the full
 length sequence or only the accessible sequence
-(see \code{\link{computeGenomeWidePWMScore}}).
+(see \code{\link{computeGenomeWideScores}}).
 
 }
 \value{
 Returns the \code{averageExpPWMScore} of a
-\code{\link{genomicProfileParameters}} when computed.
+\code{\link{genomicProfiles}} when computed.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -45,8 +45,8 @@ Patrick C.N. Martin <pm16057@essex.ac.uk>
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
-# Building genomicProfileParameters object
-GPP <- genomicProfileParameters(PFM=PFM)
+# Building genomicProfiles object
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
 # Extracting AllSitesAboveThreshold slot
 averageExpPWMScore(GPP)
 

@@ -1,14 +1,15 @@
 \name{chipSd<-}
+
+
 \alias{chipSd<-}
-\alias{chipSd<--methods}
 
 \title{
 Setter methods for \code{chipSd} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \description{
 Setter methods for \code{chipSd} slot in a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 }
 \usage{
 chipSd(object)<-value
@@ -16,7 +17,7 @@ chipSd(object)<-value
 
 \arguments{
     \item{object}{
-    \code{object} is \code{\link{occupancyProfileParameters}} object.
+    \code{object} is \code{\link{parameterOptions}} object.
     }
     \item{value}{
     \code{value} is a positive nurmeric value that will be assigned to
@@ -25,7 +26,7 @@ chipSd(object)<-value
     }
 }
 \details{
-When computing ChIP-seq like profiles (\code{\link{computeChipProfile}},
+When computing ChIP-seq like profiles (\code{\link{computeChIPProfile}},
 the occupancy values given by \code{computeOccupancy} are transformed into
 ChIP-seq like profiles.
 The average size of a ChIP-seq peak was described by Kaplan
@@ -34,11 +35,11 @@ variation. This variation is accounted for with \code{chipSd}.
 It is advised to use the standard deviation
 of ChIP peak width from actual ChIP-seq data.
 We strongly encourage to set values when building a
-\code{\link{occupancyProfileParameters}} object.
+\code{\link{parameterOptions}} object.
 
 }
 \value{
-Returns a \code{\link{occupancyProfileParameters}} object with an updated
+Returns a \code{\link{parameterOptions}} object with an updated
 value for \code{chipSd}.
 }
 \references{
@@ -57,8 +58,8 @@ Patrick C.N. Martin <pm16057@essex.ac.uk>
 }
 
 \examples{
-# Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+# Building parameterOptions object
+OPP <- parameterOptions()
 # Setting new value for chipSd slot
 chipSd(OPP) <-  250
 }

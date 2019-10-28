@@ -1,14 +1,14 @@
 \name{stepSize<-}
-\alias{stepSize<-}
-\alias{stepSize<--methods}
 
+
+\alias{stepSize<-}
 \title{
 Setter Method for the \code{stepSize} slot in a
-\code{\link{occupancyProfileParameters}}
+\code{\linkS4class{parameterOptions}}
 }
 \description{
 Setter Method for the \code{stepSize} slot in a
-\code{\link{occupancyProfileParameters}}
+\code{\linkS4class{parameterOptions}}
 }
 \usage{
 stepSize(object) <- value
@@ -16,17 +16,17 @@ stepSize(object) <- value
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{occupancyProfileParameters}} object
+    \code{object} is a \code{\linkS4class{parameterOptions}} object
     }
     \item{value}{
     \code{value} is a positive numeric value that will be assigned to the
-    \code{stepSize} slot in a \code{\link{occupancyProfileParameters}} object.
+    \code{stepSize} slot in a \code{\linkS4class{parameterOptions}} object.
     Default is set at 10 base pairs.
     }
 }
 \details{
 It possible to restrict the size of the ChIP-seq-like profile produced by
-\code{\link{computeChipProfile}}. Instead of returning ChIP-seq like score
+\code{\link{computeChIPProfile}}. Instead of returning ChIP-seq like score
 for each base pair, it is possible to skip base pairs and only return the
 predicted enrichement score for every "n" base pair
 (n is the value assigned to stepSize). This will reduce the size of the
@@ -34,7 +34,7 @@ output data (unless step size is very large, this will not affect the
 accuracy of the model). Default is set at 10 base pairs.
 }
 \value{
-Returns a \code{occupancyProfileParameters} object with an updated value
+Returns a \code{parameterOptions} object with an updated value
 for the \code{stepSize} slot.
 }
 \references{
@@ -47,8 +47,8 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 }
 
 \examples{
-# Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+# Building parameterOptions  object
+OPP <- parameterOptions()
 #Setting new Value for maxSignal
 stepSize(OPP) <- 20
 

@@ -1,14 +1,15 @@
 \name{ploidy}
+
+
 \alias{ploidy}
-\alias{ploidy-methods}
 
 \title{
 Accessor method for the \code{ploidy} slot in a
-\code{\link{occupancyProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \description{
 Accessor method for the \code{ploidy} slot in a
-\code{\link{occupancyProfileParameters}} object
+\code{\link{parameterOptions}} object
 
 }
 \usage{
@@ -17,7 +18,7 @@ ploidy(object)
 
 \arguments{
     \item{object}{
-    \code{object} is  a \code{\link{occupancyProfileParameters}} object
+    \code{object} is  a \code{\link{parameterOptions}} object
     }
 }
 \details{
@@ -29,7 +30,7 @@ organism of interest however this only considers simple polyploidy
 }
 \value{
 Returns the value assigned to the \code{ploidy} slot in a
-\code{\link{occupancyProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -39,8 +40,8 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 }
 
 \examples{
-# Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+# Building parameterOptions object
+OPP <- parameterOptions()
 #Setting new Value for maxSignal
 ploidy(OPP)
 }

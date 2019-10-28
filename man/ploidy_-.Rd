@@ -1,14 +1,15 @@
 \name{ploidy<-}
+
+
 \alias{ploidy<-}
-\alias{ploidy<--methods}
 
 \title{
 Setter Method for the \code{ploidy} slot in an
-\code{\link{occupancyProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 \description{
 Setter Method for the \code{ploidy} slot in an
-\code{\link{occupancyProfileParameters}} object
+\code{\link{parameterOptions}} object
 }
 
 \usage{
@@ -17,7 +18,7 @@ ploidy(object)<- value
 
 \arguments{
     \item{object}{
-    \code{object} is a \code{\link{occupancyProfileParameters}} object
+    \code{object} is a \code{\link{parameterOptions}} object
     }
     \item{value}{
     \code{value} is a positive integer that describes the ploidy of the
@@ -31,7 +32,7 @@ organism however this only considers simple polyploidy (or haploidy). T
 he model does not consider hybrids such as wheat.
 }
 \value{
-Returns a \code{\link{occupancyProfileParameters}} object with an updated
+Returns a \code{\link{parameterOptions}} object with an updated
 value for the \code{ploidy} slot.
 }
 \references{
@@ -41,8 +42,8 @@ factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.}
 Patrick C. N. Martin <pm16057@essex.ac.uk>
 }
 \examples{
-# Building occupancyProfileParameters object
-OPP <- occupancyProfileParameters()
+# Building parameterOptions object
+OPP <- parameterOptions()
 #Setting new Value for maxSignal
 ploidy(OPP) <- 2
 
