@@ -312,15 +312,19 @@ There are a few different ways to add new paramters:
 
 ```{r, eval=FALSE}
 ## Parsing pre computed parameters (processingChIP function)
-GP<-genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet, ChIPScore=ChIPScore)
+GP<-genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet,
+                    ChIPScore=ChIPScore)
 
 ## Parsing pre assigned function (parameterOptions)
-parameterOptions<-parameterOptions(lambdaPWM=c(1,2,3),boundMolecules=c(5,50,500))
-GP<-genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet, parameterOptions=parameterOptions)
+parameterOptions<-parameterOptions(lambdaPWM=c(1,2,3),
+                                   boundMolecules=c(5,50,500))
+GP<-genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet,
+                    parameterOptions=parameterOptions)
 
 ## Direct parameter assignement
 
-GP<-genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet, lambdaPWM=c(1,2,3),boundMolecules=c(4,500,8000))
+GP<-genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet, 
+                    lambdaPWM=c(1,2,3),boundMolecules=c(4,500,8000))
 ```
 
 NOTE `parameterOptions` object can be parsed to any function of the analysis pipeline if parameters need to be changed along the way.
@@ -335,7 +339,8 @@ The `computeOptimal` function offers a few more options that we will briefly des
 
 ```{r, eval=FALSE}
 ## Setting custom parameters
-OP<-parameterOptions(lambdaPWM=seq(1,10,by=0.5), boundMolecules=seq(1,100000, length.out=20))
+OP<-parameterOptions(lambdaPWM=seq(1,10,by=0.5), 
+                     boundMolecules=seq(1,100000, length.out=20))
 
 ## Computing ONLY Optimal Parameters and MSE as goodness Of Fit metric
 optimal<-computeOptimal(genomicProfiles=GP,
@@ -386,7 +391,8 @@ individual parameter combinations. The steps are described as following:
 ```{r,eval=TRUE,warnings=FALSE}
 
 ## Creating genomic Profiles object with PFMs and associated parameters
-GP <- genomicProfiles(PFM=PFM,PFMFormat="raw",BPFrequency=DNASequenceSet,lambdaPWM=1, boundMolecules=58794)
+GP <- genomicProfiles(PFM=PFM,PFMFormat="raw",BPFrequency=DNASequenceSet,
+                      lambdaPWM=1, boundMolecules=58794)
 
 ## Computing Genome Wide Score required
 GW <- computeGenomeWideScores(genomicProfiles=GP,
