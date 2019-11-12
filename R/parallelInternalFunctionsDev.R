@@ -328,7 +328,7 @@
 }
 
 .methodSwitchGoF <- function(gp,chip,method,step){
-
+browser()
      if(any(grepl(method, c("recall","precesion","fscore","MCC","Accuracy","AUC"),ignore.case=T))){
         method<-"all"
      }
@@ -341,22 +341,23 @@
          }
 
      } else if(grepl("spearman",method)){
+
        check <- .GoFCheck(gp,chip)
-       if(length(which(check==FALSE))>0){
+       if(length(which(check$zeroCheck==FALSE))>0){
          local<-c(0,.intMSE(gp,chip))
        }else{
          local<-c("spearman"=cor(check$predicted,check$validation,method="spearman"),"MSE"=.intMSE(check$predicted,check$validation))
        }
      } else if(grepl("kendall",method)){
        check <- .GoFCheck(gp,chip)
-       if(length(which(check==FALSE))>0){
+       if(length(which(check$zeroCheck==FALSE))>0){
          local<-c(0,.intMSE(gp,chip))
        }else{
          local<-c("kendall"=cor(check$predicted,check$validation,method="kendall"),"MSE"=.intMSE(check$predicted,check$validation))
        }
      } else if(grepl("ks",method)){
        check <- .GoFCheck(gp,chip)
-         local<-c("K-S"=ks.test(check$predicted,check$validation)[[1]],"MSE"=.intMSE(check$predicted,check$validation))
+         local<-c("K-S"=ks(check$predicted,check$validation)[[1]],"MSE"=.intMSE(check$predicted,check$validation))
      } else if(grepl("binary",method)){
        check <- .GoFCheck(gp,chip)
          local <-c(.peakExtractionFScore(check$predicted,check$validation),"MSE"=.intMSE(check$predicted,check$validation))
