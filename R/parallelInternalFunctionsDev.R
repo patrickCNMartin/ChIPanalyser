@@ -328,7 +328,7 @@
 }
 
 .methodSwitchGoF <- function(gp,chip,method,step){
-browser()
+
      if(any(grepl(method, c("recall","precesion","fscore","MCC","Accuracy","AUC"),ignore.case=T))){
         method<-"all"
      }
