@@ -7,7 +7,7 @@ setClassUnion("GRList",c("CompressedGRangesList","list","GRanges"))
 setClassUnion("nos",c("numeric","character"))
 
 # apparently PFM does not come up so we will try this
-# this works dont know why though 
+# this works dont know why though
 # do not touch this
 utils::globalVariables("PFM")
 
@@ -252,7 +252,7 @@ genomicProfiles <- function(..., parameterOptions=NULL,genomicProfiles=NULL,ChIP
       } else{
          tags <- "empty"
       }
-       return(new("genomicProfiles",ploidy = ploidy ,
+      GPP <-new("genomicProfiles",ploidy = ploidy ,
        boundMolecules = boundMolecules ,
        backgroundSignal = backgroundSignal ,
        maxSignal = maxSignal ,
@@ -274,7 +274,17 @@ genomicProfiles <- function(..., parameterOptions=NULL,genomicProfiles=NULL,ChIP
        PFM = PFM,
        PFMFormat =PFMFormat,
        BPFrequency = BPFrequency,
-       tags= tags))
+       tags= tags)
+       if(!is.null(parameterOptions)){
+         GPP <- .updateGenomicProfiles(GPP,parameterOptions)
+       }
+       if(!is.null(genomicProfiles)){
+         GPP <- .updateGenomicProfiles(GPP,genomicProfiles)
+       }
+       if(!is.null(ChIPScore)){
+         GPP <- .updateGenomicProfiles(GPP,ChIPScore)
+       }
+       return(GPP)
 }
 
 
