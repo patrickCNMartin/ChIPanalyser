@@ -20,35 +20,55 @@
     return(buffer)
 }
 
+.prepCS<-function(cs,loc){
+    ## cutting cs
+    tmp <- data.frame(cs)
+    tmp2 <- data.frame(loc)
+    if(tmp[1,"start"]< tmp2[1,"start"]){
+        tmp[1,"start"]<-tmp2[1,"start"]
+    }
+    if(tmp[nrow(tmp),"end"]> tmp2[nrow(tmp2),"end"]){
+        tmp[nrow(tmp),"end"]<-tmp2[nrow(tmp2),"end"]
+    }
 
+    ## replace cs state by numeric
+    tmp[,"stateID"]<-gsub("CS","",tmp[,"stateID"])
+    return(tmp)
+}
 
-.parameterShuffle<-function(args,geneRefColour,chrinfo,set){
+.parameterShuffle<-function(args,geneRefColour,csColours,chrinfo,set){
     ## Setting Plot order for name retrieval
     #argsOrder<-c("chromatinState","chipProfile","predictedProfile","occupancy","text",names(GeneRefColour))
-    argsOrder<-c("predictedProfile","chipProfile","chromatinState","occupancy","text",names(geneRefColour))
+    argsOrder<-c("predictedProfile",
+                 "chipProfile",
+                 "chromatinState",
+                 "occupancy",
+                 "text",
+                 names(geneRefColour),
+                 names(csColours))
     ## Setting Defaults for color argument
-    colour<-c("#D55E00","#999999","#F0E442","#56B4E9","black",geneRefColour)
+    colour<-c("#D55E00","#999999","#F0E442","#56B4E9","black",geneRefColour,csColours)
     names(colour)<-argsOrder
 
     ## Setting default for density
-    density<-c(NA,NA,rep(NA,length(geneRefColour)))
-    names(density)<-c("chipProfile","chromatinState",names(geneRefColour))
+    density<-c(NA,NA,rep(NA,length(geneRefColour)),rep(NA,length(csColours)))
+    names(density)<-c("chipProfile","chromatinState",names(geneRefColour),names(csColours))
 
     ## Setting default borders
-    border<-c(NA,NA,rep(NA,length(geneRefColour)))
-    names(border)<-c("chipProfile","chromatinState",names(geneRefColour))
+    border<-c(NA,NA,rep(NA,length(geneRefColour)),rep(NA,length(csColours)))
+    names(border)<-c("chipProfile","chromatinState",names(geneRefColour),names(csColours))
 
     ## Setting Default for line type
-    lineType<-c(1,1,1,1,1,rep(1,length(geneRefColour)))
+    lineType<-c(1,1,1,1,1,rep(1,length(geneRefColour)),rep(1,length(csColours)))
     names(lineType)<-argsOrder
 
     ## Setting Default for lwd
-    lineWidth<-c(3,0.8,1,2,0.5,rep(1,length(geneRefColour)))
+    lineWidth<-c(3,0.8,1,2,0.5,rep(1,length(geneRefColour)),rep(1,length(csColours)))
     names(lineWidth)<-argsOrder
 
-    ## setting up fond size for plot
-    fontsSizePlot<-c(1,1,0.5,0.5)
-    names(fontsSizePlot)<-c("xlab","ylab","strand","geneRef")
+    ## setting up font size for plot
+    fontsSizePlot<-c(1,1,0.5,0.5,0.5)
+    names(fontsSizePlot)<-c("xlab","ylab","strand","geneRef","cs")
 
     ##setting up font size for Axis
     fontsSizeAxis<-0.8
@@ -72,12 +92,11 @@
 
 
     ## Axis set up
-
-
-
-    if(any(geneRefColour=="None")){
+    if(any(geneRefColour=="None") & any(csColours =="None")){
         ylim<-c(0,1)
-    } else {
+    }else if(!any(geneRefColour=="None") & !any(csColours =="None")){
+        ylim<-c(-0.8,1)
+    }else {
         ylim<-c(-0.4,1)
     }
 
@@ -163,11 +182,12 @@
 
     }
 
-    ###
+
 
 
     ##Name szwpping and multicolor handeling
     ### Genetic element coding regions
+    ### NOTE: Does this need to be done for CS plotting
     names(colour)[grepl("intron",names(colour)) | grepl("exon",names(colour)) | grepl("gene",names(colour),ignore.case=TRUE)]<-"gene"
     colour[names(colour)=="gene"]<-colour[names(colour)=="gene"][1]
 
@@ -216,9 +236,15 @@
 ###### Plotiing occupancy Profile #######
 
 
-plotOccupancyProfile<-function(predictedProfile, ChIPScore = NULL,chromatinState = NULL
-    ,occupancy = NULL,goodnessOfFit = NULL,PWM=FALSE,
-    geneRef = NULL,axis=TRUE,...){
+plotOccupancyProfile<-function(predictedProfile,
+                               ChIPScore = NULL,
+                               chromatinState = NULL,
+                               asCS = FALSE,
+                               occupancy = NULL,
+                               goodnessOfFit = NULL,
+                               PWM=FALSE,
+                               geneRef = NULL,
+                               axis=TRUE,...){
 
      ### handling paramter checks and building up object for plotting
      buffer<- .what.is.predictedProfile(predictedProfile)
@@ -252,11 +278,22 @@ plotOccupancyProfile<-function(predictedProfile, ChIPScore = NULL,chromatinState
         goodnessOfFitLocal<-.what.is.goodnessOfFit(goodnessOfFit)
      }
 
-    if(!is.null(chromatinState)){
-        localchromatineState <- .AccessExtract(lociLocal, chromatinState)
-    } else {
-        localchromatineState <- lociLocal
-        names(localchromatineState)<-names(lociLocal)
+    if(!is.null(chromatinState) & asCS == FALSE){
+        localchromatineState <- .AccessExtract(lociLocal, chromatinState,asCS)
+        csColours<-"None"
+        names(csColours)<-"default"
+    } else if(!is.null(chromatinState) & asCS == TRUE){
+        localchromatineState <- .AccessExtract(lociLocal, chromatinState,asCS)
+        csPal <- colorRampPalette(c("#999999", "#E69F00", "#56B4E9", "#009E73",
+                                    "#F0E442", "#0072B2", "#D55E00", "#CC79A7"))
+        csColours <- csPal(length(unique(localchromatineState$CS)))
+        names(csColours) <- unique(localchromatineState$CS)
+
+    } else{
+      localchromatineState <- lociLocal
+      names(localchromatineState)<-names(lociLocal)
+      csColours<-"None"
+      names(csColours)<-"default"
     }
 
 
@@ -297,7 +334,7 @@ plotOccupancyProfile<-function(predictedProfile, ChIPScore = NULL,chromatinState
 
     ## Setting Defaults
 
-    param<-.parameterShuffle(args,geneRefColour,chrinfo,i)
+    param<-.parameterShuffle(args,geneRefColour,csColours,chrinfo,i)
 
     ## setting up empty plot with and without Gene rangeBuffer
     if(!is.null(goodnessOfFit)){
@@ -364,9 +401,6 @@ plotOccupancyProfile<-function(predictedProfile, ChIPScore = NULL,chromatinState
       legend(x=(param$xlim[2])+0.06*((param$xlim[2])-(param$xlim[1])),y=max(param$ylim)+0.2,
       legend=leg,cex=0.68)
 
-
-      #legend(x=(max(param$xlim)+0.01*(max(param$xlim)-min(param$xlim))),y=max(param$ylim),
-      #legend=c(paste0("Correlation = ",round(goodnessOfFit[1],digits=5)," "),paste0("MSE = ",round(goodnessOfFit[2],digits=6))),cex=0.7)
     }
 
     ## Plotting geneRef

@@ -7,7 +7,7 @@ importFrom("graphics", "axis", "box", "contour", "image", "lines",
     "rasterImage")
 importFrom("methods", "new", "validObject","is")
 importFrom("stats", "cor", "dgamma","sd","na.omit","median","ks.test",
-    "quantile")
+    "quantile","runif")
 importFrom("utils", "read.table")
 importFrom("IRanges","IRanges")
 importFrom("rtracklayer","import")
@@ -73,7 +73,7 @@ exportMethods(
     "strandRule",
     "strandRule<-",
     "whichstrand",
-    "whichstrand<-" 
+    "whichstrand<-"
 )
 exportClasses(
     "loci",
@@ -82,5 +82,5 @@ exportClasses(
      "parameterOptions",
      "ChIPScore",
      "GRList",
-     "nos" 
+     "nos"
 )
