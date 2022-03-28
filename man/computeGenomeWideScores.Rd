@@ -48,13 +48,13 @@ Patrick C.N Martin <pm16057@essex.ac.uk>
 \examples{
 
   \donttest{
-  if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
+  if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
       if (!requireNamespace("BiocManager", quietly=TRUE))
           install.packages("BiocManager")
-      BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
+      BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm6")
       }
-  library(BSgenome.Dmelanogaster.UCSC.dm3)
-  DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+  library(BSgenome.Dmelanogaster.UCSC.dm6)
+  DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
   # Building genomicProfiles object
   GPP <- genomicProfiles(PFM=PFM, BPFrequency=DNASequenceSet)
 

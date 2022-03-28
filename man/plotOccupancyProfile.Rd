@@ -10,8 +10,8 @@ If provided, this functions will also plot ChIP-seq profiles,
 PWMScores (or Occupancy), chromatin States, Goodness of Fit estimates and gene information.
 }
 \usage{
-  plotOccupancyProfile(predictedProfile, ChIPScore = NULL,chromatinState = NULL
-      ,occupancy = NULL,goodnessOfFit = NULL,PWM=FALSE,
+  plotOccupancyProfile(predictedProfile, ChIPScore = NULL,chromatinState = NULL,
+      asCS = FALSE,occupancy = NULL,goodnessOfFit = NULL,PWM=FALSE,
       geneRef = NULL,axis=TRUE,...)
 }
 
@@ -28,6 +28,11 @@ PWMScores (or Occupancy), chromatin States, Goodness of Fit estimates and gene i
     \item{chromatinState}{
     \code{chromatinState} is a \code{\link[GenomicRanges]{GRanges}}
     containing accesible DNA sites or chromatin States.
+    }
+    \item{asCS}{
+    \code{asCS} is a logical defining if chromatinStates should be plotted as
+    accessibility data (Default FALSE) or if chromatine states should be plotted
+    in seperate track.
     }
 
     \item{occupancy}{
@@ -93,13 +98,13 @@ data(ChIPanalyserData)
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 \donttest{
-if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
+if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
     if (!requireNamespace("BiocManager", quietly=TRUE))
         install.packages("BiocManager")
-    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
+    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm6")
     }
-library(BSgenome.Dmelanogaster.UCSC.dm3)
-DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+library(BSgenome.Dmelanogaster.UCSC.dm6)
+DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 #Building data objects
 GPP <- genomicProfiles(PFM=PFM,BPFrequency=DNASequenceSet)
 
