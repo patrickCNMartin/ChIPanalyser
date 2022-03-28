@@ -96,8 +96,10 @@
         ylim<-c(0,1)
     }else if(!any(geneRefColour=="None") & !any(csColours =="None")){
         ylim<-c(-0.8,1)
+        track <- c(-0.2,-0.4)
     }else {
         ylim<-c(-0.4,1)
+        track <- c(-0.2)
     }
 
     ## Swaping if arguments supplied
@@ -225,7 +227,7 @@
 
 
 
-    return(list("colour"=colour,"density"=density,"border"=border,"lineType"=lineType,"lineWidth"=lineWidth,"fontsSizePlot"=fontsSizePlot,"fontsSizeAxis"=fontsSizeAxis,"lableOri"=lableOri,"main"=main,"xlab"=xlab,"ylab"=ylab,"xlim"=xlim,"ylim"=ylim,"xaxislabels"=xaxislabels))
+    return(list("colour"=colour,"density"=density,"border"=border,"lineType"=lineType,"lineWidth"=lineWidth,"fontsSizePlot"=fontsSizePlot,"fontsSizeAxis"=fontsSizeAxis,"lableOri"=lableOri,"main"=main,"xlab"=xlab,"ylab"=ylab,"xlim"=xlim,"ylim"=ylim,"xaxislabels"=xaxislabels,"track" =track))
 }
 
 
@@ -352,13 +354,21 @@ plotOccupancyProfile<-function(predictedProfile,
 
 
     ## Accesibility plotting
-    if(!is.null(chromatinState)){
+    if(!is.null(chromatinState) & asCS == FALSE){
         localAccessibility<-localchromatineState[[i]]
 
         for(localAccess in seq_len(nrow(localAccessibility))){
             rect(localAccessibility[localAccess,"start"],0,localAccessibility[localAccess,"end"],param$ylim[2],
             col=param$colour[["chromatinState"]],density=param$density[["chromatinState"]], border=param$borders[["chromatinState"]],lwd=param$lineWidth[["chromatinState"]],lty=param$lineType[["chromatinState"]])
         }
+    } else if(!is.null(chromatinState) & asCS == TRUE) {
+      localAccessibility<-localchromatineState[[i]]
+
+      for(localAccess in seq_len(nrow(localAccessibility))){
+          rect(localAccessibility[localAccess,"start"],param$track[1],localAccessibility[localAccess,"end"],param$ylim[2],
+          col=param$colour[["chromatinState"]],density=param$density[["chromatinState"]], border=param$borders[["chromatinState"]],lwd=param$lineWidth[["chromatinState"]],lty=param$lineType[["chromatinState"]])
+          #text(start(elementBuffer[[elem]])[pos],(trackPosY + 0.03),elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+      }
     }
     ## ChIP Profile Plotting
     if(!is.null(ChIPScore)){
@@ -396,7 +406,7 @@ plotOccupancyProfile<-function(predictedProfile,
     ## Adding accuracy estimate
     if(!is.null(goodnessOfFit)){
       goodnessOfFit<-goodnessOfFitLocal[[i]]
-#param$xlim[i,1],param$xlim[i,2]
+
       leg<-paste(names(goodnessOfFit),"=",signif(goodnessOfFit,4))
       legend(x=(param$xlim[2])+0.06*((param$xlim[2])-(param$xlim[1])),y=max(param$ylim)+0.2,
       legend=leg,cex=0.68)
@@ -405,9 +415,10 @@ plotOccupancyProfile<-function(predictedProfile,
 
     ## Plotting geneRef
     if(!is.null(geneRef)){
-        lines(c(min(localPosition),max(localPosition)),c(-0.2,-0.2), col = param$colour[["text"]],lty=param$lineType[["text"]], lwd=param$lineWidth[["text"]])
-        text(min(localPosition), (-0.1), "+", col=param$colour[["text"]],cex=param$fontsSizePlot["strand"])
-        text(min(localPosition), (-0.3), "-", col=param$colour[["text"]],cex=param$fontsSizePlot["strand"])
+        trackPosY <- ifelse(length(param$track)==1,param$track[1],param$track[2])
+        lines(c(min(localPosition),max(localPosition)),c(trackPosY,trackPosY), col = param$colour[["text"]],lty=param$lineType[["text"]], lwd=param$lineWidth[["text"]])
+        text(min(localPosition), (trackPosY + 0.1), "+", col=param$colour[["text"]],cex=param$fontsSizePlot["strand"])
+        text(min(localPosition), (trackPosY - 0.1), "-", col=param$colour[["text"]],cex=param$fontsSizePlot["strand"])
         ## Genetic Element plotting
 
         for(elem in seq_along(elementBuffer)){
@@ -418,10 +429,10 @@ plotOccupancyProfile<-function(predictedProfile,
                 pos<-which(as.logical(strand(elementBuffer[[elem]])=="+" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="-"))
                 neg<-which(as.logical(strand(elementBuffer[[elem]])=="-" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="+"))
                 if(length(pos)>0){
-                    segments(x0=start(elementBuffer[[elem]])[pos],x1=end(elementBuffer[[elem]])[pos],y0=-0.1,lwd=param$lineWidth["gene"],lty=param$lineType["gene"],col=param$colour["gene"])
+                    segments(x0=start(elementBuffer[[elem]])[pos],x1=end(elementBuffer[[elem]])[pos],y0=(trackPosY + 0.1),lwd=param$lineWidth["gene"],lty=param$lineType["gene"],col=param$colour["gene"])
                 }
                 if(length(neg)>0){
-                    segments(x0=start(elementBuffer[[elem]])[neg],x1=end(elementBuffer[[elem]])[neg],y0=-0.3,lwd=param$lineWidth["gene"],lty=param$lineType["gene"],col=param$colour["gene"])
+                    segments(x0=start(elementBuffer[[elem]])[neg],x1=end(elementBuffer[[elem]])[neg],y0=(trackPosY - 0.1),lwd=param$lineWidth["gene"],lty=param$lineType["gene"],col=param$colour["gene"])
                 }
 
             } else if(names(elementBuffer)[elem]=="gene" | names(elementBuffer)[elem]=="exon"){
@@ -429,12 +440,12 @@ plotOccupancyProfile<-function(predictedProfile,
                 pos<-which(as.logical(strand(elementBuffer[[elem]])=="+" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="-"))
                 neg<-which(as.logical(strand(elementBuffer[[elem]])=="-" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="+"))
                 if(length(pos)>0){
-                    rect(start(elementBuffer[[elem]])[pos],-0.05,end(elementBuffer[[elem]])[pos],-0.15,col=param$colour["gene"],density=param$density["gene"],lty=param$lineType["gene"],lwd=param$lineWidth["gene"],border=param$border["gene"])
-                    text(start(elementBuffer[[elem]])[pos],-0.18,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+                    rect(start(elementBuffer[[elem]])[pos],(trackPosY + 0.15),end(elementBuffer[[elem]])[pos],(trackPosY + 0.05),col=param$colour["gene"],density=param$density["gene"],lty=param$lineType["gene"],lwd=param$lineWidth["gene"],border=param$border["gene"])
+                    text(start(elementBuffer[[elem]])[pos],(trackPosY + 0.03),elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
                 }
                 if(length(neg)>0){
-                    rect(start(elementBuffer[[elem]])[neg],-0.25,end(elementBuffer[[elem]])[neg],-0.35,col=param$colour["gene"],density=param$density["gene"],lty=param$lineType["gene"],lwd=param$lineWidth["gene"],border=param$border["gene"])
-                    text(start(elementBuffer[[elem]])[neg],-0.38,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+                    rect(start(elementBuffer[[elem]])[neg],(trackPosY - 0.05),end(elementBuffer[[elem]])[neg],(trackPosY - 0.15),col=param$colour["gene"],density=param$density["gene"],lty=param$lineType["gene"],lwd=param$lineWidth["gene"],border=param$border["gene"])
+                    text(start(elementBuffer[[elem]])[neg],(trackPosY - 0.18),elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
                 }
 
             } else if(length(grep(x=names(elementBuffer)[elem],pattern="UTR",ignore.case=TRUE))>0){
@@ -443,12 +454,12 @@ plotOccupancyProfile<-function(predictedProfile,
                 neg<-which(as.logical(strand(elementBuffer[[elem]])=="-" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="+"))
 
                 if(length(pos)>0){
-                    rect(start(elementBuffer[[elem]])[pos],-0.1,end(elementBuffer[[elem]])[pos],-0.15,col=param$colour["UTR"],density=param$density["UTR"],lty=param$lineType["UTR"],lwd=param$lineWidth["UTR"],border=param$border["UTR"])
-                    text(start(elementBuffer[[elem]])[pos],-0.18,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+                    rect(start(elementBuffer[[elem]])[pos],(trackPosY + 0.15),end(elementBuffer[[elem]])[pos],(trackPosY + 0.05),col=param$colour["UTR"],density=param$density["UTR"],lty=param$lineType["UTR"],lwd=param$lineWidth["UTR"],border=param$border["UTR"])
+                    text(start(elementBuffer[[elem]])[pos],(trackPosY + 0.03),elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
                 }
                 if(length(neg)>0){
-                    rect(start(elementBuffer[[elem]])[neg],-0.25,end(elementBuffer[[elem]])[neg],-0.35,col=param$colour["UTR"],density=param$density["UTR"],lty=param$lineType["UTR"],lwd=param$lineWidth["UTR"],border=param$border["UTR"])
-                    text(start(elementBuffer[[elem]])[neg],-0.38,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+                    rect(start(elementBuffer[[elem]])[neg],(trackPosY - 0.05),end(elementBuffer[[elem]])[neg],(trackPosY - 0.15),col=param$colour["UTR"],density=param$density["UTR"],lty=param$lineType["UTR"],lwd=param$lineWidth["UTR"],border=param$border["UTR"])
+                    text(start(elementBuffer[[elem]])[neg],(trackPosY - 0.18),elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
                 }
 
             } else {
@@ -458,12 +469,12 @@ plotOccupancyProfile<-function(predictedProfile,
                   neg<-which(as.logical(strand(elementBuffer[[elem]])=="-" | strand(elementBuffer[[elem]])=="*" & strand(elementBuffer[[elem]])!="+"))
 
                   if(length(pos)>0){
-                      rect(start(elementBuffer[[elem]])[pos],-0.1,end(elementBuffer[[elem]])[pos],-0.15,col=param$colour[nameBuffer],density=param$density[nameBuffer],lty=param$lineType[nameBuffer],lwd=param$lineWidth[nameBuffer],border=param$border[nameBuffer])
-                      text(start(elementBuffer[[elem]])[pos],-0.18,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+                      rect(start(elementBuffer[[elem]])[pos],(trackPosY + 0.15),end(elementBuffer[[elem]])[pos],(trackPosY + 0.05),col=param$colour[nameBuffer],density=param$density[nameBuffer],lty=param$lineType[nameBuffer],lwd=param$lineWidth[nameBuffer],border=param$border[nameBuffer])
+                      text(start(elementBuffer[[elem]])[pos],(trackPosY + 0.03),elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
                   }
                   if(length(neg)>0){
-                      rect(start(elementBuffer[[elem]])[neg],-0.25,end(elementBuffer[[elem]])[neg],-0.35,col=param$colour[nameBuffer],density=param$density[nameBuffer],lty=param$lineType[nameBuffer],lwd=param$lineWidth[nameBuffer],border=param$border[nameBuffer])
-                      text(start(elementBuffer[[elem]])[neg],-0.38,elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
+                      rect(start(elementBuffer[[elem]])[neg],(trackPosY - 0.05),end(elementBuffer[[elem]])[neg],(trackPosY - 0.15),col=param$colour[nameBuffer],density=param$density[nameBuffer],lty=param$lineType[nameBuffer],lwd=param$lineWidth[nameBuffer],border=param$border[nameBuffer])
+                      text(start(elementBuffer[[elem]])[neg],(trackPosY - 0.18),elementBuffer[[elem]]$ID,pos=4, col=param$colour["text"],cex=param$fontsSizePlot["geneRef"])
                   }
             }
         }
