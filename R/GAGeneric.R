@@ -481,3 +481,61 @@
 
     return(mat)
 }
+
+
+## chunk data for training a validation 
+
+getTrainingData <- function(ChIPscore,loci = 1){
+    train <- ChIPscore
+    if(is.numeric(loci)){
+        scores(train) <- scores(train)[seq(1,loci)]
+        loci(train) <- loci(train)[seq(1,loci)]
+    }else if(is.character(loci)){
+        scores(train) <- scores(train)[loci]
+        loci(train) <- loci(train)[loci]
+    }else {
+        stop("Unknown subset attribute - use numeric vector or loci names")
+    }
+
+    ## quick check to make sure it's not empty
+    if(length(scores(train))<1){
+        stop("Empty training set!")
+    }
+    return(train)
+    
+    
+}
+
+getTestingData <- function(ChIPscore,loci = 1){
+    validation <- ChIPscore
+    if(is.numeric(loci)){
+        scores(validation) <- scores(validation)[seq(1,loci)]
+        loci(validation) <- loci(validation)[seq(1,loci)]
+    }else if(is.character(loci)){
+        scores(validation) <- scores(validation)[loci]
+        loci(validation) <- loci(validation)[loci]
+    }else {
+        stop("Unknown subset attribute - use numeric vector or loci names")
+    }
+    if(length(scores(validation))<1){
+        stop("Empty validation set!")
+    }
+    return(validation)
+}
+
+splitData <- function(ChIPscore, dist = c(50,50)){
+    locs <- seq(1, length(scores(ChIPscore)))
+    if(locs <= 1){
+        stop("Cannot split less than 2 loci!")
+    }
+    train <- round(length(locs)*dist[1])
+    if(train < 1)stop("Training set proportion too small!")
+    test <- round(length(locs)*dist[1]) + round(length(locs)*dist[2])
+    if(test < 1)stop("Validation set proportion too small!")
+
+    trainSet <- getTrainingData(ChIPscore, loci = seq(1,train))
+    testSet <- getTestingData(ChIPscore,  loci = seq(train, test))
+
+    return(list("trainingSet" = trainSet, "testingSet" = testSet))
+
+}

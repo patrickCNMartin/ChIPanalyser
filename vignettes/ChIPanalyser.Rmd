@@ -554,7 +554,7 @@ Finally, we provide a list of setter/getter functions for each slot:
     PositionFrequencyMatrix(obj)
     PositionFrequencyMatrix(obj)<-value
     PositionWeightMatrix(obj)
-    PositionWeightMatrix<-value
+    PositionWeightMatrix(obj)<-value
     profiles(obj)
     PWMpseudocount(obj)
     PWMpseudocount(obj)<-value
@@ -562,14 +562,12 @@ Finally, we provide a list of setter/getter functions for each slot:
     PWMThreshold(obj)<-value
     removeBackground(obj)
     removeBackground(obj)<-value
-    
     stepSize(obj)
     stepSize(obj)<-value
     strandRule(obj)
     strandRule(obj)<-value
     whichstrand(obj)
-    whichstrand(obj)<-value 
-    
+    whichstrand(obj)<-value
     ## ChIPScore slots accessors 
     loci(obj)
     scores(obj)
