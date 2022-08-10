@@ -21,9 +21,9 @@ loci, genetic information, DNA accessibility data and ChIP-seq data.
 \format{
 \enumerate{
 
-    \item{\code{Access}}{is \code{\link[GenomicRanges]{GRanges}}
+    \item{\code{access}}{is \code{\link[GenomicRanges]{GRanges}}
     containing DNA Accesibility data for the sequences described above.}
-    \item{\code{CS}}{is \code{\link[GenomicRanges]{GRanges}}
+    \item{\code{cs}}{is \code{\link[GenomicRanges]{GRanges}}
     containing Chromatin State data for the sequences described above.}
     \item{\code{eveLocus}}{is \code{\link[GenomicRanges]{GRanges}}
     containing a locus of interest.

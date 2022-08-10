@@ -462,7 +462,7 @@ setMethod("loci","ChIPScore",
     function(object) object@loci
 )
 
-setReplaceMethod(".loci",
+setReplaceMethod("loci",
     signature(object="ChIPScore",
         value="loci"),
     function(object, value){
@@ -477,7 +477,7 @@ setMethod("scores","ChIPScore",
     function(object) object@scores
 )
 
-setReplaceMethod(".scores",
+setReplaceMethod("scores",
     signature(object="ChIPScore",
         value="list"),
     function(object, value){
