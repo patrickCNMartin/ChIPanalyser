@@ -217,11 +217,12 @@
         return(list("DataBase"=as.data.frame(database),"ComputedPop"=ComputedPop,
                     "ToBeComputedPop"=ToBeComputedPop))
     } else {
-
+        #population <- lapply(population,unlist)
         population<-as.data.frame(do.call("rbind", population))
-        population<-as.data.frame(population)
+       
         population$gen<-rep(generation,nrow(population))
         database<-rbind(database,population)
+       
         return(database)
     }
 
@@ -341,10 +342,10 @@
         localPopulation<-FitPopulation[[reuseGA[j]]]
         ## Taking reused population and mutating it
         if(runif(1)<=mutationProbability){
-            print("mutate")
+            
             localPopulation<-.mutate(localPopulation,parameters)
         } else {
-             print("cross")
+             
             localPopulation<-.crossover(localPopulation,NewPop[[sample(seq_along(wellFit),size=1)]])
             #localPopulation<-.crossover(localPopulation,NewPop[[sample(seq_len(j),size=1)]])
         }
@@ -487,54 +488,47 @@
 
 getTrainingData <- function(ChIPscore,loci = 1){
     train <- ChIPscore
-    if(is.numeric(loci)){
-        scores(train) <- scores(train)[seq(1,loci)]
-        loci(train) <- loci(train)[seq(1,loci)]
-    }else if(is.character(loci)){
-        scores(train) <- scores(train)[loci]
-        loci(train) <- loci(train)[loci]
-    }else {
-        stop("Unknown subset attribute - use numeric vector or loci names")
-    }
-
-    ## quick check to make sure it's not empty
+    scores(train) <- scores(train)[loci]
+    loci(train) <- loci(train)[loci]
+   ## quick check to make sure it's not empty
     if(length(scores(train))<1){
         stop("Empty training set!")
     }
     return(train)
-    
-    
 }
 
 getTestingData <- function(ChIPscore,loci = 1){
     validation <- ChIPscore
-    if(is.numeric(loci)){
-        scores(validation) <- scores(validation)[seq(1,loci)]
-        loci(validation) <- loci(validation)[seq(1,loci)]
-    }else if(is.character(loci)){
-        scores(validation) <- scores(validation)[loci]
-        loci(validation) <- loci(validation)[loci]
-    }else {
-        stop("Unknown subset attribute - use numeric vector or loci names")
-    }
+    scores(validation) <- scores(validation)[loci]
+    loci(validation) <- loci(validation)[loci]
+    
     if(length(scores(validation))<1){
         stop("Empty validation set!")
     }
     return(validation)
 }
 
-splitData <- function(ChIPscore, dist = c(50,50)){
-    locs <- seq(1, length(scores(ChIPscore)))
+splitData <- function(ChIPscore, dist = c(50,50), as.proportion = FALSE){
+    locs <- length(scores(ChIPscore))
     if(locs <= 1){
         stop("Cannot split less than 2 loci!")
     }
-    train <- round(length(locs)*dist[1])
-    if(train < 1)stop("Training set proportion too small!")
-    test <- round(length(locs)*dist[1]) + round(length(locs)*dist[2])
-    if(test < 1)stop("Validation set proportion too small!")
+    if(as.proportion){
+        train <- floor(locs*(dist[1]/100))
+        if(train < 1)stop("Training set proportion too small!")
+        test <- floor(locs*(dist[1]/100)) + floor(locs*(dist[2]/100))
+        if(test < 1)stop("Validation set proportion too small!")
 
-    trainSet <- getTrainingData(ChIPscore, loci = seq(1,train))
-    testSet <- getTestingData(ChIPscore,  loci = seq(train, test))
+        trainSet <- getTrainingData(ChIPscore, loci = seq(1,train))
+        testSet <- getTestingData(ChIPscore,  loci = seq(train +1 , test))
+    }else {
+        if(length(dist) != 4){
+            stop("Please Provide start/stop loci index for training and testing")
+        }
+        trainSet <- getTrainingData(ChIPscore, loci = seq(dist[1],dist[2]))
+        testSet <- getTestingData(ChIPscore,  loci = seq(dist[3], dist[4]))
+    }
+   
 
     return(list("trainingSet" = trainSet, "testingSet" = testSet))
 

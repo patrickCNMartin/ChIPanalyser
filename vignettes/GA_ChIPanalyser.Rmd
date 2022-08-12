@@ -69,7 +69,8 @@ library(ChIPanalyser)
 # Input data 
 data(ChIPanalyserData)
 # PFM Matrix 
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
+#PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
 
 ```
 
@@ -106,7 +107,7 @@ The next step consitst in setting initial parameters to run the genetic algorith
 pop <- 10 
 
 # Number of generations 
-gen <- 10
+gen <- 2
 
 # Mutation Probability 
 mut <- 0.3
@@ -118,6 +119,28 @@ child <- 2
 method <- "MSE"
 
 ```
+
+Please note that the parameters presented here are for the sake of the vignette. We recommend using the following parameters for a first 
+trial with your own data. Please be advised that these parameters will depend on the nature of the data you are using. 
+
+```{r GA_params, class.source = 'fold-hide' eval = FALSE, echo = TRUE}
+# Number of individuals per generation 
+pop <- 100 
+
+# Number of generations 
+gen <- 50
+
+# Mutation Probability 
+mut <- 0.3
+
+# Children - Number of ofspring passed to the next generation 
+child <- 10
+
+# Method - Goodness of fit metric used to optimise the Genetic algorithm 
+method <- "MSE"
+
+```
+
 
 We can also define which parameters we wish to optimise. In this example, we will optimise the number of bound molecules ($N$),
 lambda ($\lambda$), the PWM Threshold and 11 different chromatin states. 
@@ -173,15 +196,79 @@ chipProfile <- processingChIP(chip,loci = top)
 
 # Splitting data into training and testing
 # We recommend setting dist to 20/80. However, here we only have 2 loci. 
-splitdata <- splitData(chipProfile,dist = c(50,50))
+splitdata <- splitData(chipProfile,dist = c(50,50),as.proportion = TRUE)
 
 trainingSet <- splitdata$trainingSet
 testingSet <- splitdata$testingSet
 ```
     
 ## Evolution 
+We can run the Genetic algorithm provided by ChIPanalyser using a single function. 
+The function  will generate intermediate files that allow you to check the status of the algorithm while it is running. 
+It should be noted that the intermediate files are updated at each generation. This method also provides a lambda database. 
+This allows for a faster run time on larger data sets as all values for lambda are pre-computed. 
 
+If you do not want intermediate files, set the `checkpoint` argument to `FALSE`.
 
+If you do not want to pre-compute lambda values, set the `lambda` argument to `FALSE`.
 
+For the purpose of this vignette, we will not save intermediate files.
+
+```{r evolve, eval = FALSE, echo = TRUE}
+evo <- evolve(population = pop,
+    DNASequenceSet = DNASequenceSet,
+    ChIPScore = trainingSet,
+    genomicProfiles = GPP,
+    parameters = params,
+    mutationProbability = mut,
+    generations = gen,
+    offsprings = child,
+    chromatinState = cs,
+    method = method,
+    filename = "This_TF_is_Best_TF",
+    checkpoint = TRUE,cores= 1)
+
+```
+
+The output of this function returns a list of 3 elements: 
+
+* *database* - a data frame with all parameters that have been computed through out each generation 
+* *poppulation* - list containing the last generated population 
+* *fitest* - list containing goodness of metric for best perfomring individuals
+
+## Fitest of them all 
+Once we have the best perfomring paramters, we can plug them into a single run of ChIPanalyser and use these parameters on a tesing set. 
+
+### Get fitest individual
+The first step is to extract the best performing individual and its associated traits from the population. 
+
+```{r getFit, echo = TRUE, eval = TRUE}
+SuperFit <- getHighestFitnessSolutions(evo$population,child=1,method=method)
+single<-evo[["population"]][SuperFit]
+```
+### Running ChIPanalyser with fitest individual
+We can use these parameters as input to the `singleRun` function to obtain the ChIP like profiles. This run represents the predicted run and 
+TF binding affinity of our TF of choice. 
+
+```{r singleRun, eval = TRUE, echo = TRUE}
+# Set chromatin states for single run - create CS Granges with affinity scores
+cs_single <- setChromatineStates(single,cs)[[1]]
+
+superFit <- singleRun(indiv = single,
+    DNAAffinity = cs_single,
+    genomicProfiles = GPP,
+    DNASequenceSet = DNASequenceSet,
+    ChIPScore = testingSet,
+    fitness = method)
+
+```
+
+This final sections returns a list containing 3 elements: 
+
+* *occupnacy* - genomicProfiles object containing occupancy scores for each region
+* *ChIP* - genomicProfiles object containing ChIP like scores for each region 
+* *gof* - goodness of fit scores for each regions and mean scores over all regions. 
+
+## Plotting 
 
     
