@@ -75,8 +75,7 @@ evolve <- function(population,DNASequenceSet,ChIPScore,
         #}
 
         ToBeComputedPop <- buffer[[3]]
-        print(paste("Comp ",length(ComputedPopulation)))
-        print(paste("New ",length(ToBeComputedPop)))
+        
 
 
 
@@ -119,18 +118,18 @@ evolve <- function(population,DNASequenceSet,ChIPScore,
 
 
 
-        print(paste("fitness",GenFit[i]))
+        message(paste0("Generation Fitness: ",GenFit[i]))
         ## checkpoint saving this is messy af
         # shame shame shame Patrick
         if(checkpoint){
             if(!is.null(filename)){
                 fileCheckPop<-paste0(filename,"_",method,"_OptimalOutputTraining_Generation_",i,".Rda")
                 fileCheckDB<-paste0(filename,"_",method,"_DatabaseTraining_Generation_",i,".Rda")
-                fileCheckFit<-paste0(filename,"_",method,"_MrOlympiaTraining_Generation_",i,".Rda")
+                fileCheckFit<-paste0(filename,"_",method,"_FittyMcFitFace_Training_Generation_",i,".Rda")
             }else{
                 fileCheckPop<-paste0(method,"_OptimalOutputTraining_Generation_",i,".Rda")
                 fileCheckDB<-paste0(method,"_DatabaseTraining_Generation_",i,".Rda")
-                fileCheckFit<-paste0(filename,"_",method,"_MrOlympiaTraining_Generation_",i,".Rda")
+                fileCheckFit<-paste0(,method,"_FittyMcFitFace_Training_Generation_",i,".Rda")
 
             }
             save(population,file=fileCheckPop)
@@ -141,11 +140,11 @@ evolve <- function(population,DNASequenceSet,ChIPScore,
                 if(!is.null(filename)){
                     fileCheckPop<-paste0(filename,"_",method,"_OptimalOutputTraining_Generation_",i-1,".Rda")
                     fileCheckDB<-paste0(filename,"_",method,"_DatabaseTraining_Generation_",i-1,".Rda")
-                    fileCheckFit<-paste0(filename,"_",method,"_MrOlympiaTraining_Generation_",i-1,".Rda")
+                    fileCheckFit<-paste0(filename,"_",method,"_FittyMcFitFace_Training_Generation_",i-1,".Rda")
                 }else{
                     fileCheckPop<-paste0(method,"_OptimalOutputTraining_Generation_",i-1,".Rda")
                     fileCheckDB<-paste0(method,"_DatabaseTraining_Generation_",i-1,".Rda")
-                    fileCheckFit<-paste0(filename,"_",method,"_MrOlympiaTraining_Generation_",i-1,".Rda")
+                    fileCheckFit<-paste0(method,"_FittyMcFitFace_Training_Generation_",i-1,".Rda")
 
 
                 }
@@ -172,7 +171,9 @@ evolve <- function(population,DNASequenceSet,ChIPScore,
     }
 
     ## When generation are over return databse and last population
-    return(list("database"=database,"population"=population,"Olympia"=GenFit))
+    return(list("database"=as.data.frame(apply(database,2,unlist)),
+                "population"=population,
+                "fitest"=GenFit))
 
 }
 
@@ -189,7 +190,7 @@ getHighestFitnessSolutions<-function(population,child=2,method="geometric"){
 
     ## We are just going to consider a interger value for children. we can add that option somewhere else
     ## in the create new pop function
-        print("getfit")
+        
         UFit<-unlist(sapply(population,"[[","fitness"))
 
         if(grepl("ks",method,ignore.case=T) |
@@ -249,12 +250,12 @@ singleRun <- function(indiv,DNAAffinity,
         } else {
             internalMethod <- fitness
         }
-        print("gof pre")
+       
         ## Goodness of fit
         GoF <- profileAccuracyEstimate(chip,ChIPScore,method=internalMethod)
 
 
-      return(list("Occupancy"=occup,"ChIP"=chip,"GoF"=GoF))
+      return(list("occupancy"=occup,"ChIP"=chip,"gof"=GoF))
 }
 
 

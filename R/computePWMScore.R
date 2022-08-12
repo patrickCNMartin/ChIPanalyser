@@ -75,7 +75,10 @@ computePWMScore <- function(genomicProfiles,DNASequenceSet,
         buffer <- .splitRanges(loci,cores)
         localSequence<-buffer$rangeSet
         cores<-buffer$cores
-        message("PWM Scores Extraction")
+        if(verbose){
+            message("PWM Scores Extraction")
+        }
+        
         ## Computing PWM Score above threshold
         Scores<-parallel::mclapply(localSequence,.internalPWMScoreExt,
             DNASequenceSet=DNASequenceSet,
@@ -87,7 +90,9 @@ computePWMScore <- function(genomicProfiles,DNASequenceSet,
 
 
     } else {
-        message("PWM Scores Extraction")
+        if(verbose){
+            message("PWM Scores Extraction")
+        }
         localSequence<-loci[which(width(loci)>2*ncol(PWM)+1)]
         ## Computing PWM Score above threshold
         Scores<-.internalPWMScoreExt(localSequence,
