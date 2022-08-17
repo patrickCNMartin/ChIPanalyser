@@ -227,7 +227,21 @@
 
 
 
-    return(list("colour"=colour,"density"=density,"border"=border,"lineType"=lineType,"lineWidth"=lineWidth,"fontsSizePlot"=fontsSizePlot,"fontsSizeAxis"=fontsSizeAxis,"lableOri"=lableOri,"main"=main,"xlab"=xlab,"ylab"=ylab,"xlim"=xlim,"ylim"=ylim,"xaxislabels"=xaxislabels,"track" =track))
+    return(list("colour"=colour,
+        "density"=density,
+        "border"=border,
+        "lineType"=lineType,
+        "lineWidth"=lineWidth,
+        "fontsSizePlot"=fontsSizePlot,
+        "fontsSizeAxis"=fontsSizeAxis,
+        "lableOri"=lableOri,
+        "main"=main,
+        "xlab"=xlab,
+        "ylab"=ylab,
+        "xlim"=xlim,
+        "ylim"=ylim,
+        "xaxislabels"=xaxislabels,
+        "track" =track))
 }
 
 
