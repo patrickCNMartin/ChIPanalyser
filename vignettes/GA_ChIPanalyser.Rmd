@@ -149,18 +149,19 @@ lambda ($\lambda$), the PWM Threshold and 11 different chromatin states.
 params <- c("N","lambda","PWMThreshold", paste0("CS",seq(1:11)))
 ```
 
-Alternatively, we can also set custom ranges for the parameters. 
-```{r opti_params2, class.source = 'fold-hide',eval = FALSE,echo= TRUE}
+Alternatively, we can also set custom ranges for the parameters.
+We will use custom ranges here to reduce computational time.
+```{r opti_params2,eval = FALSE,echo= TRUE}
 params_custom <- vector("list", 14)
 names(params_custom) <- c("N","lambda","PWMThreshold", paste0("CS",seq(1:11)))
 
 # vector in the format of min value, max value and number of values 
-params_custom$N <- c(1,100000,20)
+params_custom$N <- c(1,1000000,5)
 
-params_custom$lambda <- c(0.5,5,10)
+params_custom$lambda <- c(1,5,5)
 
 # Bound between 0 and 1 
-params_custom$PWMThreshold <- c(0,1,10)
+params_custom$PWMThreshold <- c(0.1,0.9,5)
 
 # Bound between 0 and 1 
 CS <- c(0,1,5)
@@ -176,15 +177,15 @@ The first step of any ChIPanalyser anaylsis is to create parameter object. These
 Here, we will load the PFM as PWM and compute the Base Pair Frequency from the DNASequenceSet. 
 
 ```{r gpp, eval = TRUE, echo = TRUE}
-GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw", BPFrequency=DNASequenceSet)
 
 ```
 
 ### Generating a starting population 
 For clairty, we will show what a starting population looks like. This step is not stricly required as the `evolve` function can take the 
-number of individuals in the poppulation (defined above by `pop`) and the parameters to be optimised (defined above by `params`).
+number of individuals in the poppulation (defined above by `pop`) and the parameters to be optimised (defined above by `params` or `params_custom`).
 ```{r generateStartingPopulation, class.source = 'fold-hide', eval = TRUE, echo = TRUE}
-start_pop <- generateStartingPopulation(pop, params)
+start_pop <- generateStartingPopulation(pop, params_custom)
 ```
 
 ### Pre-processing ChIP data
@@ -219,7 +220,7 @@ evo <- evolve(population = pop,
     DNASequenceSet = DNASequenceSet,
     ChIPScore = trainingSet,
     genomicProfiles = GPP,
-    parameters = params,
+    parameters = params_custom,
     mutationProbability = mut,
     generations = gen,
     offsprings = child,

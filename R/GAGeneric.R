@@ -18,11 +18,11 @@
 
 .initiateSol<-function(solutions,strict=TRUE){
     param<-names(solutions)
-
+   
     if(strict){
-        solutions<-mapply(.setStrictSoltions,solutions,param)
+        solutions<-mapply(.setStrictSoltions,solutions,param,SIMPLIFY = FALSE)
     } else {
-        solutions<-mapply(.setfluxRangeSolutions,solutions,param)
+        solutions<-mapply(.setfluxRangeSolutions,solutions,param,SIMPLIFY = FALSE)
 
     }
     return(solutions)
@@ -68,22 +68,18 @@
         grepl("Bound molecules",getName, ignore.case=T)|
         grepl("^N$",getName,ignore.case=T)){
             # getting random values between
-            solutions <- round(runif(solutions[3],solutions[1],solutions[2]))
-            solutions <- sort(solutions)
+            solutions <- round(seq(solutions[1],solutions[2],l = solutions[3]))
     } else if(grepl("ScalingFactor",getName,ignore.case=T)|
         grepl("Scaling Factor",getName,ignore.case=T)|
         grepl("lambda",getName,ignore.case=T)){
-            solutions <- round(runif(solutions[3],solutions[1],solutions[2]),2)
-            solutions <- sort(solutions)
+            solutions <- round(seq(solutions[1],solutions[2],l = solutions[3]),2)
     } else if(grepl("CS",getName,ignore.case=T)|
         grepl("DNAAccessibility",getName,ignore.case=T)|
         grepl("DNAAffinity",getName,ignore.case=T)){
-            solutions <- round(runif(solutions[3],solutions[1],solutions[2]),2)
-            solutions <- sort(solutions)
+            solutions <- round(seq(solutions[1],solutions[2],l = solutions[3]),2)
     } else if(grepl("PWMThreshold",getName,ignore.case=T)|
         grepl("PWM Threshold",getName,ignore.case=T)){
-            solutions <- round(runif(solutions[3],solutions[1],solutions[2]),2)
-            solutions <- sort(solutions)
+            solutions <- round(seq(solutions[1],solutions[2],l = solutions[3]),2)
     } else{
         warning("Unused list element in setStrictSoltuons input list")
     }
@@ -242,7 +238,7 @@
         pop<-lapply(pop,function(x){x<-parameters})
     }
     solutions<-.initiateGASolutions(pop)
-
+    
     ## mutating individuals
     # where and what to mutate
     mutation<-sample(seq_along(solutions[[1]]),size=1)
@@ -413,7 +409,9 @@
 
         ## check naming of pwmscore its a bit shit also you need to find a more elegant way to deal with it
         pwmScores <- computePWMScore(genomeWide,DNASequenceSet,ChIPScore,DNAAffinity, verbose=FALSE)
-
+        if(is.null(pwmScores)){
+            return(indiv)
+        }
 
 
         ## compute occupancy

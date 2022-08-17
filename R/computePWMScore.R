@@ -112,6 +112,9 @@ computePWMScore <- function(genomicProfiles,DNASequenceSet,
      lociDrop<-names(AccessibleSequence)[which(sapply(AccessibleSequence,length)==0)]
      if(length(lociDrop)!=0){
         .drop(genomicProfiles) <- lociDrop
+     } else if(length(lociDrop)==length(profiles(genomicProfiles))){
+        warning("All selected Loci dropped under current parameter selection - Returning NULL")
+        return(NULL)
      } else {
         .drop(genomicProfiles) <-"No loci dropped"
      }
