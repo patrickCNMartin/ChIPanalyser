@@ -31,7 +31,7 @@ PWMScores (or Occupancy), chromatin States, Goodness of Fit estimates and gene i
     }
     \item{asCS}{
     \code{asCS} is a logical defining if chromatinStates should be plotted as
-    accessibility data (Default FALSE) or if chromatine states should be plotted
+    accessibility data (Default FALSE) or if chromatin states should be plotted
     in seperate track.
     }
 

@@ -249,18 +249,19 @@ single<-evo[["population"]][SuperFit]
 ```
 ### Running ChIPanalyser with fitest individual
 We can use these parameters as input to the `singleRun` function to obtain the ChIP like profiles. This run represents the predicted run and 
-TF binding affinity of our TF of choice. 
+TF binding affinity of our TF of choice. We will set fitness to `all`. This means that the function will return all 
+goodness of fit metrics available. 
 
 ```{r singleRun, eval = TRUE, echo = TRUE}
 # Set chromatin states for single run - create CS Granges with affinity scores
-cs_single <- setChromatineStates(single,cs)[[1]]
+cs_single <- setChromatinStates(single,cs)[[1]]
 
 superFit <- singleRun(indiv = single,
     DNAAffinity = cs_single,
     genomicProfiles = GPP,
     DNASequenceSet = DNASequenceSet,
     ChIPScore = testingSet,
-    fitness = method)
+    fitness = "all")
 
 ```
 
@@ -271,5 +272,17 @@ This final sections returns a list containing 3 elements:
 * *gof* - goodness of fit scores for each regions and mean scores over all regions. 
 
 ## Plotting 
+Finally, we plot the resulting profiles.
 
+```{r plotOccup, eval = TRUE, echo = TRUE,fig.height= 10, fig.width=8,fig.show=TRUE}
+pdf("test.pdf",height=12,width=8.5)
+par(mfrow = c(5,1))
+plotOccupancyProfile(predictedProfile = superFit$ChIP,
+    ChIPScore = testingSet,
+    chromatinState = cs_single,
+    occupancy = superFit$occupancy,
+    goodnessOfFit = superFit$gof,
+    addLegend = TRUE)
+dev.off()
+```
     

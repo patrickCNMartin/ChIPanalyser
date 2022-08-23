@@ -29,7 +29,7 @@ Collate: 2AllS4Class_ProfileParameters.R
 	  computeGenomeWide.R
 	  parallelInternalFunctionsDev.R
 	  GenomicProfileGenericFunctions.R
-	  plotOccupancyDev.R
+	  plotOccupancy.R
 	  plotOptimalHeatMapDev.R
 	  DataPreprocessingDev.R
 	  DataPreprocessingGenericFunctionsDev.R
