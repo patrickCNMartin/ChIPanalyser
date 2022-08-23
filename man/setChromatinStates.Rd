@@ -1,14 +1,14 @@
-\name{setChromatineStates}
-\alias{setChromatineStates}
+\name{setchromatinStates}
+\alias{setchromatinStates}
 
 \title{
-setChromatineStates
+setchromatinStates
 }
 \description{
-\code{setChromatineStates} sets chromatin state affinity values to a GRanges object.
+\code{setchromatinStates} sets chromatin state affinity values to a GRanges object.
 }
 \usage{
-  setChromatineStates(population,chromatineStates)
+  setchromatinStates(population,chromatinStates)
 }
 
 \arguments{
@@ -16,7 +16,7 @@ setChromatineStates
     Population list containing all individuals and associated parameter. Must
     contain chromatin state affinity values. See \code{generateStartingPopulation}.
     }
-    \item{chromatineStates}{
+    \item{chromatinStates}{
     GRanges object containing chromatin state locations.
     }
 

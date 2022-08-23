@@ -21,7 +21,7 @@ evolve <- function(population,DNASequenceSet,ChIPScore,
 
       ## setting up chromatinState from starting population
     if(!is.null(chromatinState) & length(grep("cs",names(population[[1]]),ignore.case=T))>1){
-        CS <- setChromatineStates(population,chromatinState)
+        CS <- setChromatinStates(population,chromatinState)
     } else if(!is.null(chromatinState) & length(grep("cs",names(population[[1]]),ignore.case=T))==1){
         CS<-list(chromatinState)
     } else{
@@ -83,7 +83,7 @@ evolve <- function(population,DNASequenceSet,ChIPScore,
         if(length(ToBeComputedPop)!=0){
           ## re set Chromatin States
           if(!is.null(chromatinState) & length(grep("cs",names(ToBeComputedPop[[1]]),ignore.case=T))>1){
-              CS <- setChromatineStates(ToBeComputedPop,chromatinState)
+              CS <- setChromatinStates(ToBeComputedPop,chromatinState)
           } else if(!is.null(chromatinState) & length(grep("cs",names(ToBeComputedPop[[1]]),ignore.case=T))==1){
               CS<-list(chromatinState)
           } else{
@@ -207,7 +207,7 @@ getHighestFitnessSolutions<-function(population,child=2,method="geometric"){
 
 singleRun <- function(indiv,DNAAffinity,
     genomicProfiles,DNASequenceSet,
-    ChIPScore,fitness="geometric"){
+    ChIPScore,fitness="all"){
 
     if(length(indiv) ==1 & class(indiv)=="list"){
       indiv <- indiv[[1]]
@@ -259,38 +259,38 @@ singleRun <- function(indiv,DNAAffinity,
 }
 
 
-setChromatineStates <- function(population,chromatineStates){
+setChromatinStates <- function(population,chromatinStates){
     ## probably could do with some validity checks but thats for later
 
-    ## Let's assume that chromatine states come in the form as GRanges
+    ## Let's assume that chromatin states come in the form as GRanges
     ## same form as you ahve atm
 
     # Right for now this will just set the built affinities to a GRanges
     affinities<- lapply(population,function(x){x[grep(pattern="cs",names(x),ignore.case=T)]})
 
-    # selecting score in chromatine states GR
-    if(length(grep(x=chromatineStates$name,pattern="cs",ignore.case=T))<1){
+    # selecting score in chromatin states GR
+    if(length(grep(x=chromatinStates$name,pattern="cs",ignore.case=T))<1){
         stateNames<-
-        chromatineStates$name <- paste0("CS",chromatineStates$name)
+        chromatinStates$name <- paste0("CS",chromatinStates$name)
     }
     #### NOTE this is a problem! your CS that you are adding wont always match
     #### NEED to find a better way of assinging names. A more robust a universal way of doing it
     #### Run code as is for now BUT IT NEEDS TO BE CHANGED
-    chromatineStates<-chromatineStates[which(chromatineStates$name %in% names(affinities[[1]]))]
+    chromatinStates<-chromatinStates[which(chromatinStates$name %in% names(affinities[[1]]))]
     # Removing levels
-    chromatineStates<-GRanges(seqnames=as.character(seqnames(chromatineStates)),
-        ranges=IRanges(start(chromatineStates), end(chromatineStates)),
-        stateID=chromatineStates$name,
-        DNAaffinity=rep(0,length(chromatineStates)))
+    chromatinStates<-GRanges(seqnames=as.character(seqnames(chromatinStates)),
+        ranges=IRanges(start(chromatinStates), end(chromatinStates)),
+        stateID=chromatinStates$name,
+        DNAaffinity=rep(0,length(chromatinStates)))
 
     # reorder
-    states <- match(names(affinities[[1]]),unique(chromatineStates$stateID))
+    states <- match(names(affinities[[1]]),unique(chromatinStates$stateID))
     states <- names(affinities[[1]])[!is.na(states)]
 
     # replae affinity score in CS granges object
     GRStates<-vector("list", length(affinities))
     for(i in seq_along(GRStates)){
-        GRStates[[i]]<-chromatineStates
+        GRStates[[i]]<-chromatinStates
         for(j in states){
             GRStates[[i]]$DNAaffinity[which(GRStates[[i]]$stateID == j)] <- affinities[[i]][[which(names(affinities[[i]])==j)]]
         }

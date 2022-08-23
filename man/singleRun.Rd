@@ -20,7 +20,7 @@ evolve function.
     a list of length 1 containing another list with all parameter values.
     }
     \item{DNAAffinity}{
-    GRanges object as outputed by the \code{setChromatineStates}.
+    GRanges object as outputed by the \code{setchromatinStates}.
     }
     \item{genomicProfiles}{
     genomicProfiles object containing PWM scores and other desired metrics. Note
@@ -49,7 +49,7 @@ Second, using this index, subset top individual from GA population. Note this
 should be done using "[]" single bracket notation as, a list of length 1 containing
 another list with all parameter values is required for the next steps. Yes, this
 is might seem annoying but the functions were design for list structures...
-Third, setChromatineStates using the top individual list. This will add chromatin
+Third, setchromatinStates using the top individual list. This will add chromatin
 affinity values to your chromatinState GRanges. Use this new chromatinState object
 as your new chromatinState object.
 Fourth, parse your indiv list object to \code{singleRun}.
