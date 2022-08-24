@@ -68,22 +68,22 @@ data(ChIPanalyserData)
 # We recommend using the latest version of the genome 
 # Please ensure that all your data is aligned to the same version of the genome
 
-library(BSgenome.Dmelanogaster.UCSC.dm3)
+library(BSgenome.Dmelanogaster.UCSC.dm6)
 
-DNASequenceSet <-getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+DNASequenceSet <-getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 
 
 
 #Loading Position Frequency Matrix
 
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 
 #Checking if correctly loaded
 ls()
 
 ```
 The global environment should now contain a few new variables:
-DNASequenceSet, PFM, Access, geneRef, eveLocus, eveLocusChip.
+DNASequenceSet, PFM, Access, geneRef, top, chip.
 
 * `DNASequenceSet` is DNAStringSet extracted from the
 *Drosophila melanogaster* genome (BSgenome). It is advised to
@@ -101,10 +101,10 @@ the sequence above.
 * `geneRef` is a `GRanges` containing genetic information
 (exon, intron, 3'UTR, 5'UTR) for the sequence above.
 
-* `eveLocus` is a `GRanges` object with genomic postion for the eve strip
+* `top` is a `GRanges` object with genomic postion for the eve strip
 locus in *Drosophila melanogaster*.
 
-* `eveLocusChip` is a data frame with ChIP score in the format of a simple
+* `chip` is a data frame with ChIP score in the format of a simple
 bed file ( 4 columns : chromosome, start, end and score) for Bicoid
 transcription factor.
 
@@ -123,16 +123,16 @@ The package will maximise (or minimise) a goodness of fit metric between the pre
 If you have inferred or approximated the values to be assigned to $N$ and $\lambda$ by other means,
 skip this step and go directly to **Advanced Work**.
 
-`eveLocusChip` can be a connection to your ChIP data, a GRanges of your ChIP
+`chip` can be a connection to your ChIP data, a GRanges of your ChIP
 or data frame (_bed_ format style)
 `loci` is a GRanges object containing loci of interest. Default set as NULL
 (see **Advanced Work**)
 
 ```{r,eval=TRUE, warnings = FALSE}
-eveLocusChip<-processingChIP(profile=eveLocusChip,
-                              loci=eveLocus,
+chip<-processingChIP(profile=chip,
+                              loci=top,
                               cores=1)
-eveLocusChip
+chip
 ```
 The output of `processingChIP` returns a `ChIPScore` object containing
 extracted and normalised ChIP scores, your loci of interest and internal
@@ -169,7 +169,7 @@ and extracted/normalised experimental ChIP score (result of the `processingChIP`
 ## surpress dependency warnings
 optimal<-suppressWarnings(computeOptimal(genomicProfiles=GP,
                         DNASequenceSet=DNASequenceSet,
-                        ChIPScore=eveLocusChip,
+                        ChIPScore=chip,
                         chromatinState=Access))
 ```
 NOTE Default Optimal parameters are provided internally as the following:
@@ -227,7 +227,7 @@ function to produce predicted profile plots.
 
 ```{r, eval=TRUE,fig.width=12, fig.height=4.5}
 plotOccupancyProfile(predictedProfile=optimalParam$ChIPProfiles,
-                     ChIPScore=eveLocusChip,
+                     ChIPScore=chip,
                      chromatinState=Access,
                      occupancy=optimalParam$Occupancy,
                      goodnessOfFit=optimalParam$goodnessOfFit)
@@ -345,7 +345,7 @@ OP<-parameterOptions(lambdaPWM=seq(1,10,by=0.5),
 ## Computing ONLY Optimal Parameters and MSE as goodness Of Fit metric
 optimal<-computeOptimal(genomicProfiles=GP,
                         DNASequenceSet=DNASequenceSet,
-                        ChIPScore=eveLocusChip,
+                        ChIPScore=chip,
                         chromatinState=Access,
                         parameterOptions=OP,
                         optimalMethod="MSE",
@@ -354,7 +354,7 @@ optimal<-computeOptimal(genomicProfiles=GP,
 ### Computing ONLY Optimal Parameters and using Rank slection method
 optimal<-computeOptimal(genomicProfiles=GP,
                         DNASequenceSet=DNASequenceSet,
-                        ChIPScore=eveLocusChip,
+                        ChIPScore=chip,
                         chromatinState=Access,
                         parameterOptions=OP,
                         optimalMethod="all",
@@ -402,7 +402,7 @@ GW
 ## Computing PWM score above threshold
 pwm <- computePWMScore(genomicProfiles=GW,
                        DNASequenceSet=DNASequenceSet,
-                       loci=eveLocusChip,
+                       loci=chip,
                        chromatinState=Access)
 pwm
 ## Computing Occupancy of sites above threshold
@@ -412,11 +412,11 @@ occup
 ## Compute ChIP seq like profiles
 
 chip <- computeChIPProfile(genomicProfiles=occup,
-                            loci=eveLocusChip)
+                            loci=chip)
 chip
 ## Compute goodness Of Fit of model
 accu <- profileAccuracyEstimate(genomicProfiles=chip,
-                                ChIPScore=eveLocusChip)
+                                ChIPScore=chip)
 accu
 
 ```
@@ -433,7 +433,7 @@ Finally, you can plot your newly computed profiles.
 ```{r, eval=TRUE,fig.width=12, fig.height=4.5}
 
 plotOccupancyProfile(predictedProfile=chip,
-                     ChIPScore=eveLocusChip,
+                     ChIPScore=chip,
                      chromatinState=Access,
                      occupancy=occup,
                      goodnessOfFit=accu,

@@ -49,7 +49,7 @@ PLoS Genet.,2011, vol. 7 pg. e1001290
 
 }
 \author{
-Patrick C.N. Martin <pm16057@essex.ac.uk>
+Patrick C.N. Martin <pcnmartin@gmail.com>
 }
 
 \examples{

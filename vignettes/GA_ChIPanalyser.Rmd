@@ -69,8 +69,8 @@ library(ChIPanalyser)
 # Input data 
 data(ChIPanalyserData)
 # PFM Matrix 
-#PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
+
 
 ```
 
@@ -123,7 +123,7 @@ method <- "MSE"
 Please note that the parameters presented here are for the sake of the vignette. We recommend using the following parameters for a first 
 trial with your own data. Please be advised that these parameters will depend on the nature of the data you are using. 
 
-```{r GA_params, class.source = 'fold-hide' eval = FALSE, echo = TRUE}
+```{r GA_params_recom, class.source = 'fold-hide' ,eval = FALSE, echo = TRUE}
 # Number of individuals per generation 
 pop <- 100 
 
@@ -177,7 +177,7 @@ The first step of any ChIPanalyser anaylsis is to create parameter object. These
 Here, we will load the PFM as PWM and compute the Base Pair Frequency from the DNASequenceSet. 
 
 ```{r gpp, eval = TRUE, echo = TRUE}
-GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw", BPFrequency=DNASequenceSet)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
 
 ```
 
@@ -196,7 +196,7 @@ ChIP scores that will be used to train and test the model.
 chipProfile <- processingChIP(chip,loci = top)
 
 # Splitting data into training and testing
-# We recommend setting dist to 20/80. However, here we only have 2 loci. 
+# We recommend setting dist to 20/80. However, here we only have 4 loci. 
 splitdata <- splitData(chipProfile,dist = c(50,50),as.proportion = TRUE)
 
 trainingSet <- splitdata$trainingSet
@@ -274,8 +274,8 @@ This final sections returns a list containing 3 elements:
 ## Plotting 
 Finally, we plot the resulting profiles.
 
-```{r plotOccup, eval = TRUE, echo = TRUE,fig.height= 10, fig.width=8,fig.show=TRUE}
-pdf("test.pdf",height=12,width=8.5)
+```{r plotOccup, eval = TRUE, echo = TRUE,fig.height= 12, fig.width=10,fig.show=TRUE}
+pdf("test.pdf",height=12,width=10)
 par(mfrow = c(5,1))
 plotOccupancyProfile(predictedProfile = superFit$ChIP,
     ChIPScore = testingSet,

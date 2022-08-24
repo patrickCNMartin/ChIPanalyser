@@ -108,13 +108,17 @@ Returns a named list with three elements.
 
 }
 
+
+
 \author{
-Patrick C.N. Martin
+Patrick C.N. Martin <pcnmartin@gmail.com
 }
 
 
 \examples{
 
-#### To be added
+library(ChIPanalyser)
+data(ChIPanalyserData)
+# See GA vignette for usage 
 
 }

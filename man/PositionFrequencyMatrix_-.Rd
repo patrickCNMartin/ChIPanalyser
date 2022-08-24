@@ -55,7 +55,7 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>}
 #Loading data
 data(ChIPanalyserData)
 #Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #Building genomicProfiles object
 GPP<-genomicProfiles()
 #Setting PFM

@@ -46,7 +46,7 @@ Patrick C. N. Martin <p.martin@essex.ac.uk>
 #Data extraction
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 \donttest{
 if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){

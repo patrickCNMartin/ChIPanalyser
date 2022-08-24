@@ -36,12 +36,14 @@ Return the index of the top "child" solutions.
 }
 
 \author{
-Patrick C.N. Martin
+Patrick C.N. Martin <pcnmartin@gmail.com>
 }
 
 
 \examples{
 
-
+library(ChIPanalyser)
+data(ChIPanalyserData)
+# See GA vignette for usage 
 
 }

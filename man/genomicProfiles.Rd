@@ -39,6 +39,7 @@ Returns a \code{genomicsProfiles} object with updated slots for all paramters pa
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
 factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
+Patrick C.N. Martin and Nicolae Radu Zabe (2020) Dissecting the binding mechanisms of transcription factors to DNA using a statistical thermodynamics framework. CSBJ, 18, 3590-3605.
 }
 \author{
 Patrick C. N. Martin <pm16057@essex.ac.uk>
@@ -52,7 +53,7 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 
 }
 \examples{
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 genomicProfiles()
 genomicProfiles(PFM=PFM,PFMFormat="raw")
 }

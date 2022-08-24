@@ -1,14 +1,14 @@
-\name{setchromatinStates}
-\alias{setchromatinStates}
+\name{setChromatinStates}
+\alias{setChromatinStates}
 
 \title{
-setchromatinStates
+setChromatinStates
 }
 \description{
-\code{setchromatinStates} sets chromatin state affinity values to a GRanges object.
+\code{setChromatinStates} sets chromatin state affinity values to a GRanges object.
 }
 \usage{
-  setchromatinStates(population,chromatinStates)
+  setChromatinStates(population,chromatinStates)
 }
 
 \arguments{
@@ -41,7 +41,14 @@ Patrick C.N. Martin
 
 
 \examples{
+library(ChIPanalyser)
+# Input data 
+data(ChIPanalyserData)
 
+pop <- 10
+params <- c("N","lambda","PWMThreshold", paste0("CS",seq(1:11)))
+start_pop <- generateStartingPopulation(pop, params)
 
+cs <- setChromatinStates(start_pop,cs)
 
 }

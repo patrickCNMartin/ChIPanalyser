@@ -54,6 +54,7 @@ plotOccupancyProfile <- function(predictedProfile,
     ## Extracting chromatin states if present 
     if(!is.null(chromatinState)){
         chromaState <- .what.is.chromatinState(chromatinState,lociLocal)
+        states <- unique(unlist(sapply(chromaState,function(x){return(x$stateID)})))
         cs <- TRUE
     } else {
         cs <- FALSE
@@ -105,7 +106,7 @@ plotOccupancyProfile <- function(predictedProfile,
 
          ## Adding chromatin states 
         if(cs){
-            chroma <- .prepCS(chromaState[[i]],param)
+            chroma <- .prepCS(chromaState[[i]],states,param)
             .drawCS(chroma)
         }
 
@@ -178,11 +179,11 @@ plotOccupancyProfile <- function(predictedProfile,
     # Dispatch pred color 
     param$colPred <- ifelse(any(names(graph) == "colPred"),graph$colPred,"#E69F00")
     # Dispatch ChIPcolor 
-    param$colChIP <- ifelse(any(names(graph) == "colPred"),graph$colChIP,"#999999")
+    param$colChIP <- ifelse(any(names(graph) == "colChIP"),graph$colChIP,"#999999")
     # Dispatch occup color 
     param$colOccup <- ifelse(any(names(graph) == "colOccup"),graph$colChIP,"#56B4E9")
     # Dispatch CS color
-    param$colCS <- ifelse(any(names(graph) == "colPred"),
+    param$colCS <- ifelse(any(names(graph) == "colCS"),
         colorRampPalette(graph$colCS),
         colorRampPalette(c("#F0E442","#999999","#E69F00", "#56B4E9", "#009E73",
             "#0072B2", "#D55E00", "#CC79A7")))
@@ -195,10 +196,12 @@ plotOccupancyProfile <- function(predictedProfile,
         paste("Occupancy at Position",chr,paste(xlim[1],":",xlim[2],sep=""),sep=" "))
     # Dispatch ylab 
     param$ylab <- ifelse(any(names(graph) == "ylab"),graph$ylab," ")
+    # Dispatch Main 
+    param$main <- ifelse(any(names(graph) == "main"),graph$main," ")
     # Dispatch axis ticks 
-    param$axis <- ifelse(any(names(graph) == "n_axis_ticks"),
-        round(seq(from=xlim[1],to=xlim[2], length.out=n_axis_ticks)),
-        round(seq(from=xlim[1],to=xlim[2], length.out=10)))
+    param$n_axis_ticks <- ifelse(any(names(graph) == "n_axis_ticks"),
+        list(round(seq(from=xlim[1],to=xlim[2], length.out=graph$n_axis_ticks))),
+        list(round(seq(from=xlim[1],to=xlim[2], length.out=10))))
     
     return(param)
 
@@ -218,18 +221,18 @@ plotOccupancyProfile <- function(predictedProfile,
         xlab = "", ylab = "",
         ylim = param$ylim,
         xlim = param$xlim)
-    axis(side=BELOW<-1,at=param$axes,labels=param$axes,cex.axis=param$cex)
+    axis(side=BELOW<-1,at=param$n_axis_ticks[[1]],labels=param$n_axis_ticks[[1]],cex.axis=param$cex)
     title(xlab = param$xlab , cex.lab = param$cex.lab)
     title(ylab = param$ylab , cex.lab = param$cex.lab)
     title(main = param$main , cex = param$cex.main)
 }
 
-.prepCS <- function(CS, param){
+.prepCS <- function(CS,states, param){
     CS$y0 <- -0.3
     CS$y1 <- -0.1
     CS$density <- param$densityCS
-    col_local <- param$colCS(length(unique(CS$stateID)))
-    CS$col <- col_local[match(CS$stateID,unique(CS$stateID))]
+    col_local <- param$colCS(length(states))
+    CS$col <- col_local[match(CS$stateID,states)]
     return(CS)
 }
 
@@ -338,6 +341,16 @@ plotOccupancyProfile <- function(predictedProfile,
     }
 }
 
+.reorder <- function(cs){
+    
+    states <- unique(cs$stateID)
+    cols <- rep(NA,length(states))
+    for(i in seq_along(states)){
+        cols[i] <- unique(cs$col[cs$stateID == states[i]])
+    }
+    return(list("stateID" = states, "col" = cols))
+}
+
 .prepLegend <- function(chip,
     occup,
     cs,
@@ -372,7 +385,7 @@ plotOccupancyProfile <- function(predictedProfile,
     if(any(gof != "empty")){
         gof <- gof[[1]]
         tmp <- gof[names(gof) %in% c("MSE","AUC","pearson")]
-        leg$gof <- list("x" = param$xlim[1],
+        leg$gof <- list("x" = param$xlim[1] -((param$xlim[2] - param$xlim[1]) * 0.02),
         "y" = 0,
         "legend" = paste(paste(names(tmp),"=",signif(tmp,4)),collapse = "\n"),
         "col" = "black",
@@ -382,11 +395,12 @@ plotOccupancyProfile <- function(predictedProfile,
     }
     if(any(cs != "empty")){
         cs <- cs[[1]]
-        leg$cs <- list("x" = param$xlim[2] +((param$xlim[2] - param$xlim[1]) * 0.3),
-        "y" = 0.0,
-        "legend" = unique(cs$stateID),
+        cs <- .reorder(cs)
+        leg$cs <- list("x" = param$xlim[2] +((param$xlim[2] - param$xlim[1]) * 0.2),
+        "y" = 0.5,
+        "legend" = cs$stateID,
         "col" = NA,
-        "fill" = unique(cs$col),
+        "fill" = cs$col,
         "border" = NA,
         "cex" = param$cex)
     }
