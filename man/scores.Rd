@@ -42,8 +42,8 @@ Patrick C. N. Martin <p.martin@essex.ac.uk>
 # Loading data
 data(ChIPanalyserData)
 
-eveLocusChip<-processingChIP(eveLocusChip,eveLocus)
-str(scores(eveLocusChip))
+chip<-processingChIP(chip,top)
+str(scores(chip))
 
 
 

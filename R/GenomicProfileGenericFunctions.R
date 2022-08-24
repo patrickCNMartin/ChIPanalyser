@@ -1029,7 +1029,7 @@ searchSites <- function(Sites,lambdaPWM="all",
             start(tmp) <- pmax(start(tmp),start(lociLocal[i]))
             end(tmp) <- pmin(end(tmp),end(lociLocal[i]))
             if(ncol(mcols(tmp))==0){
-                tmp$stateID <- "Accessible DNA"
+                tmp$stateID <- "Inaccessible DNA"
             } else {
                 # Making sure that it is correctly named 
                 colnames(mcols(tmp))[1] <- "stateID"

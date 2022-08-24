@@ -11,8 +11,8 @@ PWMScores (or Occupancy), chromatin States, Goodness of Fit estimates and gene i
 }
 \usage{
   plotOccupancyProfile(predictedProfile, ChIPScore = NULL,chromatinState = NULL,
-      asCS = FALSE,occupancy = NULL,goodnessOfFit = NULL,PWM=FALSE,
-      geneRef = NULL,axis=TRUE,...)
+    occupancy = NULL,goodnessOfFit = NULL,PWM=FALSE,
+    geneRef = NULL,addLegend = TRUE,...)
 }
 
 \arguments{
@@ -29,11 +29,7 @@ PWMScores (or Occupancy), chromatin States, Goodness of Fit estimates and gene i
     \code{chromatinState} is a \code{\link[GenomicRanges]{GRanges}}
     containing accesible DNA sites or chromatin States.
     }
-    \item{asCS}{
-    \code{asCS} is a logical defining if chromatinStates should be plotted as
-    accessibility data (Default FALSE) or if chromatin states should be plotted
-    in seperate track.
-    }
+    
 
     \item{occupancy}{
     \code{occupancy} is a \code{\link[GenomicRanges]{GRanges}} or a \code{genomicProfiles}
@@ -53,41 +49,50 @@ PWMScores (or Occupancy), chromatin States, Goodness of Fit estimates and gene i
     containing gene information on exons,introns, UTR's, enhancers or any
     other genetic element to be plotted.
     }
-    \item{axis}{
-    \code{axis} is a logical value indicating if axes should be plotted or not.
+    \item{addLegend}{
+    \code{addLegend} is a logical value defining if the legend should be added.
+    The legend will add all elements provided. See details. 
     }
+    
     \item{...}{
-    Any other graphical Parameter of the following : col, density, border,
-    lty, lwd, cex, cex.axis, xlab, ylab, xlim, ylim, las and axislables.
-    Each Parameter will be parsed in the same order as the arguments to
-    this function. If the name of the argument is specified, the argument value
-    will be parsed to the correct internal plotting. See examples below
+    Any other graphical Parameter of the following : cex, cex.lab, cex.main, 
+    densityCS , densityGR , ylab, xlab, main, colPred,
+    colChIP, colOccup, colCS, colGR, n_axis_ticks. See details. 
     }
 
 }
 \details{
 Once the predicted ChIP-seq like profiles have been computed,
 it is possible to plot these profiles.
+
+This functions allows to control graphical parameters. In short:
+
+* col = color values - exact number of colors or colors that will 
+be used in a colorRampPalettte.
+
+* cex = font sizes - for text, axis labels and main 
+
+* Density = fill density for chromatin state and/or geneRef blocks
+
+Pred = predictedProfile
+ChIP = ChIP score (Experimental ChIP data)
+CS = Chromatin States
+GR = Gene reference 
+Occup = Occupnacy locations
 }
 \value{
 Returns a profile plot with "Occupancy" on the y axis and DNA position on
-the the X- axis. If the orange line is the predicted profile, the grey
-shaded area represents real ChIP-seq data. The yellow boxes represent
-regions on NON-accessible DNA. On the lower part of the plot, gene
-information is plotted with respect to the strand they are localised on.
-Finally, the blue vertical lines represent sites of either high Occupancy
-or high PWM score depending on which had been selected. The minimal plot
-will only contain the predicted profile.
-The more data is provided the more will be plotted.
-IMPORTANT: the colours described above represent the default colour values.
-If colours are provided by the user, they will be updated in plotting order or
-if the argument has been speicified assigned to said argument.
+the the X- axis.
+
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
-factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.}
+factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
+Patrick C.N. Martin and Nicolae Radu Zabe (2020) 
+Dissecting the binding mechanisms of transcription factors to DNA using a statistical thermodynamics framework. CSBJ, 18, 3590-3605.
+}
 \author{
-Patrick C.N. Martin <pm16057@essex.ac.uk>
+Patrick C.N. Martin <pcnmartin@gmail.com>
 }
 
 \examples{
@@ -95,7 +100,7 @@ Patrick C.N. Martin <pm16057@essex.ac.uk>
 #Data extraction
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 \donttest{
 if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
@@ -116,40 +121,30 @@ GenomeWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,
 #Compute PWM Scores
 PWMScores <- computePWMScore(DNASequenceSet = DNASequenceSet,
     genomicProfiles = GenomeWide,
-    loci = eveLocus, chromatinState = Access)
+    loci = top, chromatinState = Access)
 #Compute Occupnacy
 Occupancy <- computeOccupancy(genomicProfiles = PWMScores)
 
 #Compute ChIP profiles
-chipProfile <- computeChipProfile(loci = eveLocus,
+chipProfile <- computeChipProfile(loci = top,
     genomicProfiles = Occupancy)
 
 
 #Plotting Profile
 plotOccupancyProfile(predictedProfile=chipProfile,
-    ChIPScore = eveLocusChip,
+    ChIPScore = chip,
     chromatinState = Access,
     occupancy = Occupancy,
     geneRef =geneRef)
 
-## Changing graphical Parameters
-
-#### In this examples ####
-### predictedProfile will be red
-### chipProfile will be blue
-### and DNAAccessibility will be green
 plotOccupancyProfile(predictedProfile=chipProfile,
-    ChIPScore = eveLocusChip,
+    ChIPScore = chip,
     chromatinState = Access,
     occupancy = Occupancy,
-    geneRef =geneRef,col=c("red","blue","green"))
+    geneRef = geneRef,
+    colCS = c("red","blue"),
+    densityGR = 60)
 
-### If name is specified
-plotOccupancyProfile(predictedProfile=chipProfile,
-    ChIPScore = eveLocusChip,
-    chromatinState = Access,
-    occupancy = Occupancy,
-    geneRef =geneRef,col=c("DNAAccessibility"="red","blue","green"))
 
 }
 }

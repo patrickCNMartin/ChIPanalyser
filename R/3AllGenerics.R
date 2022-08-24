@@ -202,10 +202,10 @@ setGeneric(".paramTag<-",
 
 setGeneric("loci",
       function(object) standardGeneric("loci"))
-setGeneric("loci<-",
+setGeneric(".loci<-",
       function(object,value) standardGeneric("loci<-"))
 
 setGeneric("scores",
       function(object) standardGeneric("scores"))
-setGeneric("scores<-",
+setGeneric(".scores<-",
       function(object,value) standardGeneric("scores<-"))

@@ -486,8 +486,8 @@
 
 getTrainingData <- function(ChIPscore,loci = 1){
     train <- ChIPscore
-    scores(train) <- scores(train)[loci]
-    loci(train) <- loci(train)[loci]
+    .scores(train) <- scores(train)[loci]
+    .loci(train) <- loci(train)[loci]
    ## quick check to make sure it's not empty
     if(length(scores(train))<1){
         stop("Empty training set!")
@@ -497,8 +497,8 @@ getTrainingData <- function(ChIPscore,loci = 1){
 
 getTestingData <- function(ChIPscore,loci = 1){
     validation <- ChIPscore
-    scores(validation) <- scores(validation)[loci]
-    loci(validation) <- loci(validation)[loci]
+    .scores(validation) <- scores(validation)[loci]
+    .loci(validation) <- loci(validation)[loci]
     
     if(length(scores(validation))<1){
         stop("Empty validation set!")
@@ -506,7 +506,7 @@ getTestingData <- function(ChIPscore,loci = 1){
     return(validation)
 }
 
-splitData <- function(ChIPscore, dist = c(50,50), as.proportion = FALSE){
+splitData <- function(ChIPscore, dist = c(80,20), as.proportion = TRUE){
     locs <- length(scores(ChIPscore))
     if(locs <= 1){
         stop("Cannot split less than 2 loci!")

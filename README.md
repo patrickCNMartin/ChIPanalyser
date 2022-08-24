@@ -4,7 +4,7 @@
 ChIPanalyser: Predicting Transcription Factor Binding Sites
 
 ## Authors
-Patrick C.N. Martin <patrick.martin@bric.ku.dk>
+Patrick C.N. Martin <pcnmartin@gmail.com>
 
 and
 

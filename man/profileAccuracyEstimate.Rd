@@ -46,6 +46,7 @@ Returns list of goodness of fit metrics for each loci and each parameter selecte
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
 factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
+Patrick C.N. Martin and Nicolae Radu Zabe (2020) Dissecting the binding mechanisms of transcription factors to DNA using a statistical thermodynamics framework. CSBJ, 18, 3590-3605.
 }
 \author{
 Patrick C. N. Martin <pm16057@essex.ac.uk>
@@ -55,7 +56,7 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 #Data extraction
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 \donttest{
   if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
@@ -75,15 +76,15 @@ PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
 
   #Compute PWM Scores
   PWMScores <- computePWMScore(genomicProfiles = GenomeWide,
-       DNASequenceSet = DNASequenceSet, loci = eveLocus, chromatinState = Access)
+       DNASequenceSet = DNASequenceSet, loci = top, chromatinState = Access)
   #Compute Occupnacy
   Occupancy <- computeOccupancy(genomicProfiles = PWMScores)
 
   #Compute ChIP profiles
-  chipProfile <- computeChIPProfile(genomicProfiles=Occupancy,loci=eveLocus)
+  chipProfile <- computeChIPProfile(genomicProfiles=Occupancy,loci=top)
 #Estimating accuracy estimate
 AccuracyEstimate <- profileAccuracyEstimate(genomicProfiles = chipProfile,
-    ChIPScore = eveLocusChip,
+    ChIPScore = chip,
     occupancyProfileParameters = OPP)
 }
 }

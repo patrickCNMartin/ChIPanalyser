@@ -6,7 +6,7 @@ library("ChIPanalyser")
 
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 
 if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
@@ -86,7 +86,7 @@ load(file.path(path.package("ChIPanalyser"), "unitTests", "GPPWithPFM.rda"))
 #    "PWMScoreNoAccess.rda"))
 #    GPP <- genomicProfileParameters(PFM=PFM,BPFrequency=DNASequenceSet)
 #    GW <- computeGenomeWidePWMScore(DNASequenceSet,GPP)
-#    SAT <- computePWMScore(DNASequenceSet,GPP,eveLocus)
+#    SAT <- computePWMScore(DNASequenceSet,GPP,top)
 #    checkTrue(class(SAT)=="genomicProfileParameters")
 
     #checkTrue(is(AllSitesAboveThreshold(SAT), "GRangesList"),
@@ -103,7 +103,7 @@ load(file.path(path.package("ChIPanalyser"), "unitTests", "GPPWithPFM.rda"))
 #    "PWMScoreAccess.rda"))
 #    GPP <- genomicProfileParameters(PFM=PFM,BPFrequency=DNASequenceSet)
 #    GW <- computeGenomeWidePWMScore(DNASequenceSet,GPP,Access,GenomeWide=FALSE)
-#    SAT <- computePWMScore(DNASequenceSet,GPP,eveLocus,Access)
+#    SAT <- computePWMScore(DNASequenceSet,GPP,top,Access)
 #    checkTrue(class(SAT)=="genomicProfileParameters")
 
     #checkTrue(is(AllSitesAboveThreshold(SAT), "GRangesList"),
@@ -121,7 +121,7 @@ load(file.path(path.package("ChIPanalyser"), "unitTests", "GPPWithPFM.rda"))
 #    "OccupancyNoAccess.rda"))
 #    GPP <- genomicProfileParameters(PFM=PFM,BPFrequency=DNASequenceSet)
 #    GW <- computeGenomeWidePWMScore(DNASequenceSet,GPP)
-#    SAT <- computePWMScore(DNASequenceSet,GPP,eveLocus)
+#    SAT <- computePWMScore(DNASequenceSet,GPP,top)
 #    OPP <- occupancyProfileParameters()
 #    Occup <- computeOccupancy(SAT,OPP)
 #    checkTrue(class(Occup)=="genomicProfileParameters")
@@ -137,7 +137,7 @@ load(file.path(path.package("ChIPanalyser"), "unitTests", "GPPWithPFM.rda"))
 #    "OccupancyAccess.rda"))
 #    GPP <- genomicProfileParameters(PFM=PFM,BPFrequency=DNASequenceSet)
 #    GW <- computeGenomeWidePWMScore(DNASequenceSet,GPP)
-#    SAT <- computePWMScore(DNASequenceSet,GPP,eveLocus)
+#    SAT <- computePWMScore(DNASequenceSet,GPP,top)
 #    OPP <- occupancyProfileParameters()
 #    Occup <- computeOccupancy(SAT,OPP)
 #    checkTrue(class(Occup)=="genomicProfileParameters")

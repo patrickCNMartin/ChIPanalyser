@@ -11,7 +11,7 @@ evolve function.
 \usage{
   singleRun(indiv,DNAAffinity,
             genomicProfiles,DNASequenceSet,
-            ChIPScore,fitness="geometric")
+            ChIPScore,fitness="all")
 }
 
 \arguments{
@@ -66,12 +66,12 @@ Third element contains a goodness of fit metrics.
 }
 
 \author{
-Patrick C.N. Martin
+Patrick C.N. Martin <pcnmartin@gmail.com
 }
 
 
 \examples{
-
-
-
+library(ChIPanalyser)
+data(ChIPanalyserData)
+# See GA vignette for usage 
 }

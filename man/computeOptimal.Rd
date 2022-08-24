@@ -115,7 +115,7 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 #Data extraction
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 \donttest{
 if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
@@ -125,14 +125,14 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
     }
 library(BSgenome.Dmelanogaster.UCSC.dm6)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
-eveLocusChip<-processingChIP(eveLocusChip,eveLocus)
+chip<-processingChIP(chip,top)
 #Building data objects
 GPP <- genomicProfiles(PFM=PFM,BPFrequency=DNASequenceSet)
 OPP <- parameterOptions()
 #Computing Optimal set of Parameters
 optimalParam <- computeOptimal(genomicProfiles = GPP,
     DNASequenceSet = DNASequenceSet,
-    ChIPScore = eveLocusChip,
+    ChIPScore = chip,
     chromatinState = Access,
     parameterOptions = OPP,
     parameter = "all",
