@@ -57,7 +57,7 @@ Patrick C.N Martin <pm16057@essex.ac.uk>
   library(BSgenome.Dmelanogaster.UCSC.dm6)
   DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
   # Building genomicProfiles object
-  GPP <- genomicProfiles(PFM=PFM, BPFrequency=DNASequenceSet)
+  GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
 
 
   # Computing Genome Wide

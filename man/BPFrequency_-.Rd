@@ -87,7 +87,7 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
 library(BSgenome.Dmelanogaster.UCSC.dm6)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 # Building genomicProfiles object
-GPP <- genomicProfiles(PFM=PFM, BPFrequency=DNASequenceSet)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat = "JASPAR", BPFrequency=DNASequenceSet)
 # Updating BPFrequency
 ## !! Note!! BPFrequency is used to compute PWM from PFM
 ## IF updated after building GPP, then it will not influence PWM

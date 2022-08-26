@@ -25,13 +25,13 @@ PFMFormat(object) <- value
     \code{value} is character string of one of the following:
     "raw","transfac","JASPAR" or "sequences". If loading a
     \code{\link{PositionFrequencyMatrix}} from a file, the format
-    of the file should specified. Default is raw.
+    of the file should specified. Default is JASPAR.
     }
 }
 \details{
 If loading a
 \code{\link{PositionFrequencyMatrix}} from a file, the format
-of the file should be specified. Default is raw. Please keep in mind that
+of the file should be specified. Default is JASPAR. Please keep in mind that
 this argument is used when parsing the
 \code{\link{PositionFrequencyMatrix}} file. IF this argument is changed
 after building the \code{\link{genomicProfiles}} with
@@ -58,7 +58,7 @@ data(ChIPanalyserData)
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #Building data objects
 #### THIS IS THE PREFFERED METHOD FOR SETTING PFMFormat
-GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR")
 #Setting New value for PFMFormat
-PFMFormat(GPP) <- "raw"
+PFMFormat(GPP) <- "JASPAR"
 }

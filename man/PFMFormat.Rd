@@ -55,7 +55,7 @@ data(ChIPanalyserData)
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #Building data objects
 #### THIS IS THE PREFFERED METHOD FOR SETTING PFMFormat
-GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR")
 #Setting New value for PFMFormat
 PFMFormat(GPP)
 }

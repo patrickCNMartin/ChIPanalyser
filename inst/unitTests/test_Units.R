@@ -9,15 +9,15 @@ data(ChIPanalyserData)
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 
-if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
+if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
     if (!requireNamespace("BiocManager", quietly=TRUE))
         install.packages("BiocManager")
-    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
+    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm6")
 }
-library(BSgenome.Dmelanogaster.UCSC.dm3)
-DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+library(BSgenome.Dmelanogaster.UCSC.dm6)
+DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 
-load(file.path(path.package("ChIPanalyser"), "unitTests", "GPPWithPFM.rda"))
+
 # S4 Class testing
 
 #test_genomicProfileParametersBuild <- function(){

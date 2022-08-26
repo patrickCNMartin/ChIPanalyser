@@ -7,6 +7,7 @@ direc<-getwd()
 
 library(BSgenome.Dmelanogaster.UCSC.dm6)
 library(BSgenome)
+library(rtracklayer)
 library(RcppRoll)
 library(GenomicRanges)
 library(ROCR)
@@ -18,17 +19,19 @@ for (i in files) source(i)
 
 setwd(direc)
 ##
-load("BG3_modEncode_921_BEAF-32_5cat_reduce100MSEKingOfTheHilloutputValidation.Rda")
+load("/home/patrickmartin/ChIPanalyser/ChIPanalyserFinal/CS/BG3/BG3_modEncode_921_BEAF-32_5cat_reduce100MSEKingOfTheHilloutputValidation.Rda")
 
 
-#### top 10 Granges in that data set
+#### top 4 Granges in that data set
 top <- lapply(KingOfTheHill[[1]]@profiles[[1]][1:4], function(k){
       gr <- GRanges(seqnames = as.character(seqnames(k))[1L],
                     ranges = IRanges(start = start(k)[1L], end = end(k)[length(k)]))
 })
 top <- unlist(as(top, "GRangesList"))
 
-
+## GeneRef - geneRef downloaded from http://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/genes/
+geneRef <- import("/home/patrickmartin/ChIPanalyser/ChIPanalyserFinal/dm6.refGene.gtf.gz")
+geneRef <- subsetByOverlaps(geneRef, top)
 
 #### Getting Chip profile data for each of those regions
 chip <- import("/home/patrickmartin/ChIP/modEncode_BG3/modEncode/modEncode_921/signal_data_files/BEAF-32:Cell-Line=ML-DmBG3-c2#Developmental-Stage=Larvae-3rd-instar#Tissue=CNS-derived-cell-line:ChIP-chip:Rep-1::Dmel_r5.32:modENCODE_921:repset.4620429.smoothedM.bed")
@@ -42,4 +45,4 @@ cs <- subsetByOverlaps(cs, top)
 Access <- get(load("/home/patrickmartin/DNAaccess/cellAccess/BG3_DHS_005.Rda"))
 Access <- subsetByOverlaps(Access,top)
 
-save(top,chip,cs,Access, file = "/home/patrickmartin/ChIPanalyser/ChIPanalyserData.Rda")
+save(top,geneRef,chip,cs,Access, file = "/home/patrickmartin/ChIPanalyser/ChIPanalyserData.rda")

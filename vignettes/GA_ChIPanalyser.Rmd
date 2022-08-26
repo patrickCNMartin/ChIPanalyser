@@ -100,6 +100,8 @@ Essentially, this represents the binding affinity of our TF (here we are using B
 
 * *DNASequenceSet* - DNAStringSet containing the DNASequenceSet of the organism we are looking at. 
 
+* *geneRef* - GRanges object containing gene reference taken from the (Genome UCSC website)[https://genome.ucsc.edu/]
+
 ## Setting Parameters
 The next step consitst in setting initial parameters to run the genetic algorithm. 
 ```{r GA_params, eval = TRUE, echo = TRUE}
@@ -144,14 +146,14 @@ method <- "MSE"
 
 We can also define which parameters we wish to optimise. In this example, we will optimise the number of bound molecules ($N$),
 lambda ($\lambda$), the PWM Threshold and 11 different chromatin states. 
-```{r opti_params, eval = TRUE, echo = TRUE}
+```{r opti_params, eval = FALSE, echo = TRUE}
 # Parameters to optimised
 params <- c("N","lambda","PWMThreshold", paste0("CS",seq(1:11)))
 ```
 
 Alternatively, we can also set custom ranges for the parameters.
 We will use custom ranges here to reduce computational time.
-```{r opti_params2,eval = FALSE,echo= TRUE}
+```{r opti_params2,eval = TRUE,echo= TRUE}
 params_custom <- vector("list", 14)
 names(params_custom) <- c("N","lambda","PWMThreshold", paste0("CS",seq(1:11)))
 
@@ -215,7 +217,7 @@ If you do not want to pre-compute lambda values, set the `lambda` argument to `F
 
 For the purpose of this vignette, we will not save intermediate files.
 
-```{r evolve, eval = FALSE, echo = TRUE}
+```{r evolve, eval = TRUE, echo = TRUE}
 evo <- evolve(population = pop,
     DNASequenceSet = DNASequenceSet,
     ChIPScore = trainingSet,
@@ -227,7 +229,8 @@ evo <- evolve(population = pop,
     chromatinState = cs,
     method = method,
     filename = "This_TF_is_Best_TF",
-    checkpoint = TRUE,cores= 1)
+    checkpoint = FALSE,
+    cores= 1)
 
 ```
 
@@ -274,14 +277,15 @@ This final sections returns a list containing 3 elements:
 ## Plotting 
 Finally, we plot the resulting profiles.
 
-```{r plotOccup, eval = TRUE, echo = TRUE,fig.height= 12, fig.width=10,fig.show=TRUE}
-pdf("test.pdf",height=12,width=10)
-par(mfrow = c(5,1))
+```{r plotOccup, eval = TRUE, echo = TRUE,fig.height= 8, fig.width=15,fig.show=TRUE}
+pdf("test.pdf",height=8,width=15)
+par(mfrow = c(2,1))
 plotOccupancyProfile(predictedProfile = superFit$ChIP,
     ChIPScore = testingSet,
     chromatinState = cs_single,
     occupancy = superFit$occupancy,
     goodnessOfFit = superFit$gof,
+    geneRef = geneRef,
     addLegend = TRUE)
 dev.off()
 ```

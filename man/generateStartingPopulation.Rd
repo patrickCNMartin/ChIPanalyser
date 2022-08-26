@@ -62,8 +62,9 @@ param <- c("N","lambda","PWMThreshold","CS1","CS2","CS3")
 
 pop <- generateStartingPopulation(20,param, names = NULL)
 
-#paramValue <- list(c(10,1,1000),c(10,0,5),c(10,0,0.9),c(10,0,1),c(10,0,1),c(10,0,1))
+# by range 
+paramValue <- list(c(10,1,1000),c(10,0,5),c(10,0,0.9),c(10,0,1),c(10,0,1),c(10,0,1))
 
-#pop <- generateStartingPopulation(20,paramValue,names= param)
+pop <- generateStartingPopulation(20,paramValue,names= param)
 
 }

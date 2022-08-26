@@ -1,7 +1,7 @@
 \name{ChIPanalyserData}
 \alias{ChIPanalyserData}
 \alias{Access}
-
+\alias{cs}
 \alias{top}
 \alias{chip}
 \alias{geneRef}
@@ -32,8 +32,7 @@ loci, genetic information, DNA accessibility data and ChIP-seq data.
     \item{\code{chip}}{is a GRanges containing ChIP score of the eve
     strip locus in \emph{Drosophila melanogaster}. }
     \item{\code{geneRef}}{is a \code{\link[GenomicRanges]{GRanges}}
-    containing genetic information (exon, intron, 3'UTR, 5'UTR)
-    for the sequence described above.}
+    containing UCSC gene reference information}
     }
 
 }

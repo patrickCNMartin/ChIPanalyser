@@ -63,6 +63,7 @@ plotOccupancyProfile <- function(predictedProfile,
     ## Extracting geneRef if present 
     if(!is.null(geneRef)){
         genes <- .what.is.geneRef(geneRef,lociLocal)
+        types <- unique(unlist(sapply(genes,function(x){return(x$type)})))
         gr <- TRUE
     } else {
         gr <- FALSE
@@ -112,8 +113,8 @@ plotOccupancyProfile <- function(predictedProfile,
 
         ## Adding gene reference 
         if(gr){
-            genes <- .prepGR(genes[[i]],param)
-            .drawGeneRef(genes)
+            genelist <- .prepGR(genes[[i]],types,param)
+            .drawGeneRef(genelist)
         }
 
         if(addLegend){
@@ -122,6 +123,7 @@ plotOccupancyProfile <- function(predictedProfile,
                 occup = occup,
                 cs = ifelse(cs,list(chroma),"empty"),
                 gof = ifelse(gof,goodnessOfFitLocal[i],"empty"),
+                gr = ifelse(gr,list(genelist),"empty"),
                 param)
             .drawLegend(leg)
         }
@@ -156,13 +158,18 @@ plotOccupancyProfile <- function(predictedProfile,
     } else if(legend & !cs & !gof){
         param$xpd <- TRUE 
         param$mar <- c(6,2,4,10)
+    } else if(legend & !cs & geneRef){
+        param$xpd <- TRUE 
+        param$mar <- c(6,8,4,10)
     }
     ## Expanding ylim to have space for geneRef and/or CS
     if(cs & geneRef){
-        param$ylim <- c(-0.8,1)
-    }else if((cs & !geneRef) | (!cs & geneRef)){
+        param$ylim <- c(-1.2,1)
+    }else if((cs & !geneRef)){
         param$ylim <- c(-0.3,1)
-    }else{
+    }else if(!cs & geneRef){
+        param$ylim <- c(-0.9,1)
+    }else {
         param$ylim <-c(0,1)
     }
     # Adding xlims to param 
@@ -190,7 +197,7 @@ plotOccupancyProfile <- function(predictedProfile,
     # Dispatch Gene Ref color
     param$colGR <- ifelse(any(names(graph) == "colGR"),
         colorRampPalette(graph$colGR),
-        colorRampPalette(brewer.pal(8, "Blues")))
+        colorRampPalette(brewer.pal(8, "Accent")))
     # Dispatch xlab names 
     param$xlab <- ifelse(any(names(graph) == "xlab"),graph$xlab,
         paste("Occupancy at Position",chr,paste(xlim[1],":",xlim[2],sep=""),sep=" "))
@@ -280,81 +287,135 @@ plotOccupancyProfile <- function(predictedProfile,
     }
 }
 
-.prepGR <- function(gr, param){
-   elem <- c("chr",param$xlim[1],param$xlim[2],NA,NA,"line")
-   gr <- rbind(elem,gr)
-   colnames(gr) <- c("chr","x0","x1","width","strand","element")
+.prepGR <- function(gr, types,param){
+    elem<- data.frame("chr" = "chr",
+            "x0" = param$xlim[1],
+            "x1" = param$xlim[2],
+            "width" = param$xlim[2] - param$xlim[1],
+            "strand" = "*",
+            "type" = "line",
+            "gene_id" = "None")
+    if(!is.null(nrow(gr))){
+        colnames(gr) <- c("chr","x0","x1","width","strand","type","gene_id")
+        gr <- rbind(elem,gr)
+        
+    }else {
+        gr <- elem
+    }
+   
+   
    elemY0 <- param$ylim[1]
-   elemY0[is.na(gr$strand)] <- param$ylim[1] + 0.2
-   elemY0[gr$strand == "+"] <- param$ylim[1] + 0.3
-   elemY0[gr$strand == "-"] <- param$ylim[1] + 0.1
+   elemY0[gr$strand == "*"] <- param$ylim[1] + 0.35
+   elemY0[gr$strand == "+"] <- param$ylim[1] + 0.4
+   elemY0[gr$strand == "-"] <- param$ylim[1] + 0.15
 
    elemY1 <- param$ylim[1]
-   elemY1[is.na(gr$strand)] <- param$ylim[1] + 0.2
-   elemY1[gr$strand == "+"] <- param$ylim[1] + 0.35
-   elemY1[gr$strand == "-"] <- param$ylim[1] + 0.15
+   elemY1[gr$strand == "*"] <- param$ylim[1] + 0.35
+   elemY1[gr$strand == "+"] <- param$ylim[1] + 0.55
+   elemY1[gr$strand == "-"] <- param$ylim[1] + 0.3
 
    gr$y0 <- elemY0
    gr$y1 <- elemY1
 
    ## Setting colours 
-   ids <- match(gr$element,unique(gr$element))
-   gr$col <- param$colGR(length(unique(gr$element)))[ids]
-   gr$cex <-c(param$cex.lab,rep(gr$cex,nrow(gr)-1))
+   col_local <- param$colGR(length(types))
+   gr$col <- col_local[match(gr$type,types)]
+   
+   gr$cex <-c(param$cex.lab,(rep(gr$cex,nrow(gr)-1)*0.5))
    return(gr)
 }
 
+.getGeneStarts  <- function(gr){
+    genes <- gr[gr$type == "transcript",]
+    if(!is.null(nrow(genes))){
+       
+        genes <- split(genes, genes$gene_id)
+        genes <- lapply(genes,function(x)return(min(x$x0)))
+        return(genes)
+    }
+}
+
 .drawGeneRef  <- function(gr){
+    # getting start pos of GR 
+    genes <- .getGeneStarts(gr)
     for(seg in seq_len(nrow(gr))){
-        if(gr$element[seg] == "line"){
-            segments(gr$x0[seg],
-                gr$x1[seg],
-                gr$y0[seg],
-                col = gr$col[seg])
-            text(gr$x0[seg],
-                 gr$y0[seg] + 0.15,
+        
+        if(gr$type[seg] == "line"){
+            
+            lines(c(gr$x0[seg],gr$x1[seg]),
+                c(gr$y0[seg],gr$y0[seg]),
+                col = "black",
+                lwd=1)
+            text(gr$x1[seg] + gr$width[seg] * 0.015,
+                 gr$y0[seg] + 0.2,
                 "+",
-                col = gr$col[seg],
+                col = "black",
                 cex = gr$cex[seg])
-            text(gr$x1[seg],
-                gr$y1[seg] - 0.15,
+            text(gr$x1[seg] + gr$width[seg] * 0.015,
+                gr$y1[seg] - 0.2,
                 "-",
-                col = gr$col[seg],
+                col = "black",
                 cex = gr$cex[seg])
-        }else if(gr$element[seg] == "intron"){
-             segments(gr$x0[seg],
-                gr$x1[seg],
-                gr$y0[seg],
+        }else if(gr$type[seg] == "exon"){
+             lines(c(gr$x0[seg],gr$x1[seg]),
+                c(gr$y0[seg],gr$y0[seg]),
                 col = gr$col[seg])
+        } else if(gr$type[seg] == "transcript"){
+            rect(gr$x0[seg],
+                gr$y0[seg],
+                gr$x1[seg],
+                gr$y1[seg],
+                col = gr$col[seg])
+            loc <- genes[[gr$gene_id[seg]]]
+            if(loc == gr$x0[seg] & gr$strand[seg] == "-"){
+                text(gr$x0[seg],
+                gr$y0[seg] - 0.08,
+                gr$gene_id[seg],
+                col = "black",
+                cex = gr$cex[seg] * 0.5)
+            } else if(loc == gr$x0[seg] & gr$strand[seg] == "+"){
+                text(gr$x0[seg],
+                gr$y1[seg] + 0.08,
+                gr$gene_id[seg],
+                col = "black",
+                cex = gr$cex[seg] * 0.5)
+            }
+            
         } else {
             rect(gr$x0[seg],
                 gr$y0[seg],
                 gr$x1[seg],
                 gr$y1[seg],
                 col = gr$col[seg])
-            text(gr$x0[seg],
-                gr$y0[seg],
-                gr$element[seg],
-                pos = 4,
-                cex = gr$cex[seg])
+            
         }
     }
 }
 
-.reorder <- function(cs){
-    
-    states <- unique(cs$stateID)
-    cols <- rep(NA,length(states))
-    for(i in seq_along(states)){
-        cols[i] <- unique(cs$col[cs$stateID == states[i]])
+.reorder <- function(cs,dat = "cs"){
+    if(dat == "cs"){
+        states <- unique(cs$stateID)
+        cols <- rep(NA,length(states))
+        for(i in seq_along(states)){
+            cols[i] <- unique(cs$col[cs$stateID == states[i]])
+        }
+        return(list("stateID" = states, "col" = cols))
+    }else{
+        types <- unique(cs$type)
+        cols <- rep(NA,length(types))
+        for(i in seq_along(types)){
+            cols[i] <- unique(cs$col[cs$type == types[i]])
+        }
+        return(list("type" = types, "col" = cols))
     }
-    return(list("stateID" = states, "col" = cols))
+    
 }
 
 .prepLegend <- function(chip,
     occup,
     cs,
     gof,
+    gr,
     param){
     leg <- list()
     leg$pred <- list("x" = param$xlim[2],
@@ -386,7 +447,7 @@ plotOccupancyProfile <- function(predictedProfile,
         gof <- gof[[1]]
         tmp <- gof[names(gof) %in% c("MSE","AUC","pearson")]
         leg$gof <- list("x" = param$xlim[1] -((param$xlim[2] - param$xlim[1]) * 0.02),
-        "y" = 0,
+        "y" = 1,
         "legend" = paste(paste(names(tmp),"=",signif(tmp,4)),collapse = "\n"),
         "col" = "black",
         "fill" = NA,
@@ -395,7 +456,7 @@ plotOccupancyProfile <- function(predictedProfile,
     }
     if(any(cs != "empty")){
         cs <- cs[[1]]
-        cs <- .reorder(cs)
+        cs <- .reorder(cs,dat = "cs")
         leg$cs <- list("x" = param$xlim[2] +((param$xlim[2] - param$xlim[1]) * 0.2),
         "y" = 0.5,
         "legend" = cs$stateID,
@@ -403,6 +464,20 @@ plotOccupancyProfile <- function(predictedProfile,
         "fill" = cs$col,
         "border" = NA,
         "cex" = param$cex)
+    }
+    if(any(gr != "empty")){
+        gr <- gr[[1]]
+        gr <- gr[gr$type != "line",]
+        gr <- .reorder(gr,dat="gr")
+        leg$gr <- list("x" = param$xlim[1] -((param$xlim[2] - param$xlim[1]) * 0.2),
+        "y" = -0.3,
+        "legend" = gr$type,
+        "col" = NA,
+        xjust = 1,
+        "fill" = gr$col,
+        "border" = NA,
+        "cex" = param$cex)
+        
     }
     
     return(leg)
