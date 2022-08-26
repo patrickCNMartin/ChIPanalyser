@@ -100,7 +100,7 @@ library(BSgenome.Dmelanogaster.UCSC.dm6)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 
 #Building data objects
-GPP <- genomicProfiles(PFM=PFM,BPFrequency=DNASequenceSet)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR",BPFrequency=DNASequenceSet)
 OPP <- parameterOptions()
 # Computing Genome Wide
 GenomeWide <- computeGenomeWideScores(genomicProfiles = GPP,

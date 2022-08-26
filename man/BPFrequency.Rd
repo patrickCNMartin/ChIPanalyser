@@ -51,7 +51,7 @@ data(ChIPanalyserData)
 # path to Position Frequency Matrix
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 # Building genomicProfiles object
-GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR")
 #Extracting BPFrequency slot
 BPFrequency(GPP)
 }

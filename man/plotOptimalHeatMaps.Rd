@@ -76,7 +76,7 @@ library(BSgenome.Dmelanogaster.UCSC.dm6)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 
 #Building data objects
-GPP <- genomicProfiles(PFM=PFM,BPFrequency=DNASequenceSet)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR",BPFrequency=DNASequenceSet)
 
 #Computing Optimal set of Parameters
 optimalParam <- computeOptimal(genomicProfiles = GPP,

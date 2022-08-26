@@ -91,7 +91,7 @@ library(BSgenome.Dmelanogaster.UCSC.dm6)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 chip<-processingChIP(chip,top)
 #Building data objects
-GPP <- genomicProfiles(PFM=PFM,BPFrequency=DNASequenceSet)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR",BPFrequency=DNASequenceSet)
 
 
 # Computing Genome Wide

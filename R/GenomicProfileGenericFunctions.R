@@ -1050,8 +1050,8 @@ searchSites <- function(Sites,lambdaPWM="all",
            tmp <- gr[queryHits(findOverlaps(gr, lociLocal[i]))]
            start(tmp) <- pmax(start(tmp),start(lociLocal[i]))
            end(tmp) <- pmin(end(tmp),end(lociLocal[i]))
-           colnames(mcols(tmp))[1] <- "element"
-           grList[[i]] <- as.data.frame(tmp)
+           tmp <- as.data.frame(tmp)
+           grList[[i]] <- tmp[,c("seqnames","start","end","width","strand","type","gene_id")]
         }
     } else {
         stop("Oopss Somthing went wrong. Please provide GRanges for chromatinState")

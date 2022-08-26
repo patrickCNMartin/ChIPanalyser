@@ -55,7 +55,7 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 \examples{
 PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 genomicProfiles()
-genomicProfiles(PFM=PFM,PFMFormat="raw")
+genomicProfiles(PFM=PFM,PFMFormat="JASPAR")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
