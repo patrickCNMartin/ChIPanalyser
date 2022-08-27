@@ -1,0 +1,596 @@
+---
+title: "The ChIPanalyser User's Guide"
+author: "Patrick Martin"
+output:
+    pdf_document: null
+    keep_tex: yes
+    number_sections: no
+    html_document: default
+package: '`ChIPanalyser'''
+vignette: |
+    %\VignetteIndexEntry{ChIPanalyser User's Guide}
+    %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction - What is this package?
+ChIPanalyser provides a quick an easy method to predict and explain TF binding. The package uses a statistical thermodynamic framework to model the bidning of proteins to DNA.
+ChIPanalyser makes the assumption that the probability that any given sites along the genome is bound by a TF can be explained by four main factors: DNA accessibility, Binding energy, a scaling factor 
+modulating binding energy ($\lambda$) and number of TF bound ($N$) to DNA. Both $N$ and $\lambda$ are inferred internally by maximisng (or  minimising) a goodness of fit metric between 
+predictions and actual ChIP-data. The package will produce a ChIP like profile at a base pair level. As opposed to machine learning type frameworks, if these paramters are known by other means (experimentally), ChIPanalyser does require any training to produce ChIP like profiles. Estimated values can directly be plugged into the model. Furthermore, ChIPanalyser helps gain an understanding of the mechanims behind TF binding as described by (Zabet et al 2015 & Martin and Zabet 2019).
+
+# Methods - The Model
+
+As described above, ChIPAnalyser is based on an approximation of statistical
+thermodynamics. The core formula describing TF binding is given by :
+$$P(N,a,\lambda,\omega)_{j} = \frac{N \cdot a_{j} \cdot e^{(\frac{1}{\lambda}
+\cdot \omega_{j})}}{N \cdot a_{j} \cdot e^{(\frac{1}{\lambda}
+\cdot \omega_{j})}+ L \cdot n \cdot [a_{i} \cdot e^{(\frac{1}
+\lambda \cdot \omega_j)}]_ {i}} $$
+with
+
+* N , the number of TF molecules bound to DNA
+* a , DNA accessibility
+* $\lambda$ , a parameter scaling the specificity of a given TF
+* $\omega$ , a Position Weight Matrix.
+
+
+
+# Work Flow
+The next section will be split between the following subsections
+
+* **Loading Data** - Description of internal Data. We will use this data for our
+work flow example.
+* **Quick Start** - We will give quick start example. Only core functionalities
+and work flow will be described in this section.
+* **Advanced Work** - We will describe a more indepth work flow.
+* **Parameter Description** - We will give an in depth description of each
+parameter used in ChIPAnalyser
+
+## Loading Data
+
+Before going through the inner workings of the package and the work flow,
+this section will quickly demonstrate how to load example datasets
+stored in the package. This data represents a minimal workable examples for
+the different functions. All data is derived from real biological data
+in *Drosophila melanogaster* (The *Drosophila melanogaster*
+genome can be found as a `BSgenome` ).
+
+```{r, eval=TRUE, warnings = FALSE, echo=TRUE,message=FALSE}
+
+library(ChIPanalyser)
+
+#Load data
+data(ChIPanalyserData)
+
+
+# Loading DNASequenceSet from BSgenome object
+# We recommend using the latest version of the genome 
+# Please ensure that all your data is aligned to the same version of the genome
+
+library(BSgenome.Dmelanogaster.UCSC.dm6)
+
+DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
+
+
+
+#Loading Position Frequency Matrix
+
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
+
+#Checking if correctly loaded
+ls()
+
+```
+The global environment should now contain a few new variables:
+DNASequenceSet, PFM, Access, geneRef, top, chip.
+
+* `DNASequenceSet` is DNAStringSet extracted from the
+*Drosophila melanogaster* genome (BSgenome). It is advised to
+use a full genome sequence for this object.
+
+* `PFM` is a path to file. In this case, it is a Position Frequency Matrix
+derived from the Bicoid Transcription factor in *Drosophila melanogaster*in _RAW_ format.
+we provide loading support for JASPAR, Transfac and RAW. If you wish to use any other format,
+we suggest to use the MotifDb package (or load PFM as matrix into R) and parse the matrix to ChIPanalyser.
+In this scenario, `PFMFormat` argument should be set to _matrix_ (see below for more information).
+
+* `Access` is a `GRanges` object containing accessible DNA for
+the sequence above.
+
+* `geneRef` is a `GRanges` containing gene reference annotations. 
+
+* `top` is a `GRanges` object with 4 genomic regions containing BEAF-32 binding.
+
+* `chip` is a `GRanges` with ChIP score for the BEAF-32 Transcription Factor.
+
+**IMPORTANT:** Data sets provided in the package have been currated to meet the
+size requirements for Bioconductor packages. Please read the instruction below 
+carefully as we will describe how to incorportate your own data into the pipe line.
+
+**NOTE** You can download gene reference from (Genome UCSC website)[https://genome.ucsc.edu/]
+
+## Quick Start
+
+### Step 1 - Extracting Normalised ChIP scores from ChIP-seq datasets
+
+ChIPAnalyser requires ChIP data in order to infer the optimal set of values
+that will be assigned to bound Molecules and lambda.
+The package will maximise (or minimise) a goodness of fit metric between the predictions and ChIP data.
+
+If you have inferred or approximated the values to be assigned to $N$ and $\lambda$ by other means,
+skip this step and go directly to **Advanced Work**.
+
+`chip` can be a connection to your ChIP data, a GRanges of your ChIP
+or data frame (_bed_ format style)
+`loci` is a GRanges object containing loci of interest. Default set as NULL
+(see **Advanced Work**)
+
+```{r,eval=TRUE, warnings = FALSE}
+chip <- processingChIP(profile = chip,
+                      loci = top,
+                      cores = 1)
+chip
+```
+The output of `processingChIP` returns a `ChIPScore` object containing
+extracted and normalised ChIP scores, your loci of interest and internal
+parameters associated to the ChIP extractions process.
+
+### Step 2 - Computing a PWMs
+The model relies on a Postion Weight Matrix. `genomicProfiles` serve as a way
+of storing important paramters. More importantly, this object stores intermediate 
+results as you make your way through the analysis pipeline.
+
+From a Position Frequency Matrix:
+
+```{r, eval =TRUE}
+# PFMs are automatically converted to PWM when build genomicProfiles
+GP <- genomicProfiles(PFM = PFM, PFMFormat = "JASPAR")
+GP
+```
+
+From a Position Weight Matrix:
+
+```{r, eval=FALSE}
+GP <- genomicProfiles(PWM=PositionWeightMatrix)
+```
+
+### Step 3 - Computing Optimal Parameters
+As described above, ChIPanalyser infers the optimal combination of bound molecules
+and lambda that will maximise (or minimise) a goodness of fit metric.
+The following function computes the optimal set of parameters and returns intermediate steps of
+the analysis pipeline. To do so, we will be parsing the follwing: a DNA sequence,
+a Position Weight Matrix (contained in a genomicProfiles), chromatin States (Accessible DNA - This is optional), 
+and extracted/normalised experimental ChIP score (result of the `processingChIP` function).
+
+```{r,eval=TRUE,warnings=FALSE}
+## surpress dependency warnings
+optimal <- suppressWarnings(computeOptimal(genomicProfiles = GP,
+                        DNASequenceSet = DNASequenceSet,
+                        ChIPScore = chip,
+                        chromatinState = Access))
+```
+NOTE Default Optimal parameters are provided internally as the following:
+
+```{r, eval=TRUE, echo=TRUE}
+ ## Lambda Values
+ seq(0.25,5,by=0.25)
+
+ ## Bound Molecule Values
+ c(1, 10, 20, 50, 100,
+    200, 500,1000,2000, 5000,10000,20000,50000, 100000,
+    200000, 500000, 1000000)
+```
+
+NOTE To change these parameters see __Advanced Work__
+
+### Step 4 - Extracting Optimal Paramters (Prelim)
+Once computed, we will extract the optimal set of parameters.
+
+```{r, eval =T}
+optimalParam <- optimal$Optimal
+optimalParam$OptimalParameters
+```
+We can see the opitmal set of parameters suggested by ChIPanalyser.
+
+
+### Step 5 - Plotting Optimal Set of Parameters
+Despite ChIPanalyser returning suggested optimal parameters, you may wish to
+visualise the optimal parameters for each paramter combination and choose your
+own set of parameters. To this effect, we have implemented an Optimal parameter
+plotting fucntion.
+
+
+```{r, eval=TRUE, warnings = FALSE, fig.width=10, fig.height=8}
+# Plotting Optimal heat maps
+par(oma=c(0,0,3,0))
+layout(matrix(1:8,ncol=4, byrow=T),width=c(6,1.5,6,1.5),height=c(1,1))
+plotOptimalHeatMaps(optimalParam,layout=FALSE)
+
+```
+
+### Step 6 - Extracting Optimal Set of Parameters with associated data
+Once satisfied with your choice of optimal parameters, you can extracted the data
+associated to those parameters. You can select more that one parameter however 
+the values assigned to each argument must be one of the values used for computing the 
+optimal set of parameters. 
+
+```{r,eval=TRUE}
+optimalParam <- searchSites(optimal,lambdaPWM = 1.25,BoundMolecules = 10000)
+```
+
+### Step 7 - Plotting ChIP_seq like profiles
+The final step is to plot the computed predicted profiles. We provide a plotting
+function to produce predicted profile plots.
+
+```{r, eval=TRUE,fig.width=12, fig.height=4.5}
+plotOccupancyProfile(predictedProfile = optimalParam$ChIPProfiles,
+                     ChIPScore = chip,
+                     chromatinState = Access,
+                     occupancy = optimalParam$Occupancy,
+                     goodnessOfFit = optimalParam$goodnessOfFit,
+                     geneRef = geneRef)
+```
+
+## Advanced Work
+In this section we will describe a more in depth work flow. This will include
+parameter tweakin, annexe functions and some insights into the outputs of each functions.
+
+### Step 1 - Parameter Set Up
+Some parameters can be changed between each step of the pipeline. These parameters
+will enable you to tweak and improve the quality of your analysis.
+
+There are many parameters to choose from. These parameters already have default value assigned to them.
+
+```{r, eval =TRUE}
+## Suggested Parameters to start with.
+parameterOptions()
+
+## Changing parameters
+PO <- parameterOptions(noiseFilter="sigmoid",chipSd=150,chipMean=150,lociWidth=30000)
+```
+NOTE If you wish to do so, you can change all your parameters at this step.
+These parameters will be parsed through the different steps of the pipeline as long as you parse this object to each step of the analysis. 
+
+### Step 2 - Extracting Normalised ChIP scores.
+In some case you will not have a pre-determined idea of which loci you wish to look at.
+The `processingChIP` function offers a few possibilities to work around this issue.
+
+```{r,eval=FALSE}
+## Top 50 loci based on ChIP score
+processingChIP(profile = "/path/to/ChIP",
+               loci = NULL,
+               reduce = 50,
+               parameterOptions = PO)
+
+## Top 50 loci ALSO containing peaks
+processingChIP(profile = "/path/to/ChIP",
+               loci = NULL,
+               reduce = 50,
+               peaks = "/path/to/peaks",
+               parameterOptions=PO)
+
+## Top 50 loci containing BOTH peaks and Accessible DNA
+processingChIP(profile = "/path/to/ChIP",
+               loci = NULL,
+               reduce = 50,
+               peaks = "/path/to/peaks",
+               chromatinState = "/path/to/chromatinState",
+               parameterOptions = PO)
+
+```
+
+Loci will be computed internally based on the ChIP score provided. ChIP Scores will be tilled into bins of width equals to the value assigned to the `lociWidth`
+argument in the `parameterOptions` object (see above). The default loci width is set at
+20 kbp. Top regions are selected based on ordered ChIP scores.
+
+**Most genomic formats are supported by ChIPanalyser (wig, bed, bedGraph, bigWig, bigBed). The "path/to/file" may also be a GRanges object. **
+
+`processingChIP` function returns extracted/Normalised ChIP scores (list of numeric vectors), the loci of inetrest (GRanges), and associated paramters that have been extracted (such as maxSignal and backgroundSignal). The loci are the top _n_ regions as selected by the reduce argument. Using the `loci()` accessor applied on a ChIPScore object will return a GRanges of selected loci. The `scores()` accessors applied on a `ChIPScore` object will return the normalised scores associated to each Locus. 
+
+NOTE This function also supports multi core computing.
+
+### Step 3 - Position Weight Matrix and Associated Paramters
+Computing the PWM from PFMs can be tweaked by using some additional parameters.
+PWMs depend on Base Pair Frequency in the genome of interest. Either you can provide
+a vector containing the base pair frequency (A C T G in order) or the `genomicProfiles`
+object will compute it internally if you provide a BSgenome/DNAStringSet.
+
+```{r, eval=TRUE}
+str(genomicProfiles())
+
+GP <- genomicProfiles(PFM=PFM, PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
+GP
+```
+
+The `genomicProfiles` object also contains all parameters described
+in `parameterOptions`. This makes the parsing of parameters straight forward between each step of
+the analysis pipeline. The `genomicProfiles` object will be updated internally as you provided More
+parameters. This object will also be the main object that you will parse through each step of the analysis.
+There are a few different ways to add new paramters:
+
+```{r, eval=FALSE}
+## Parsing pre computed parameters (processingChIP function)
+GP <- genomicProfiles(PFM = PFM, 
+                     PFMFormat = "JASPAR",
+                     BPFrequency = DNASequenceSet,
+                     ChIPScore = ChIPScore)
+
+## Parsing pre assigned function (parameterOptions)
+parameterOptions <- parameterOptions(lambdaPWM = c(1,2,3),
+                                     boundMolecules = c(5,50,500))
+GP <- genomicProfiles(PFM = PFM, 
+                     PFMFormat = "JASPAR", 
+                     BPFrequency = DNASequenceSet,
+                     parameterOptions = parameterOptions)
+
+## Direct parameter assignement
+
+GP <- genomicProfiles(PFM = PFM, 
+                     PFMFormat = "JASPAR", 
+                     BPFrequency = DNASequenceSet, 
+                     lambdaPWM = c(1,2,3),
+                     boundMolecules = c(4,500,8000))
+```
+
+NOTE `parameterOptions` object can be parsed to any function of the analysis pipeline if parameters need to be changed along the way.
+
+### Step 4 - Computing Optimal Set of Parameters
+The optimal set of parameters can be computed on custom set of values for $N$ and $\lambda$. As described above, 
+there a few ways to modify parameter Options.  If you were to assign more than two values to both of these slots, these new values will be used as "Optimal Parameters Combinations".
+NOTE `parameterOptions` is inherited by `genomicProfiles` hence why you can also assign those paramters to the `genomicProfiles` contructor. 
+
+
+The `computeOptimal` function offers a few more options that we will briefly describe here.
+
+```{r, eval=FALSE}
+## Setting custom parameters
+OP <- parameterOptions(lambdaPWM = seq(1,10,by=0.5), 
+                      boundMolecules = seq(1,100000, length.out=20))
+
+## Computing ONLY Optimal Parameters and MSE as goodness Of Fit metric
+optimal <- computeOptimal(genomicProfiles = GP,
+                         DNASequenceSet = DNASequenceSet,
+                         ChIPScore = chip,
+                         chromatinState = Access,
+                         parameterOptions = OP,
+                         optimalMethod = "MSE",
+                         returnAll = FALSE)
+
+### Computing ONLY Optimal Parameters and using Rank slection method
+optimal <- computeOptimal(genomicProfiles = GP,
+                         DNASequenceSet = DNASequenceSet,
+                         ChIPScore = chip,
+                         chromatinState = Access,
+                         parameterOptions = OP,
+                         optimalMethod = "all",
+                         rank=TRUE)
+
+```
+
+When the `returnAll` argument is set to _FALSE_, only the optimal parameters Will
+be return. No internal Data will be returned.
+
+Optimal Parameters are determined by selecting the best perfomring combination of paremeters. The goodness of fit score for each combination is averaged over all regions considered. When the `rank` argument is set to _TRUE_, the optimal parameters will be based on which combination of parameters showed the best performance for each regions individually. Parameter combinations are ranked based on how many individual regions performed best with that specific set of parameters.
+
+Finally, `optimalMethod` argument will enbale you to selected the goodness Of Fit method you wish to use. 
+
+
+### Step 5 - Extracting and Plotting Optimal Parameters
+Now that you have selected custom parameters, you will want to plot the associated heat maps.
+
+```{r, eval=FALSE}
+## Extracted Optimal Parameters
+optimalParam <- optimal$Optimal
+
+## Plotting heat maps
+plotOptimalHeatMaps(optimalParam,overlay=TRUE)
+```
+
+It is possible to plot an overlay of the optimal set of paramters of all goodness Of Fit methods.
+Using the `overlay` argument in the plotting function will plot overlay the top 10% of optimal parameters as selected by each Goodness of fit metric. 
+
+### Step 6 - Computing individual parameter combinations
+Let's imagine that when looking at the optimal parameter heat maps, you would like to run a combination of parameters that is not in the ones that had been provided but you do not want to re-compute optimal parameters. Or Let us imagine that you have already an estimate of number of bound molecules. ChIPanalyser provides functions that will enable you to run the piple line on
+individual parameter combinations. The steps are described as following:
+
+```{r,eval=TRUE,warnings=FALSE}
+
+## Creating genomic Profiles object with PFMs and associated parameters
+GP <- genomicProfiles(PFM = PFM,
+                      PFMFormat = "JASPAR",
+                      BPFrequency = DNASequenceSet,
+                      lambdaPWM = 1, 
+                      boundMolecules = 58794)
+
+## Computing Genome Wide Score required
+GW <- computeGenomeWideScores(genomicProfiles = GP,
+                              DNASequenceSet = DNASequenceSet,
+                              chromatinState = Access)
+GW
+## Computing PWM score above threshold
+pwm <- computePWMScore(genomicProfiles = GW,
+                       DNASequenceSet = DNASequenceSet,
+                       loci = chip,
+                       chromatinState = Access)
+pwm
+## Computing Occupancy of sites above threshold
+
+occup <- computeOccupancy(genomicProfiles = pwm)
+occup
+## Compute ChIP seq like profiles
+
+pred <- computeChIPProfile(genomicProfiles = occup,
+                          loci = chip)
+pred
+## Compute goodness Of Fit of model
+accu <- profileAccuracyEstimate(genomicProfiles = pred,
+                                ChIPScore = chip)
+accu
+
+```
+
+NOTE These functions can compute multiple parameter combinations if needed. `computeOptimal`
+is essentially a combination of these functions with a little more magic to it.
+
+For more information on these functions see **Parameters Discription**
+
+### Step 7 - Plotting Single combination
+
+Finally, you can plot your newly computed profiles.
+
+```{r, eval=TRUE,fig.width=12, fig.height=4.5}
+
+plotOccupancyProfile(predictedProfile=pred,
+                     ChIPScore=chip,
+                     chromatinState=Access,
+                     occupancy=occup,
+                     goodnessOfFit=accu,
+                     geneRef=geneRef)
+```
+
+In this case we have also added a gene reference object. This object is a GRanges
+object containing the postion of various _genetic elements_ such as 3'UTR, 5'UTR, introns , etc
+
+NOTE `plotOccupancyProfile` offers the possibility to customise graphical parameters. Unfortunately, `plotOptimalHeatMaps` offers limited graphical parameter customisation.
+
+
+## Parameter Description 
+
+In the following section, we will describe the different parameters present in both `parameterOptions` and `genomicProfiles`. 
+Information concerning arguments to functions are described in the manual pages for each function. 
+
+As a reminder, here are the parameter options for the `parameterOptions` object. 
+Parameters are divided into different categories depending on when they are required internally.
+
+```{r, eval=TRUE,echo=TRUE}
+parameterOptions()
+```
+
+* **chipMean**: Average ChIP peak width. Peak width is used during the smoothing of ChIP data.
+* **chipSd**: Standard deviation of peak width. SD of peak width is used during the smoothing of ChIP data.
+* **chipSmooth**: Window width used for ChIP data smoothing.
+* **lociWidth**: When no loci are provided, ChIPanalyser will split ChIP data into bins of width equals to lociWidth.
+* **noiseFilter**: Noise filter applied to ChIP data. ChIPanalyser provides four filters (zero, mean, median and sigmoid).
+Zero assigns 0 to any score below zero. Mean  and median assign 0 to any score below the mean or median score. 
+Sigmoid applies a weight to each ChIP score based on a logistic distribution. Scores above the 95th quantile will be weighted 
+with a score between 1 and 2. Scores below the 95th quantile will be weighted with a score between 1 and 0.
+* **maxSignal**: Maximum ChIP score after normalisation. Required in later step of the analysis. However, this score is computed internally 
+and stored into the `ChIPscore` object , result of `processingChIP`.
+* **backgroundSignal**: Average ChIP score after normalisation. Required in later step of the analysis. However, this score is computed internally 
+and stored into the `ChIPscore` object , result of `processingChIP`.
+* **naturalLog**: Log transform to be applied to PFM to PWM conversion. If `TRUE`, natural log will be used otherwise log2 will be used.
+* **noOfSites**: Number of sites in the PWM that will be used for analysis. Default is set at "all" meaning all sites will be used. In the case 
+that this argument is changed, ChIPanalyser requires a numeric value describing the number of sites selected (from first site).
+* **PWMpseudocount**: Pseudo-count used during PFM to PWM conversion. 
+* **strandRule**: PWM score computation mode. `max` returns the highest PWM score regardless of strand. `sum` returns the sum of PWM scores over both strands.
+`mean` returns the average PWM score oer both strands. It should be noted that this argument is only relevant when both strands are considered. See below.
+* **whichstrand**: Strand that should be used for analysis. Options are: both `+-` or `-+`, plus only `+` or negative only `-`.
+* **lambdaPWM**: Value to be assigned to $\lambda$ . Positive numeric value. 
+* **ploidy**: Ploidy level of the organim used during analysis.
+* **boundMolecules**: Number of molecules used to run analysis. Positive numeric value. 
+
+As you can see, some of these parameters are used during multiple steps of the analysis. If these paremeters have been changed in either a `parameterOptions` object 
+or `genomicProfiles` object, please ensure that you parse these objects to each function. Each function will extract the values you have assigned to each parameter
+and use those values for analysis. It is possible to update, these parameters between each step of the analysis however, we recommend to set all parameters beforehand
+to avoid unwanted parameter mismatch.
+
+Next, we will describe the content of `genomicProfiles` objects. As a reminder, `genomicProfiles` object have the following structure:
+
+```{r, eval=T, echo=T}
+str(genomicProfiles())
+```
+
+As you can see, we are using the structure function to show all internal slots. The `genomicProfiles` object inherit from `parameterOptions`, 
+contain slots that are not user updatetable and finally the show method applied to `genomicProfiles` varies with each step of the analysis. 
+This is intended to reduce information overload when "looking" at an object. 
+
+* **PWM**: A Position Weight Matrix. Either directly user provided or will be built internally if a Position Frequency Matrix is provided. 
+* **PFM**: A Position Frequency Matrix. This argument can either be a path towards a file containing the PFM (RAW, JASPAR or Transfac format) 
+or a matrix with rows being A, C, T, G and columns being PFM sites. 
+* **PFMFormat**: Format of provided PFM. `PFMFormat` can be one of the following: RAW, JASPAR, transfac or matrix. Matrix format is used if the provided
+PFM is an R matrix. 
+* **BPFrequency**: Genome alphabet Frequency. This parameter can be user provided in the form of a numeric vector (Frequency of each base pair in the following order A, C, T, G).
+For convenience, ChIPanalyser will automatically compute genome wide base pair frequency if a `DNAStringSet` object or `BSgenome` object is provided to this argument. 
+* **minPWMScore**: minimum PWM score over entire genome. Internally updated.
+* **maxPWMScore**: maximum PWM score over entire genome. Internally updated.
+* **profiles**: Storage slot for PWM scores above threshold, Occupancy, ChIP like profiles and Goodness of Fit. This slot holds the results each step of the analysis. Updated internally.
+* **DNASequenceLength**: Length of DNA sequence used for analysis. Updated internally but can be provided by user. 
+* **averageExpPWMScore**: Average Exponetial PWM score. Updated Internally.
+* **drop**: Regions that did not contain any accessible DNA or did not contain sites above threshold. 
+
+All other parameters have either been explained above or are part of the internal working of the package. These parameters are mainly used to keep track of the advancement of the analysis 
+between each step. They should not be changed by user. 
+
+
+
+Finally, we provide a list of setter/getter functions for each slot:
+```{r, eval=F, echo=T}
+    ## Accessors and Setters for parameterOptions and genomicProfiles
+    avrageExpPWMScore(obj)
+    backgroundSignal(obj)
+    backgroundSignal(obj)<-value
+    boundMolecules(obj)
+    boundMolecules(obj)<-value
+    BPFrequency(obj)
+    BPFrequency(obj)<-value
+    chipMean(obj)
+    chipMean(obj)<-value
+    chipSd(obj)
+    chipSd(obj)<-value
+    chipSmooth(obj)
+    chipSmooth(obj)<-value
+    DNASequenceLength(obj)
+    drop(obj)
+    lambdaPWM(obj)
+    lambdaPWM(obj)<-value
+    lociWidth(obj)
+    lociWidth(obj)<-value
+    maxPWMScore(obj)
+    maxSignal(obj)
+    maxSignal(obj)<-value
+    minPWMScore(obj)
+    naturalLog(obj)
+    naturalLog(obj)<-value
+    noiseFilter(obj)
+    noiseFilter(obj)<-value
+    noOfSites(obj)
+    noOfSites(obj)<-value
+    PFMFormat(obj)
+    PFMFormat(obj)<-value
+    ploidy(obj)
+    ploidy(obj)<-value
+    PositionFrequencyMatrix(obj)
+    PositionFrequencyMatrix(obj)<-value
+    PositionWeightMatrix(obj)
+    PositionWeightMatrix(obj)<-value
+    profiles(obj)
+    PWMpseudocount(obj)
+    PWMpseudocount(obj)<-value
+    PWMThreshold(obj)
+    PWMThreshold(obj)<-value
+    removeBackground(obj)
+    removeBackground(obj)<-value
+    stepSize(obj)
+    stepSize(obj)<-value
+    strandRule(obj)
+    strandRule(obj)<-value
+    whichstrand(obj)
+    whichstrand(obj)<-value
+    ## ChIPScore slots accessors 
+    loci(obj)
+    scores(obj)
+```
+
+
+## Session Info 
+
+```{r,eval=T}
+sessionInfo()
+```
+
+
+## References
+
+Zabet NR, Adryan B (2015) Estimating binding properties of transcription
+factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
