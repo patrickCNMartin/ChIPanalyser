@@ -223,7 +223,7 @@ optimalParam <- searchSites(optimal,lambdaPWM = 1.25,BoundMolecules = 10000)
 The final step is to plot the computed predicted profiles. We provide a plotting
 function to produce predicted profile plots.
 
-```{r, eval=TRUE,fig.width=12, fig.height=4.5}
+```{r, eval=TRUE,fig.width=15, fig.height=8}
 plotOccupancyProfile(predictedProfile = optimalParam$ChIPProfiles,
                      ChIPScore = chip,
                      chromatinState = Access,
