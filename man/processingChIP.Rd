@@ -47,7 +47,7 @@ processingChIP(profile,loci=NULL,reduce=NULL,
     \item{chromatinState}{
     \code{chromatinState} is a \code{\link[GenomicRanges]{GRanges}} containing
     Accessible DNA or chromatin States If provided, regions will be selected only if they
-    contain accesible DNA.  Default=NULL
+    contain accessible DNA.  Default=NULL
     }
 
     \item{cores}{

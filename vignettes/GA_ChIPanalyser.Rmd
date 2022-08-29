@@ -278,7 +278,7 @@ This final sections returns a list containing 3 elements:
 Finally, we plot the resulting profiles.
 
 ```{r plotOccup, eval = TRUE, echo = TRUE,fig.height= 8, fig.width=15,fig.show=TRUE}
-pdf("test.pdf",height=8,width=15)
+
 par(mfrow = c(2,1))
 plotOccupancyProfile(predictedProfile = superFit$ChIP,
     ChIPScore = testingSet,
@@ -287,6 +287,6 @@ plotOccupancyProfile(predictedProfile = superFit$ChIP,
     goodnessOfFit = superFit$gof,
     geneRef = geneRef,
     addLegend = TRUE)
-dev.off()
+
 ```
     
