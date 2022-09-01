@@ -247,7 +247,9 @@ Once we have the best perfomring paramters, we can plug them into a single run o
 The first step is to extract the best performing individual and its associated traits from the population. 
 
 ```{r getFit, echo = TRUE, eval = TRUE}
-SuperFit <- getHighestFitnessSolutions(evo$population,child=1,method=method)
+SuperFit <- getHighestFitnessSolutions(evo$population, 
+    child = 1, 
+    method = method)
 single<-evo[["population"]][SuperFit]
 ```
 ### Running ChIPanalyser with fitest individual
