@@ -44,9 +44,9 @@ Patrick C.N. Martin <p.martin@essex.ac.uk>
 # Loading data
 data(ChIPanalyserData)
 #Loading PFM files
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #Building data objects
-GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR")
 
 # Loci with no acces - a warning message will be issued
 #if loci do no contain accesible DNA

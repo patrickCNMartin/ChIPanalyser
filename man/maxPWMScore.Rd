@@ -46,18 +46,18 @@ Patrick C. N. Martin <p.martin@essex.ac.uk>
 #Data extraction
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 \donttest{
-if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
+if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
     if (!requireNamespace("BiocManager", quietly=TRUE))
         install.packages("BiocManager")
-    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
+    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm6")
 }
-library(BSgenome.Dmelanogaster.UCSC.dm3)
-DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+library(BSgenome.Dmelanogaster.UCSC.dm6)
+DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 #Building data objects
-GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR")
 
 # Computing Genome Wide
 GenomeWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,

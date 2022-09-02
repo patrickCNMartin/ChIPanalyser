@@ -66,27 +66,28 @@ value for \code{BPFrequency}.
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
 factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
+Patrick C.N. Martin and Nicolae Radu Zabe (2020) Dissecting the binding mechanisms of transcription factors to DNA using a statistical thermodynamics framework. CSBJ, 18, 3590-3605.
 }
 \author{
-Patrick C.N. Martin <pm16057@essex.ac.uk>
+Patrick C.N. Martin <pcnmartin@gmail.com>
 }
 
 \examples{
 
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 \donttest{
-if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
+if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
     if (!requireNamespace("BiocManager", quietly=TRUE))
         install.packages("BiocManager")
-    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
+    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm6")
     }
-library(BSgenome.Dmelanogaster.UCSC.dm3)
-DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+library(BSgenome.Dmelanogaster.UCSC.dm6)
+DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 # Building genomicProfiles object
-GPP <- genomicProfiles(PFM=PFM, BPFrequency=DNASequenceSet)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat = "JASPAR", BPFrequency=DNASequenceSet)
 # Updating BPFrequency
 ## !! Note!! BPFrequency is used to compute PWM from PFM
 ## IF updated after building GPP, then it will not influence PWM

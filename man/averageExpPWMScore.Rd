@@ -37,16 +37,16 @@ Returns the \code{averageExpPWMScore} of a
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
 factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.}
 \author{
-Patrick C.N. Martin <pm16057@essex.ac.uk>
+Patrick C.N. Martin <pcnmartin@gmail.com>
 }
 
 \examples{
 # Accessing Data
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 # Building genomicProfiles object
-GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw")
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR")
 # Extracting AllSitesAboveThreshold slot
 averageExpPWMScore(GPP)
 

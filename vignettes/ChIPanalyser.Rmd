@@ -68,22 +68,22 @@ data(ChIPanalyserData)
 # We recommend using the latest version of the genome 
 # Please ensure that all your data is aligned to the same version of the genome
 
-library(BSgenome.Dmelanogaster.UCSC.dm3)
+library(BSgenome.Dmelanogaster.UCSC.dm6)
 
-DNASequenceSet <-getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 
 
 
 #Loading Position Frequency Matrix
 
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 
 #Checking if correctly loaded
 ls()
 
 ```
 The global environment should now contain a few new variables:
-DNASequenceSet, PFM, Access, geneRef, eveLocus, eveLocusChip.
+DNASequenceSet, PFM, Access, geneRef, top, chip.
 
 * `DNASequenceSet` is DNAStringSet extracted from the
 *Drosophila melanogaster* genome (BSgenome). It is advised to
@@ -98,19 +98,17 @@ In this scenario, `PFMFormat` argument should be set to _matrix_ (see below for 
 * `Access` is a `GRanges` object containing accessible DNA for
 the sequence above.
 
-* `geneRef` is a `GRanges` containing genetic information
-(exon, intron, 3'UTR, 5'UTR) for the sequence above.
+* `geneRef` is a `GRanges` containing gene reference annotations. 
 
-* `eveLocus` is a `GRanges` object with genomic postion for the eve strip
-locus in *Drosophila melanogaster*.
+* `top` is a `GRanges` object with 4 genomic regions containing BEAF-32 binding.
 
-* `eveLocusChip` is a data frame with ChIP score in the format of a simple
-bed file ( 4 columns : chromosome, start, end and score) for Bicoid
-transcription factor.
+* `chip` is a `GRanges` with ChIP score for the BEAF-32 Transcription Factor.
 
 **IMPORTANT:** Data sets provided in the package have been currated to meet the
 size requirements for Bioconductor packages. Please read the instruction below 
 carefully as we will describe how to incorportate your own data into the pipe line.
+
+**NOTE** You can download gene reference from (Genome UCSC website)[https://genome.ucsc.edu/]
 
 ## Quick Start
 
@@ -123,16 +121,16 @@ The package will maximise (or minimise) a goodness of fit metric between the pre
 If you have inferred or approximated the values to be assigned to $N$ and $\lambda$ by other means,
 skip this step and go directly to **Advanced Work**.
 
-`eveLocusChip` can be a connection to your ChIP data, a GRanges of your ChIP
+`chip` can be a connection to your ChIP data, a GRanges of your ChIP
 or data frame (_bed_ format style)
 `loci` is a GRanges object containing loci of interest. Default set as NULL
 (see **Advanced Work**)
 
 ```{r,eval=TRUE, warnings = FALSE}
-eveLocusChip<-processingChIP(profile=eveLocusChip,
-                              loci=eveLocus,
-                              cores=1)
-eveLocusChip
+chip <- processingChIP(profile = chip,
+                      loci = top,
+                      cores = 1)
+chip
 ```
 The output of `processingChIP` returns a `ChIPScore` object containing
 extracted and normalised ChIP scores, your loci of interest and internal
@@ -147,14 +145,14 @@ From a Position Frequency Matrix:
 
 ```{r, eval =TRUE}
 # PFMs are automatically converted to PWM when build genomicProfiles
-GP<-genomicProfiles(PFM=PFM,PFMFormat="raw")
+GP <- genomicProfiles(PFM = PFM, PFMFormat = "JASPAR")
 GP
 ```
 
 From a Position Weight Matrix:
 
 ```{r, eval=FALSE}
-GP<-genomicProfiles(PWM=PositionWeightMatrix)
+GP <- genomicProfiles(PWM=PositionWeightMatrix)
 ```
 
 ### Step 3 - Computing Optimal Parameters
@@ -167,10 +165,10 @@ and extracted/normalised experimental ChIP score (result of the `processingChIP`
 
 ```{r,eval=TRUE,warnings=FALSE}
 ## surpress dependency warnings
-optimal<-suppressWarnings(computeOptimal(genomicProfiles=GP,
-                        DNASequenceSet=DNASequenceSet,
-                        ChIPScore=eveLocusChip,
-                        chromatinState=Access))
+optimal <- suppressWarnings(computeOptimal(genomicProfiles = GP,
+                        DNASequenceSet = DNASequenceSet,
+                        ChIPScore = chip,
+                        chromatinState = Access))
 ```
 NOTE Default Optimal parameters are provided internally as the following:
 
@@ -190,7 +188,7 @@ NOTE To change these parameters see __Advanced Work__
 Once computed, we will extract the optimal set of parameters.
 
 ```{r, eval =T}
-optimalParam<-optimal$Optimal
+optimalParam <- optimal$Optimal
 optimalParam$OptimalParameters
 ```
 We can see the opitmal set of parameters suggested by ChIPanalyser.
@@ -218,19 +216,20 @@ the values assigned to each argument must be one of the values used for computin
 optimal set of parameters. 
 
 ```{r,eval=TRUE}
-optimalParam<-searchSites(optimal,lambdaPWM=1.25,BoundMolecules=10000)
+optimalParam <- searchSites(optimal,lambdaPWM = 1.25,BoundMolecules = 10000)
 ```
 
 ### Step 7 - Plotting ChIP_seq like profiles
 The final step is to plot the computed predicted profiles. We provide a plotting
 function to produce predicted profile plots.
 
-```{r, eval=TRUE,fig.width=12, fig.height=4.5}
-plotOccupancyProfile(predictedProfile=optimalParam$ChIPProfiles,
-                     ChIPScore=eveLocusChip,
-                     chromatinState=Access,
-                     occupancy=optimalParam$Occupancy,
-                     goodnessOfFit=optimalParam$goodnessOfFit)
+```{r, eval=TRUE,fig.width=15, fig.height=8}
+plotOccupancyProfile(predictedProfile = optimalParam$ChIPProfiles,
+                     ChIPScore = chip,
+                     chromatinState = Access,
+                     occupancy = optimalParam$Occupancy,
+                     goodnessOfFit = optimalParam$goodnessOfFit,
+                     geneRef = geneRef)
 ```
 
 ## Advanced Work
@@ -259,25 +258,25 @@ The `processingChIP` function offers a few possibilities to work around this iss
 
 ```{r,eval=FALSE}
 ## Top 50 loci based on ChIP score
-processingChIP(profile="/path/to/ChIP",
-               loci=NULL,
-               reduce=50,
-               parameterOptions=PO)
+processingChIP(profile = "/path/to/ChIP",
+               loci = NULL,
+               reduce = 50,
+               parameterOptions = PO)
 
 ## Top 50 loci ALSO containing peaks
-processingChIP(profile="/path/to/ChIP",
-               loci=NULL,
-               reduce=50,
-               peaks="/path/to/peaks",
+processingChIP(profile = "/path/to/ChIP",
+               loci = NULL,
+               reduce = 50,
+               peaks = "/path/to/peaks",
                parameterOptions=PO)
 
 ## Top 50 loci containing BOTH peaks and Accessible DNA
-processingChIP(profile="/path/to/ChIP",
-               loci=NULL,
-               reduce=50,
-               peaks="/path/to/peaks",
-               chromatinState="/path/to/chromatinState"
-               parameterOptions=PO)
+processingChIP(profile = "/path/to/ChIP",
+               loci = NULL,
+               reduce = 50,
+               peaks = "/path/to/peaks",
+               chromatinState = "/path/to/chromatinState",
+               parameterOptions = PO)
 
 ```
 
@@ -300,7 +299,7 @@ object will compute it internally if you provide a BSgenome/DNAStringSet.
 ```{r, eval=TRUE}
 str(genomicProfiles())
 
-GP <- genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet)
+GP <- genomicProfiles(PFM=PFM, PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
 GP
 ```
 
@@ -312,19 +311,26 @@ There are a few different ways to add new paramters:
 
 ```{r, eval=FALSE}
 ## Parsing pre computed parameters (processingChIP function)
-GP<-genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet,
-                    ChIPScore=ChIPScore)
+GP <- genomicProfiles(PFM = PFM, 
+                     PFMFormat = "JASPAR",
+                     BPFrequency = DNASequenceSet,
+                     ChIPScore = ChIPScore)
 
 ## Parsing pre assigned function (parameterOptions)
-parameterOptions<-parameterOptions(lambdaPWM=c(1,2,3),
-                                   boundMolecules=c(5,50,500))
-GP<-genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet,
-                    parameterOptions=parameterOptions)
+parameterOptions <- parameterOptions(lambdaPWM = c(1,2,3),
+                                     boundMolecules = c(5,50,500))
+GP <- genomicProfiles(PFM = PFM, 
+                     PFMFormat = "JASPAR", 
+                     BPFrequency = DNASequenceSet,
+                     parameterOptions = parameterOptions)
 
 ## Direct parameter assignement
 
-GP<-genomicProfiles(PFM=PFM, PFMFormat="raw", BPFrequency=DNASequenceSet, 
-                    lambdaPWM=c(1,2,3),boundMolecules=c(4,500,8000))
+GP <- genomicProfiles(PFM = PFM, 
+                     PFMFormat = "JASPAR", 
+                     BPFrequency = DNASequenceSet, 
+                     lambdaPWM = c(1,2,3),
+                     boundMolecules = c(4,500,8000))
 ```
 
 NOTE `parameterOptions` object can be parsed to any function of the analysis pipeline if parameters need to be changed along the way.
@@ -339,26 +345,26 @@ The `computeOptimal` function offers a few more options that we will briefly des
 
 ```{r, eval=FALSE}
 ## Setting custom parameters
-OP<-parameterOptions(lambdaPWM=seq(1,10,by=0.5), 
-                     boundMolecules=seq(1,100000, length.out=20))
+OP <- parameterOptions(lambdaPWM = seq(1,10,by=0.5), 
+                      boundMolecules = seq(1,100000, length.out=20))
 
 ## Computing ONLY Optimal Parameters and MSE as goodness Of Fit metric
-optimal<-computeOptimal(genomicProfiles=GP,
-                        DNASequenceSet=DNASequenceSet,
-                        ChIPScore=eveLocusChip,
-                        chromatinState=Access,
-                        parameterOptions=OP,
-                        optimalMethod="MSE",
-                        returnAll=FALSE)
+optimal <- computeOptimal(genomicProfiles = GP,
+                         DNASequenceSet = DNASequenceSet,
+                         ChIPScore = chip,
+                         chromatinState = Access,
+                         parameterOptions = OP,
+                         optimalMethod = "MSE",
+                         returnAll = FALSE)
 
 ### Computing ONLY Optimal Parameters and using Rank slection method
-optimal<-computeOptimal(genomicProfiles=GP,
-                        DNASequenceSet=DNASequenceSet,
-                        ChIPScore=eveLocusChip,
-                        chromatinState=Access,
-                        parameterOptions=OP,
-                        optimalMethod="all",
-                        rank=TRUE)
+optimal <- computeOptimal(genomicProfiles = GP,
+                         DNASequenceSet = DNASequenceSet,
+                         ChIPScore = chip,
+                         chromatinState = Access,
+                         parameterOptions = OP,
+                         optimalMethod = "all",
+                         rank=TRUE)
 
 ```
 
@@ -375,7 +381,7 @@ Now that you have selected custom parameters, you will want to plot the associat
 
 ```{r, eval=FALSE}
 ## Extracted Optimal Parameters
-optimalParam<-optimal$Optimal
+optimalParam <- optimal$Optimal
 
 ## Plotting heat maps
 plotOptimalHeatMaps(optimalParam,overlay=TRUE)
@@ -391,32 +397,35 @@ individual parameter combinations. The steps are described as following:
 ```{r,eval=TRUE,warnings=FALSE}
 
 ## Creating genomic Profiles object with PFMs and associated parameters
-GP <- genomicProfiles(PFM=PFM,PFMFormat="raw",BPFrequency=DNASequenceSet,
-                      lambdaPWM=1, boundMolecules=58794)
+GP <- genomicProfiles(PFM = PFM,
+                      PFMFormat = "JASPAR",
+                      BPFrequency = DNASequenceSet,
+                      lambdaPWM = 1, 
+                      boundMolecules = 58794)
 
 ## Computing Genome Wide Score required
-GW <- computeGenomeWideScores(genomicProfiles=GP,
-                              DNASequenceSet=DNASequenceSet,
-                              chromatinState=Access)
+GW <- computeGenomeWideScores(genomicProfiles = GP,
+                              DNASequenceSet = DNASequenceSet,
+                              chromatinState = Access)
 GW
 ## Computing PWM score above threshold
-pwm <- computePWMScore(genomicProfiles=GW,
-                       DNASequenceSet=DNASequenceSet,
-                       loci=eveLocusChip,
-                       chromatinState=Access)
+pwm <- computePWMScore(genomicProfiles = GW,
+                       DNASequenceSet = DNASequenceSet,
+                       loci = chip,
+                       chromatinState = Access)
 pwm
 ## Computing Occupancy of sites above threshold
 
-occup <- computeOccupancy(genomicProfiles=pwm)
+occup <- computeOccupancy(genomicProfiles = pwm)
 occup
 ## Compute ChIP seq like profiles
 
-chip <- computeChIPProfile(genomicProfiles=occup,
-                            loci=eveLocusChip)
-chip
+pred <- computeChIPProfile(genomicProfiles = occup,
+                          loci = chip)
+pred
 ## Compute goodness Of Fit of model
-accu <- profileAccuracyEstimate(genomicProfiles=chip,
-                                ChIPScore=eveLocusChip)
+accu <- profileAccuracyEstimate(genomicProfiles = pred,
+                                ChIPScore = chip)
 accu
 
 ```
@@ -432,8 +441,8 @@ Finally, you can plot your newly computed profiles.
 
 ```{r, eval=TRUE,fig.width=12, fig.height=4.5}
 
-plotOccupancyProfile(predictedProfile=chip,
-                     ChIPScore=eveLocusChip,
+plotOccupancyProfile(predictedProfile=pred,
+                     ChIPScore=chip,
                      chromatinState=Access,
                      occupancy=occup,
                      goodnessOfFit=accu,
@@ -554,7 +563,7 @@ Finally, we provide a list of setter/getter functions for each slot:
     PositionFrequencyMatrix(obj)
     PositionFrequencyMatrix(obj)<-value
     PositionWeightMatrix(obj)
-    PositionWeightMatrix<-value
+    PositionWeightMatrix(obj)<-value
     profiles(obj)
     PWMpseudocount(obj)
     PWMpseudocount(obj)<-value
@@ -562,14 +571,12 @@ Finally, we provide a list of setter/getter functions for each slot:
     PWMThreshold(obj)<-value
     removeBackground(obj)
     removeBackground(obj)<-value
-    
     stepSize(obj)
     stepSize(obj)<-value
     strandRule(obj)
     strandRule(obj)<-value
     whichstrand(obj)
-    whichstrand(obj)<-value 
-    
+    whichstrand(obj)<-value
     ## ChIPScore slots accessors 
     loci(obj)
     scores(obj)

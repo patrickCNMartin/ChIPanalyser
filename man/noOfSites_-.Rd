@@ -38,6 +38,7 @@ value for the \code{noOfSites} slot.
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
 factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
+Patrick C.N. Martin and Nicolae Radu Zabe (2020) Dissecting the binding mechanisms of transcription factors to DNA using a statistical thermodynamics framework. CSBJ, 18, 3590-3605.
 }
 \author{
 Patrick C.N. Martin <p.martin@essex.ac.uk>

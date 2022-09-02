@@ -45,7 +45,8 @@ computeOccupancy <- function(genomicProfiles ,
     ## Also you just return a big fat falt line anyway
 
     dropLoci<-drop(genomicProfiles)
-    if(dropLoci!="No loci dropped"){
+
+    if(length(grep("No loci dropped",dropLoci))==0){
       widthDisplay<-round(options()$width*0.5)
       cat("No Accessible DNA in: ",paste(rep(" ",
          times=(widthDisplay-nchar("StepSize: ")-nchar(dropLoci[1]))),collapse=''),
@@ -104,7 +105,7 @@ computeOccupancy <- function(genomicProfiles ,
             buffer <- unlist(PWMGRList)
 
             buffer$Occupancy <- Occupancy
-            if(dropLoci!="No loci dropped"){
+            if(length(grep("No loci dropped",dropLoci))==0){
                buffer<-c(buffer,LocalDrop)
             }
     # Extracting and pasting names of Parameters

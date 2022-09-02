@@ -521,12 +521,22 @@ searchSites <- function(Sites,lambdaPWM="all",
 }
 
 ### Extracting Non Accesible DNA
-.AccessExtract<-function(subject,query){
+.AccessExtract<-function(subject,query,isCS=FALSE){
     setLocal<-vector("list",length(subject))
 
     for(i in seq_along(subject)){
         localIntersect<-setdiff(subject[i], query)
-        setLocal[[i]]<-data.frame("chr"=as.character(seqnames(localIntersect)),"start"=start(localIntersect), "end"=end(localIntersect))
+        if(isCS){
+          setLocal[[i]]<-data.frame("chr"=as.character(seqnames(localIntersect)),
+                                    "start"=start(localIntersect),
+                                    "end"=end(localIntersect),
+                                    "CS" = mcols(localIntersect)[,1])
+        }else {
+          setLocal[[i]]<-data.frame("chr"=as.character(seqnames(localIntersect)),
+                                    "start"=start(localIntersect),
+                                    "end"=end(localIntersect))
+        }
+
     }
     names(setLocal)<-names(subject)
     return(setLocal)
@@ -1007,4 +1017,44 @@ searchSites <- function(Sites,lambdaPWM="all",
       } else{
          stop("Oops Somthing went wrong. We are not sure what your are parsing to predictedProfile")
       }
+}
+
+.what.is.chromatinState <- function(cs,lociLocal){
+    
+    if(class(cs) == "GRanges"){
+        csList <- list()
+        for(i in seq_along(lociLocal)){
+            tmp <- cs[queryHits(findOverlaps(cs, lociLocal[i]))]
+           
+            start(tmp) <- pmax(start(tmp),start(lociLocal[i]))
+            end(tmp) <- pmin(end(tmp),end(lociLocal[i]))
+            if(ncol(mcols(tmp))==0){
+                tmp$stateID <- "Inaccessible DNA"
+            } else {
+                # Making sure that it is correctly named 
+                colnames(mcols(tmp))[1] <- "stateID"
+            }
+            csList[[i]] <- as.data.frame(tmp)
+            
+        }
+    } else {
+        stop("Oopss Somthing went wrong. Please provide GRanges for chromatinState")
+    }
+    return(csList)
+}
+
+.what.is.geneRef <- function(gr,lociLocal){
+    if(class(gr) == "GRanges"){
+        grList <- list()
+        for(i in seq_along(lociLocal)){
+           tmp <- gr[queryHits(findOverlaps(gr, lociLocal[i]))]
+           start(tmp) <- pmax(start(tmp),start(lociLocal[i]))
+           end(tmp) <- pmin(end(tmp),end(lociLocal[i]))
+           tmp <- as.data.frame(tmp)
+           grList[[i]] <- tmp[,c("seqnames","start","end","width","strand","type","gene_id")]
+        }
+    } else {
+        stop("Oopss Somthing went wrong. Please provide GRanges for chromatinState")
+    }
+    return(grList)
 }

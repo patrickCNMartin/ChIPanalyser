@@ -39,20 +39,20 @@ factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
 #Data extraction
 data(ChIPanalyserData)
 # path to Position Frequency Matrix
-PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BCDSlx.pfm")
+PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #As an example of genome, this example will run on the Drosophila genome
 
-if(!require("BSgenome.Dmelanogaster.UCSC.dm3", character.only = TRUE)){
+if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
     if (!requireNamespace("BiocManager", quietly=TRUE))
         install.packages("BiocManager")
-    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm3")
+    BiocManager::install("BSgenome.Dmelanogaster.UCSC.dm6")
 }
-library(BSgenome.Dmelanogaster.UCSC.dm3)
-DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm3)
+library(BSgenome.Dmelanogaster.UCSC.dm6)
+DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 #Building data objects
-GPP <- genomicProfiles(PFM=PFM,PFMFormat="raw",BPFrequency=DNASequenceSet)
+GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR",BPFrequency=DNASequenceSet)
 
-eveLocusChip<-processingChIP(eveLocusChip,eveLocus)
+chip<-processingChIP(chip,top)
 # Computing Genome Wide
 GenomeWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,
     genomicsProfiles = GPP)
@@ -60,18 +60,18 @@ GenomeWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,
 #Compute PWM Scores
 PWMScores <- computePWMScore(genomicsProfiles = GenomeWide,
     DNASequenceSet = DNASequenceSet,
-    loci = eveLocus, chromatinState = Access)
+    loci = top, chromatinState = Access)
 #Compute Occupnacy
 Occupancy <- computeOccupancy(genomicsProfiles = PWMScores,
     parameterOptions = OPP)
 
 #Compute ChIP profiles
 chipProfile <- computeChIPProfile(genomicProfiles = Occupancy,
-     loci = eveLocus,
+     loci = top,
     parameterOptions = OPP)
 #Estimating accuracy estimate
 AccuracyEstimate <- profileAccuracyEstimate(genomicProfiles = chipProfile,
-     ChIPScore = eveLocusChip,
+     ChIPScore = chip,
      parameterOptions = OPP)
 
     }

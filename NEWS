@@ -1,8 +1,7 @@
-Changes in version 1.4.1 
+Changes in version 2.0.1
 
 -------------------------------------
 Package Updates
 
-    * Updated Plotting functions
-    * Model quality assessment has been improved
-    * Noise Filter method for ChIP-seq Pre-processing
+    * New model - integrating chromatin affinity and chromatin states
+    * Genetic algorithm to infer optimal paramters
