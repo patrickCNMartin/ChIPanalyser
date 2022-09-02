@@ -42,7 +42,7 @@ factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
 
 }
 \author{
-Patrick C.N. Martin <pm16057@essex.ac.uk>
+Patrick C.N. Martin <pcnmartin@gmail.com>
 }
 \examples{
 # Building parameterOptions object

@@ -1,9 +1,9 @@
 \name{ChIPanalyserData}
 \alias{ChIPanalyserData}
 \alias{Access}
-
-\alias{eveLocus}
-\alias{eveLocusChip}
+\alias{cs}
+\alias{top}
+\alias{chip}
 \alias{geneRef}
 \docType{data}
 \title{
@@ -23,15 +23,16 @@ loci, genetic information, DNA accessibility data and ChIP-seq data.
 
     \item{\code{Access}}{is \code{\link[GenomicRanges]{GRanges}}
     containing DNA Accesibility data for the sequences described above.}
-    \item{\code{eveLocus}}{is \code{\link[GenomicRanges]{GRanges}}
+    \item{\code{cs}}{is \code{\link[GenomicRanges]{GRanges}}
+    containing Chromatin State data for the sequences described above.}
+    \item{\code{top}}{is \code{\link[GenomicRanges]{GRanges}}
     containing a locus of interest.
     In this case \emph{eve strip Locus} on
     chromosome 2R in \emph{Drosophila melanogaster}}
-    \item{\code{eveLocusChip}}{is a GRanges containing ChIP score of the eve
+    \item{\code{chip}}{is a GRanges containing ChIP score of the eve
     strip locus in \emph{Drosophila melanogaster}. }
     \item{\code{geneRef}}{is a \code{\link[GenomicRanges]{GRanges}}
-    containing genetic information (exon, intron, 3'UTR, 5'UTR)
-    for the sequence described above.}
+    containing UCSC gene reference information}
     }
 
 }
@@ -46,6 +47,7 @@ Berkeley Drosophila Transcription Network Project (bdtnp.lbl.gov)
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
 factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
+Patrick C.N. Martin and Nicolae Radu Zabe (2020) Dissecting the binding mechanisms of transcription factors to DNA using a statistical thermodynamics framework. CSBJ, 18, 3590-3605.
 }
 
 \examples{

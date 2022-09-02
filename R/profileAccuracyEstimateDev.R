@@ -28,7 +28,7 @@ profileAccuracyEstimate <- function(genomicProfiles,ChIPScore,
 
       #If Sites are not accesible or have no overlapp with chipprofile
       dropLoci<-drop(genomicProfiles)
-      if(dropLoci!="No loci dropped"){
+      if(length(grep("No loci dropped",dropLoci))==0){
         widthDisplay<-round(options()$width*0.5)
         cat("No Accessible DNA in: ",paste(rep(" ",
            times=(widthDisplay-nchar("StepSize: ")-nchar(dropLoci[1]))),collapse=''),

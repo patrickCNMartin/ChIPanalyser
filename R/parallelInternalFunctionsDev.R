@@ -357,7 +357,7 @@
        }
      } else if(grepl("ks",method)){
        check <- .GoFCheck(gp,chip)
-         local<-c("K-S"=ks(check$predicted,check$validation)[[1]],"MSE"=.intMSE(check$predicted,check$validation))
+         local<-c("K-S"=ks.test(check$predicted,check$validation)[[1]],"MSE"=.intMSE(check$predicted,check$validation))
      } else if(grepl("binary",method)){
        check <- .GoFCheck(gp,chip)
          local <-c(.peakExtractionFScore(check$predicted,check$validation),"MSE"=.intMSE(check$predicted,check$validation))
