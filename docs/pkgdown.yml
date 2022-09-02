@@ -1,0 +1,8 @@
+pandoc: '2.18'
+pkgdown: 2.0.6
+pkgdown_sha: ~
+articles:
+  ChIPanalyser: ChIPanalyser.html
+  GA_ChIPanalyser: GA_ChIPanalyser.html
+last_built: 2022-08-27T11:27Z
+
