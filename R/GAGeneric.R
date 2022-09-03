@@ -531,3 +531,14 @@ splitData <- function(ChIPscore, dist = c(80,20), as.proportion = TRUE){
     return(list("trainingSet" = trainSet, "testingSet" = testSet))
 
 }
+
+.revert_to_class <- function(database){
+    database <- as.data.frame(apply(database, 2, unlist))
+    numerics <- which(!colnames(database) %in% 
+        c("computed"))
+    for(i in numerics){
+        database[,i] <- as.numeric(as.character(database[,i]))
+    }
+    database$computed <- as.logical(database$computed)
+    return(database)
+}

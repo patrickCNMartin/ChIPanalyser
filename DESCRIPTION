@@ -45,3 +45,4 @@ biocViews: Software, BiologicalQuestion, WorkflowStep, Transcription,
     Sequencing, ChipOnChip, Coverage, Alignment, ChIPSeq, SequenceMatching,
     DataImport ,PeakDetection
 VignetteBuilder: knitr
+RoxygenNote: 7.2.1

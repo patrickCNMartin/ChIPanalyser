@@ -118,41 +118,31 @@ evolve <- function(population,DNASequenceSet,ChIPScore,
 
 
 
-        message(paste0("Generation Fitness: ",GenFit[i]))
+        message(paste0("Generation Fitness: ",GenFit[[i]]))
         ## checkpoint saving this is messy af
         # shame shame shame Patrick
         if(checkpoint){
             if(!is.null(filename)){
-                fileCheckPop<-paste0(filename,"_",method,"_OptimalOutputTraining_Generation_",i,".Rda")
-                fileCheckDB<-paste0(filename,"_",method,"_DatabaseTraining_Generation_",i,".Rda")
-                fileCheckFit<-paste0(filename,"_",method,"_FittyMcFitFace_Training_Generation_",i,".Rda")
-            }else{
-                fileCheckPop<-paste0(method,"_OptimalOutputTraining_Generation_",i,".Rda")
-                fileCheckDB<-paste0(method,"_DatabaseTraining_Generation_",i,".Rda")
-                fileCheckFit<-paste0(,method,"_FittyMcFitFace_Training_Generation_",i,".Rda")
-
-            }
-            save(population,file=fileCheckPop)
-            save(database,file=fileCheckDB)
-            save(GenFit,file=fileCheckFit)
-            ## get rid of last generations
+                fileCheckPop<-paste0(filename,"_",method,"_population.csv")
+             }else{
+                fileCheckPop<-paste0(filename,"_",method,"_population.csv")
+             }
             if(i>1){
-                if(!is.null(filename)){
-                    fileCheckPop<-paste0(filename,"_",method,"_OptimalOutputTraining_Generation_",i-1,".Rda")
-                    fileCheckDB<-paste0(filename,"_",method,"_DatabaseTraining_Generation_",i-1,".Rda")
-                    fileCheckFit<-paste0(filename,"_",method,"_FittyMcFitFace_Training_Generation_",i-1,".Rda")
-                }else{
-                    fileCheckPop<-paste0(method,"_OptimalOutputTraining_Generation_",i-1,".Rda")
-                    fileCheckDB<-paste0(method,"_DatabaseTraining_Generation_",i-1,".Rda")
-                    fileCheckFit<-paste0(method,"_FittyMcFitFace_Training_Generation_",i-1,".Rda")
-
-
-                }
-                if(file.exists(fileCheckPop) | file.exists(fileCheckDB)){
-                    file.remove(fileCheckPop)
-                    file.remove(fileCheckDB)
-                    file.remove(fileCheckFit)
-                }
+                out <- .revert_to_class(do.call("rbind",population))
+                write.table(out,
+                    file = fileCheckPop,
+                    sep = ",",
+                    col.names= TRUE, 
+                    row.names = FALSE,
+                    append = TRUE )
+            } else {
+                out <- .revert_to_class(do.call("rbind",population))
+                write.table(out,
+                    file = fileCheckPop,
+                    sep = ",",
+                    col.names= TRUE, 
+                    row.names = FALSE,
+                    append = FALSE)
             }
 
         }
