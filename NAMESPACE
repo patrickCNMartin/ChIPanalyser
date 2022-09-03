@@ -9,7 +9,7 @@ importFrom("graphics", "axis", "box", "contour", "image", "lines",
 importFrom("methods", "new", "validObject","is")
 importFrom("stats", "cor", "dgamma","sd","na.omit","median","ks.test",
     "quantile","runif")
-importFrom("utils", "read.table")
+importFrom("utils", "read.table","write.table")
 importFrom("IRanges","IRanges")
 importFrom("rtracklayer","import")
 importFrom("S4Vectors","queryHits")

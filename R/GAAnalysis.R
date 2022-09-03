@@ -129,10 +129,11 @@ evolve <- function(population,DNASequenceSet,ChIPScore,
              }
             if(i>1){
                 out <- .revert_to_class(do.call("rbind",population))
+                out$gen <- i
                 write.table(out,
                     file = fileCheckPop,
                     sep = ",",
-                    col.names= TRUE, 
+                    col.names = FALSE,
                     row.names = FALSE,
                     append = TRUE )
             } else {
