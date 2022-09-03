@@ -4,6 +4,7 @@ Title: ChIPanalyser: Predicting Transcription Factor Binding Sites
 Authors@R: c(
     person(c("Patrick", "CN"), "Martin", role=c("cre", "aut"), email="pcnmartin@gmail.com"),
     person(c("Nicolea","Radu"), "Zabet", role="aut"))
+
 Version: 2.1.0
 Date: 2017-09-01
 Author: Patrick C.N.Martin & Nicolae Radu Zabet
