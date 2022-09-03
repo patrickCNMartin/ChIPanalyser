@@ -63,9 +63,8 @@ evolve(population,DNASequenceSet,ChIPScore,
     increases the speed of the algorithm.
     }
     \item{checkpoint}{
-    logical describing if intermediate files should be saved. Intermediate files
-    contain optimsed values for all individuals of current and past generations,
-    as well as current population. Saved as .Rda
+    logical describing if population parameters at each generations should be 
+    saved. 
     }
 
     \item{filename}{
@@ -80,19 +79,10 @@ ChIPanalyser offers a way of finding optimal solution by using a genetic algorit
 Instead of running the stadard analysis, TF binding affinities to chromatin states
 can be extracted via this more complex method. It should be noted that this
 method is better suited for the analysis of chromatin states. While the algorithm
-still works with simple DNA Accessibility (as long as it fits the specified formatting),
+still works with simple DNA Accessibility,
 it would potentially take more time for accuracy minor gains.
 
-There are three intermediate files that are saved (if requested) during the analysis.
-    \itemize{
-        \item{_OptimalOutputTraining_Generation_}{ saves the last population with
-        chromosome values}
-        \item{_DatabaseTraining_Generation_}{ saves the data frame containing all
-        scores for each individual since generation 1}
-        \item{_MrOlympiaTraining_Generation_}{saves the fittest individual
-         for a given generation}
-    }
-Each files is overwritten to only keep the most recent generation.
+
 }
 
 \value{
@@ -102,7 +92,7 @@ Returns a named list with three elements.
   scores for each individual since generation 1}
   \item{population}{ saves the last population with
   chromosome values}
-  \item{Olympia}{saves the fittest individual
+  \item{fitest}{saves the fittest individual
    for a given generation}
   }
 
