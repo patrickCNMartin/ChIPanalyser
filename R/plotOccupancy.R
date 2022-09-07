@@ -151,7 +151,7 @@ plotOccupancyProfile <- function(predictedProfile,
     ## Expanding if legened needs to be added
     if(legend & cs & gof){
         param$xpd <- TRUE 
-        param$mar <- c(6,8,4,15)
+        param$mar <- c(6,8,4,20)
     } else if(legend & !cs & gof){
         param$xpd <- TRUE 
         param$mar <- c(6,8,4,10)
@@ -179,6 +179,8 @@ plotOccupancyProfile <- function(predictedProfile,
     param$cex.lab <- ifelse(any(names(graph) == "cex.lab"),graph$cex.lab,1)
     # Dispatch main title font 
     param$cex.main <- ifelse(any(names(graph) == "cex.main"),graph$cex.main,1)
+    # Dispatch prediction line width 
+    param$lwd <- ifelse(any(names(graph) == "lwd"),graph$lwd,1)
     # Dispatch CS density 
     param$densityCS <- ifelse(any(names(graph) == "densityCS"),graph$densityCS,50)
     # Dispatch geneRef Density 
@@ -267,6 +269,7 @@ plotOccupancyProfile <- function(predictedProfile,
     lines(x,
         y,
         type = "l",
+        lwd = param$lwd,
         col = param$colPred)
 }
 
