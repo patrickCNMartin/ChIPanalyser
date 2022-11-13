@@ -200,7 +200,7 @@ singleRun <- function(indiv,DNAAffinity,
     genomicProfiles,DNASequenceSet,
     ChIPScore,fitness="all"){
 
-    if(length(indiv) ==1 & class(indiv)=="list"){
+    if(length(indiv) ==1 & is(indiv,"list")){
       indiv <- indiv[[1]]
     }else {
       stop("Oops somthing went wrong. Not sure what your indiv object is")
@@ -261,7 +261,7 @@ setChromatinStates <- function(population,chromatinStates){
 
     # selecting score in chromatin states GR
     if(length(grep(x=chromatinStates$name,pattern="cs",ignore.case=T))<1){
-        stateNames<-
+        #stateNames<-
         chromatinStates$name <- paste0("CS",chromatinStates$name)
     }
     #### NOTE this is a problem! your CS that you are adding wont always match

@@ -255,7 +255,7 @@
 
 # Validity check function for Genomic Profile Parameters
 .is.genomicProfiles<- function(object){
-    if(class(object) == "genomicProfiles"){
+    if(is(object,"genomicProfiles")){
         return(TRUE)
     } else {
         return(FALSE)
@@ -264,7 +264,7 @@
 
 # Validity check function for occupancy Profile Parameters
 .is.parameterOptions <- function(object){
-    if(class(object) == "parameterOptions"){
+    if(is(object,"parameterOptions")){
         return(TRUE)
     } else {
         return(FALSE)
@@ -286,10 +286,10 @@
 # Extracting and computing Base Pair frequency from BSGenome when
 #contructing genomicProfileParamter
 .computeBPFrequency <- function(object){
-    if(class(object) == "BSgenome"){
+    if(is(object,"BSgenome")){
     object <- getSeq(object)
     }
-    if(class(object) == "DNAStringSet"){
+    if(is(object,"DNAStringSet")){
     object <- object
     }
     if(length(object)>1){
@@ -443,9 +443,9 @@ searchSites <- function(Sites,lambdaPWM="all",
                                                   BoundMolecules=BoundMolecules,
                                                   Locus=Locus))
        return(bufferSites)
-    }else if(class(Sites)=="genomicProfiles" | class(Sites)=="list"){
+    }else if(is(Sites,"genomicProfiles") | is(Sites,"list")){
 
-        if(class(Sites)=="genomicProfiles"){
+        if(is(Sites,"genomicProfiles")){
             Sites <- profiles(Sites)
         }
 
@@ -502,7 +502,7 @@ searchSites <- function(Sites,lambdaPWM="all",
     if(all(Locus == "all")){
         bufferSites <- bufferSites
     } else {
-        if(class(bufferSites)=="list"){
+        if(is(bufferSites,"list")){
         for( k in seq_along(bufferSites)){
             LocalLocus <- names(bufferSites[[k]])
             buffer <- which(LocalLocus==Locus)
@@ -911,7 +911,7 @@ searchSites <- function(Sites,lambdaPWM="all",
     }
   }
 
-    if(class(predictedProfile)=="list" &
+    if(is(predictedProfile,"list") &
               any(grepl("lambda",names(predictedProfile)))){
         stepSize<-unique(width(predictedProfile[[1]][[1]]))
         loci <- unique(unlist(GRangesList(lapply(predictedProfile[[1]], function(x){
@@ -925,7 +925,7 @@ searchSites <- function(Sites,lambdaPWM="all",
          predictedProfile<-lapply(predictedProfile, function(x){return(x$ChIP)})
 
          #warning("No Parameter Combination selected - We will just plot everything",immediate.=TRUE)
-    } else if(class(predictedProfile)=="list" &
+    } else if(is(predictedProfile,"list") &
               any(!grepl("lambda",names(predictedProfile)))){
            stepSize<-unique(width(predictedProfile[[1]]))
            loci <- unique(unlist(GRangesList(lapply(predictedProfile, function(x){
@@ -933,7 +933,7 @@ searchSites <- function(Sites,lambdaPWM="all",
                                   ranges=IRanges(start(x)[1], end(x)[length(x)])))
            }))))
            predictedProfile <- lapply(predictedProfile, function(x){return(x$ChIP)})
-    } else if(class(predictedProfile)=="GRanges"){
+    } else if(is(predictedProfile,"GRanges")){
          stepSize<-unique(width(predictedProfile))
          loci<- GRanges(seqnames=as.character(predictedProfile),
                         ranges=IRanges(start(predictedProfile)[1],end(predictedProfile)[length(predictedProfile)]))
@@ -953,17 +953,17 @@ searchSites <- function(Sites,lambdaPWM="all",
   }
 }
 
-    if(class(occupancy)=="list" &
+    if(is(occupancy,"list") &
        any(grepl("lambda",names(occupancy)))){
             occupancy<-.internalUnlist(occupancy)
 
            #warning("No Parameter Combination selected - We will just plot everything",immediate.=TRUE)
-      } else if(class(occupancy)=="list" &
+      } else if(is(occupancy,"list") &
                 any(!grepl("lambda",names(occupancy)))){
 
 
           occupancy-occupancy
-      } else if(class(occupancy)=="GRanges"){
+      } else if(is(occupancy,"GRanges")){
 
            occupancy<-list(occupancy)
       } else{
@@ -976,7 +976,7 @@ searchSites <- function(Sites,lambdaPWM="all",
 
 
 .what.is.ChIPScore <- function(ChIPScore){
-    if(class(ChIPScore)=="ChIPScore"){
+    if(is(ChIPScore,"ChIPScore")){
 
         ChIPScore<-scores(ChIPScore)
 
@@ -984,9 +984,9 @@ searchSites <- function(Sites,lambdaPWM="all",
     }
 
       ## once un packed we can move twords checking the other elements
-    if(class(ChIPScore)=="list"){
+    if(is(ChIPScore,"list")){
          ChIPScore<-ChIPScore
-    } else if(class(ChIPScore)=="numeric"){
+    } else if(is(ChIPScore,"numeric")){
           ChIPScore<-list(ChIPScore)
     }else{
        stop("Oops Somthing went wrong. We are not sure what you are parsing to ChIPScore")
@@ -1002,17 +1002,17 @@ searchSites <- function(Sites,lambdaPWM="all",
   }
 }
 
-    if(class(goodnessOfFit)=="list" &
+    if(is(goodnessOfFit,"list") &
        any(grepl("lambda",names(goodnessOfFit)))){
 
                   goodnessOfFit<-unlist(goodnessOfFit,recursive=FALSE)
 
            #warning("No Parameter Combination selected - We will just plot everything",immediate.=TRUE)
-      } else if(class(goodnessOfFit)=="list" &
+      } else if(is(goodnessOfFit,"list") &
                 any(!grepl("lambda",names(goodnessOfFit)))){
           goodnessOfFit<-goodnessOfFit
 
-      } else if(class(goodnessOfFit)=="numeric") {
+      } else if(is(goodnessOfFit,"numeric")) {
            goodnessOfFit <-list(goodnessOfFit)
       } else{
          stop("Oops Somthing went wrong. We are not sure what your are parsing to predictedProfile")
@@ -1021,7 +1021,7 @@ searchSites <- function(Sites,lambdaPWM="all",
 
 .what.is.chromatinState <- function(cs,lociLocal){
     
-    if(class(cs) == "GRanges"){
+    if(is(cs,"GRanges")){
         csList <- list()
         for(i in seq_along(lociLocal)){
             tmp <- cs[queryHits(findOverlaps(cs, lociLocal[i]))]
@@ -1044,7 +1044,7 @@ searchSites <- function(Sites,lambdaPWM="all",
 }
 
 .what.is.geneRef <- function(gr,lociLocal){
-    if(class(gr) == "GRanges"){
+    if(is(gr,"GRanges")){
         grList <- list()
         for(i in seq_along(lociLocal)){
            tmp <- gr[queryHits(findOverlaps(gr, lociLocal[i]))]

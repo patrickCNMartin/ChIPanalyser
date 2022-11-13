@@ -129,7 +129,7 @@ setClass("parameterOptions",
     if(object@stepSize < 0){
     stop("Occupancy Profile Parameters: Step Size must be positive.")
     }
-    if(class(object@removeBackground)!="numeric"){
+    if(!is(object@removeBackground,"numeric")){
     stop("removeBackground Must be numeric")
     }
     if(any(object@lambdaPWM < 0)){
@@ -173,11 +173,11 @@ setClass("ChIPScore",
             loci="loci" ),
        validity=function(object){
 
-        if(class(object@scores)!="list"){
+        if(!is(object@scores, "list")){
            stop("Internal Error: ChIPScore score is not a list")
         }
 
-        if(!is.null(object@loci)& class(object@loci)!="GRanges"){
+        if(!is.null(object@loci)& !is(object@loci, "GRanges")){
            stop("Internal Error: loci is not empty but it ain't no GRanges")
         }
 

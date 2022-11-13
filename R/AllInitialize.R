@@ -46,14 +46,14 @@ setMethod(f="initialize",
         ){
 
         if(length(ploidy)>0){
-            if(class(ploidy)=="numeric"){
+            if(is(ploidy,"numeric")){
         NewPloidy<-ploidy
         .Object@ploidy <- NewPloidy
         validObject(.Object)
         } else {
         stop("ploidy is not numeric")}}
         if(length(lambdaPWM)>0){
-            if(class(lambdaPWM)=="numeric"){
+            if(is(lambdaPWM,"numeric")){
         NewLambda<-lambdaPWM
         .Object@lambdaPWM<-NewLambda
         validObject(.Object)
@@ -62,7 +62,7 @@ setMethod(f="initialize",
         or a vector of numeric values")
         }}
         if(length(boundMolecules)>0){
-            if(class(boundMolecules)=="numeric"){
+            if(is(boundMolecules,"numeric")){
         NewboundMolecules<-boundMolecules
         .Object@boundMolecules <- NewboundMolecules
         validObject(.Object)
@@ -70,7 +70,7 @@ setMethod(f="initialize",
         stop("boundMolecules is not numeric")}}
 
         if(length(backgroundSignal)>0){
-            if(class(backgroundSignal)=="numeric"){
+            if(is(backgroundSignal, "numeric")){
         NewbackgroundSignal<-backgroundSignal
         .Object@backgroundSignal <- NewbackgroundSignal
         validObject(.Object)
@@ -78,7 +78,7 @@ setMethod(f="initialize",
         stop("backgroundSignal is not numeric")}}
 
         if(length(maxSignal)>0){
-            if(class(maxSignal)=="numeric"){
+            if(is(maxSignal,"numeric")){
         NewmaxSignal<-maxSignal
         .Object@maxSignal <- NewmaxSignal
         validObject(.Object)
@@ -86,7 +86,7 @@ setMethod(f="initialize",
         stop("maxSignal is not numeric")}}
 
         if(length(lociWidth)>0){
-            if(class(lociWidth)=="numeric"){
+            if(is(lociWidth,"numeric")){
         NewmlociWidth<-lociWidth
         .Object@lociWidth <- NewmlociWidth
         validObject(.Object)
@@ -94,7 +94,7 @@ setMethod(f="initialize",
         stop("maxSignal is not numeric")}}
 
         if(length(chipMean)>0){
-            if(class(chipMean)=="numeric"){
+            if(is(chipMean,"numeric")){
         NewchipMean<-chipMean
         .Object@chipMean <- NewchipMean
         validObject(.Object)
@@ -102,7 +102,7 @@ setMethod(f="initialize",
         stop("chipMean is not numeric")}}
 
         if(length(chipSd)>0){
-            if(class(chipSd)=="numeric"){
+            if(is(chipSd,"numeric")){
         NewchipSd<-chipSd
         .Object@chipSd <- NewchipSd
         validObject(.Object)
@@ -110,7 +110,7 @@ setMethod(f="initialize",
         stop("chipSd is not numeric")}}
 
         if(length(chipSmooth)>0){
-            if(class(chipSmooth)=="numeric"){
+            if(is(chipSmooth,"numeric")){
         NewchipSmooth<-chipSmooth
         .Object@chipSmooth <- NewchipSmooth
         validObject(.Object)
@@ -118,7 +118,7 @@ setMethod(f="initialize",
         stop("chipSmooth is not numeric")
         }}
         if(length(stepSize)>0){
-            if(class(stepSize)=="numeric"){
+            if(is(stepSize,"numeric")){
         NewstepSize<-stepSize
         .Object@stepSize <- NewstepSize
         validObject(.Object)
@@ -126,14 +126,15 @@ setMethod(f="initialize",
         stop("stepSize is not numeric")}}
 
         if(length(removeBackground)>0){
-            if(class(removeBackground)=="numeric"){
+            if(is(removeBackground,"numeric")){
         NewremoveBackground<-removeBackground
         .Object@removeBackground <- NewremoveBackground
         validObject(.Object)
         } else {
-        stop("removeBackground is not numeric")}}
+        stop("removeBackground is not numeric")}
+        }
         if(length(PWMpseudocount)>0){
-            if(class(PWMpseudocount)=="numeric"){
+            if(is(PWMpseudocount,"numeric")){
         Newpseudocount<-PWMpseudocount
         .Object@PWMpseudocount<-Newpseudocount
         validObject(.Object)
@@ -147,7 +148,7 @@ setMethod(f="initialize",
         validObject(.Object)
         }
         if(length(noOfSites)>0){
-            if(class(noOfSites)=="numeric"|class(noOfSites)=="character"){
+            if(is(noOfSites,"numeric") |is(noOfSites,"character")){
         NewnoOfSites<-noOfSites
         .Object@noOfSites<-NewnoOfSites
         validObject(.Object)
@@ -155,7 +156,7 @@ setMethod(f="initialize",
         stop("noOfSites is not numeric or 'all' - for all sites")
         }}
         if(length(PWMThreshold)>0){
-            if(class(PWMThreshold)=="numeric"){
+            if(is(PWMThreshold,"numeric")){
         NewPWMThreshold<-PWMThreshold
         .Object@PWMThreshold<-NewPWMThreshold
         validObject(.Object)
@@ -164,7 +165,7 @@ setMethod(f="initialize",
         }}
 
         if(length(strandRule)>0){
-            if(class(strandRule)=="character"){
+            if(is(strandRule,"character")){
         NewStrandRule<-strandRule
         .Object@strandRule<-NewStrandRule
         validObject(.Object)
@@ -174,7 +175,7 @@ setMethod(f="initialize",
         }}
 
         if(length(whichstrand)>0){
-            if(class(whichstrand)=="character"){
+            if(is(whichstrand,"character")){
         NewStrand<-whichstrand
         .Object@whichstrand<-NewStrand
         validObject(.Object)
@@ -183,7 +184,7 @@ setMethod(f="initialize",
         following: +-, -+ , - or +")
         }}
         if(length(noiseFilter)>0){
-            if(class(noiseFilter)=="character"){
+            if(is(noiseFilter,"character")){
 
         .Object@noiseFilter<-noiseFilter
         validObject(.Object)
@@ -278,19 +279,19 @@ setMethod(f="initialize",
     ZeroBackground=.Object@ZeroBackground,
     drop=.Object@drop,
     tags=.Object@tags){
-      if(class(BPFrequency) != "vector" &
-      (class(BPFrequency) == "BSgenome" |
-      class(BPFrequency) == "DNAStringSet")){
+        
+      if( is(BPFrequency,"BSgenome") ||
+       is(BPFrequency,"DNAStringSet")){
       BPFrequency<-.computeBPFrequency(BPFrequency)
       .Object@BPFrequency<-BPFrequency
-      } else if(!is.null(BPFrequency) & class(BPFrequency)=="vector") {
+      } else if(is(BPFrequency,"numeric")) {
       NewBPFrequency<-BPFrequency
       .Object@BPFrequency<-NewBPFrequency
       validObject(.Object)
-      }
+      } 
 
       if(length(PFMFormat)>0){
-          if(class(PFMFormat)=="character"){
+          if(is(PFMFormat,"character")){
       NewPFMFormat<-PFMFormat
       .Object@PFMFormat<-NewPFMFormat
       validObject(.Object)
@@ -311,7 +312,7 @@ setMethod(f="initialize",
       validObject(.Object)
       }
       if(!is.null(PFM)){
-          if(class(PFM)!="matrix"){
+          if(!is(PFM, "matrix")){
       PFMmatrix<-.parsePFM(PFM,PFMFormat)
       .Object@PFM<-PFMmatrix
       validObject(.Object)
@@ -362,14 +363,14 @@ setMethod(f="initialize",
       validObject(.Object)
       }
       if(length(ploidy)>0){
-          if(class(ploidy)=="numeric"){
+          if(is(ploidy,"numeric")){
       NewPloidy<-ploidy
       .Object@ploidy <- NewPloidy
       validObject(.Object)
       } else {
       stop("ploidy is not numeric")}}
       if(length(lambdaPWM)>0){
-          if(class(lambdaPWM)=="numeric"){
+          if(is(lambdaPWM,"numeric")){
       NewLambda<-lambdaPWM
       .Object@lambdaPWM<-NewLambda
       validObject(.Object)
@@ -378,7 +379,7 @@ setMethod(f="initialize",
       or a vector of numeric values")
       }}
       if(length(boundMolecules)>0){
-          if(class(boundMolecules)=="numeric"){
+          if(is(boundMolecules,"numeric")){
       NewboundMolecules<-boundMolecules
       .Object@boundMolecules <- NewboundMolecules
       validObject(.Object)
@@ -386,7 +387,7 @@ setMethod(f="initialize",
       stop("boundMolecules is not numeric")}}
 
       if(length(backgroundSignal)>0){
-          if(class(backgroundSignal)=="numeric"){
+          if(is(backgroundSignal,"numeric")){
       NewbackgroundSignal<-backgroundSignal
       .Object@backgroundSignal <- NewbackgroundSignal
       validObject(.Object)
@@ -394,7 +395,7 @@ setMethod(f="initialize",
       stop("backgroundSignal is not numeric")}}
 
       if(length(maxSignal)>0){
-          if(class(maxSignal)=="numeric"){
+          if(is(maxSignal,"numeric")){
       NewmaxSignal<-maxSignal
       .Object@maxSignal <- NewmaxSignal
       validObject(.Object)
@@ -402,7 +403,7 @@ setMethod(f="initialize",
       stop("maxSignal is not numeric")}}
 
       if(length(lociWidth)>0){
-          if(class(lociWidth)=="numeric"){
+          if(is(lociWidth,"numeric")){
       NewmlociWidth<-lociWidth
       .Object@lociWidth <- NewmlociWidth
       validObject(.Object)
@@ -410,7 +411,7 @@ setMethod(f="initialize",
       stop("maxSignal is not numeric")}}
 
       if(length(chipMean)>0){
-          if(class(chipMean)=="numeric"){
+          if(is(chipMean,"numeric")){
       NewchipMean<-chipMean
       .Object@chipMean <- NewchipMean
       validObject(.Object)
@@ -418,7 +419,7 @@ setMethod(f="initialize",
       stop("chipMean is not numeric")}}
 
       if(length(chipSd)>0){
-          if(class(chipSd)=="numeric"){
+          if(is(chipSd,"numeric")){
       NewchipSd<-chipSd
       .Object@chipSd <- NewchipSd
       validObject(.Object)
@@ -426,7 +427,7 @@ setMethod(f="initialize",
       stop("chipSd is not numeric")}}
 
       if(length(chipSmooth)>0){
-          if(class(chipSmooth)=="numeric"){
+          if(is(chipSmooth,"numeric")){
       NewchipSmooth<-chipSmooth
       .Object@chipSmooth <- NewchipSmooth
       validObject(.Object)
@@ -434,7 +435,7 @@ setMethod(f="initialize",
       stop("chipSmooth is not numeric")
       }}
       if(length(stepSize)>0){
-          if(class(stepSize)=="numeric"){
+          if(is(stepSize,"numeric")){
       NewstepSize<-stepSize
       .Object@stepSize <- NewstepSize
       validObject(.Object)
@@ -442,14 +443,14 @@ setMethod(f="initialize",
       stop("stepSize is not numeric")}}
 
       if(length(removeBackground)>0){
-          if(class(removeBackground)=="numeric"){
+          if(is(removeBackground,"numeric")){
       NewremoveBackground<-removeBackground
       .Object@removeBackground <- NewremoveBackground
       validObject(.Object)
       } else {
       stop("removeBackground is not numeric")}}
       if(length(PWMpseudocount)>0){
-          if(class(PWMpseudocount)=="numeric"){
+          if(is(PWMpseudocount,"numeric")){
       Newpseudocount<-PWMpseudocount
       .Object@PWMpseudocount<-Newpseudocount
       validObject(.Object)
@@ -463,7 +464,7 @@ setMethod(f="initialize",
       validObject(.Object)
       }
       if(length(noOfSites)>0){
-          if(class(noOfSites)=="numeric"|class(noOfSites)=="character"){
+          if(is(noOfSites,"numeric")|is(noOfSites,"character")){
       NewnoOfSites<-noOfSites
       .Object@noOfSites<-NewnoOfSites
       validObject(.Object)
@@ -471,7 +472,7 @@ setMethod(f="initialize",
       stop("noOfSites is not numeric or 'all' - for all sites")
       }}
       if(length(PWMThreshold)>0){
-          if(class(PWMThreshold)=="numeric"){
+          if(is(PWMThreshold,"numeric")){
       NewPWMThreshold<-PWMThreshold
       .Object@PWMThreshold<-NewPWMThreshold
       validObject(.Object)
@@ -480,7 +481,7 @@ setMethod(f="initialize",
       }}
 
       if(length(strandRule)>0){
-          if(class(strandRule)=="character"){
+          if(is(strandRule,"character")){
       NewStrandRule<-strandRule
       .Object@strandRule<-NewStrandRule
       validObject(.Object)
@@ -490,7 +491,7 @@ setMethod(f="initialize",
       }}
 
       if(length(whichstrand)>0){
-          if(class(whichstrand)=="character"){
+          if(is(whichstrand,"character")){
       NewStrand<-whichstrand
       .Object@whichstrand<-NewStrand
       validObject(.Object)
@@ -499,7 +500,7 @@ setMethod(f="initialize",
       following: +-, -+ , - or +")
       }}
       if(length(noiseFilter)>0){
-          if(class(noiseFilter)=="character"){
+          if(is(noiseFilter,"character")){
 
       .Object@noiseFilter<-noiseFilter
       validObject(.Object)
