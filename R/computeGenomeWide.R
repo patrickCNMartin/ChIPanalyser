@@ -8,13 +8,13 @@ computeGenomeWideScores <- function(genomicProfiles,DNASequenceSet,
                                    cores=1, verbose=TRUE)
   {
     # Validity Checking for each argument
-    if(class(DNASequenceSet) != "BSgenome" &
-    class(DNASequenceSet) != "DNAStringSet"){
+    if(!is(DNASequenceSet,"BSgenome") &
+    !is(DNASequenceSet,"DNAStringSet")){
     stop(paste0(deparse(substitute(DNASequenceSet)),
     " is not a BSgenome Object or a DNAStringSet"))
     }
 
-    if(class(DNASequenceSet) == "BSgenome"){
+    if(is(DNASequenceSet,"BSgenome")){
     DNASequenceSet<-getSeq(DNASequenceSet)
     }
 
@@ -24,7 +24,7 @@ computeGenomeWideScores <- function(genomicProfiles,DNASequenceSet,
     Please set Genomic Profile Parameters."))
     }
 
-    if(class(chromatinState) != "GRanges" & !is.null(chromatinState)){
+    if(!is(chromatinState, "GRanges")){
     stop(paste0(chromatinState," must be a GRanges Object."))
     }
 

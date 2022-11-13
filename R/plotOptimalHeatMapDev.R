@@ -10,10 +10,10 @@ plotOptimalHeatMaps<-function(optimalParam,contour=TRUE,col=NULL,main=NULL,layou
        optimalParam<-optimalParam[[1]][[2]]
     } else if(all(names(optimalParam) %in% c("OptimalParameters","OptimalMatrix","method"))){
        optimalParam<-optimalParam[[2]]
-    } else if(class(optimalParam)=="list"){
+    } else if(is(optimalParam,"list")){
        optimalParam<-optimalParam
 
-    } else if(class(optimalParam)=="matrix"){
+    } else if(is(optimalParam,"matrix")){
       optimalParam<-list(optimalParam)
     } else{
       stop("Oops Sonthing went wrong. Please enusre that you are parsing the right object.

@@ -16,7 +16,7 @@ processingChIP <- function(profile,loci=NULL,reduce=NULL,
      ## Loading ChIP profile
      ## check if RDA files as well
 
-     if(class(profile)=="character"){
+     if(is(profile,"character")){
        if(!grepl(".Rda",profile)){
         fileFormat<-unlist(strsplit(profile,"\\."))
         fileFormat<-fileFormat[length(fileFormat)]
@@ -38,7 +38,7 @@ processingChIP <- function(profile,loci=NULL,reduce=NULL,
         profile<-.formatCheck(profile,type="ChIP")
 
 
-     } else if( class(profile)=="GRanges") {
+     } else if( is(profile,"GRanges")) {
 
         profile<-profile
         seqlevelsStyle(profile) <- "UCSC"
@@ -61,10 +61,10 @@ processingChIP <- function(profile,loci=NULL,reduce=NULL,
      noiseFilter<-noiseFilter(parameterOptions)
     ## Loading peaks
     if(!is.null(peaks)){
-        if(class(peaks)=="GRanges"){
+        if(is(peaks,"GRanges")){
             peaks<-peaks
             seqlevelsStyle(peaks) <- "UCSC"
-        }else if(class(peaks)=="character"){
+        }else if(is(peaks,"character")){
           if(!grepl(".Rda",peaks)){
               fileFormat<-unlist(strsplit(peaks,"\\."))
               fileFormat<-fileFormat[length(fileFormat)]
@@ -96,10 +96,10 @@ processingChIP <- function(profile,loci=NULL,reduce=NULL,
 
     ## Loading access
     if(!is.null(chromatinState)){
-      if(class(chromatinState)=="GRanges"){
+      if(is(chromatinState,"GRanges")){
         chromatinState<-chromatinState
         seqlevelsStyle(chromatinState) <- "UCSC"
-      } else if(class(chromatinState)=="character" ){
+      } else if(is(chromatinState,"character" )){
           if(!grepl(".Rda",chromatinState)){
              fileFormat<-unlist(strsplit(chromatinState,"\\."))
              fileFormat<-fileFormat[length(fileFormat)]
@@ -115,7 +115,7 @@ processingChIP <- function(profile,loci=NULL,reduce=NULL,
        }else if(grepl(".Rda",chromatinState)){
              chromatinState<-get(load(chromatinState))
              seqlevelsStyle(chromatinState) <- "UCSC"
-       }else if(class(chromatinState)== "data.frame"| class(chromatinState)=="matrix"){
+       }else if(is(chromatinState, "data.frame")| is(chromatinState,"matrix")){
          chromatinState<-.formatCheck(chromatinState,type="peaks")
          seqlevelsStyle(chromatinState) <- "UCSC"
         }
@@ -148,13 +148,13 @@ processingChIP <- function(profile,loci=NULL,reduce=NULL,
             loci<-suppressWarnings(c(loci, unlist(tile(localRanges[[i]],width=lociWidth))))
         }
         .cleanUpAfterYourself(localRanges)
-    }  else if(class(loci)=="GRanges"){
+    }  else if(is(loci,"GRanges")){
        loci <-loci
-     } else if(class(loci)=="character" & !grepl(".Rda", loci )){
+     } else if(is(loci,"character") & !grepl(".Rda", loci )){
         loci<-import(loci)
         seqlevelsStyle(loci) <- "UCSC"
 
-    } else if(class(loci)=="character" & grepl(".Rda",loci)){
+    } else if(is(loci,"character") & grepl(".Rda",loci)){
         loci <-get(load(loci))
         seqlevelsStyle(loci) <- "UCSC"
 

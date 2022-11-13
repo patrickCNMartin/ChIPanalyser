@@ -14,15 +14,15 @@ computePWMScore <- function(genomicProfiles,DNASequenceSet,
     Please set a Genomic Profile Parameters Object."))
     }
 
-    if(class(DNASequenceSet) != "BSgenome" &
-    class(DNASequenceSet)!="DNAStringSet"){
+    if(!is(DNASequenceSet,"BSgenome") &
+    !is(DNASequenceSet,"DNAStringSet")){
     stop(paste0(deparse(substitute(DNASequenceSet)),
     " is not a BSgenome Object or a DNAStringSet"))
     }
-    if(class(DNASequenceSet) == "BSgenome"){
+    if(is(DNASequenceSet,"BSgenome")){
     DNASequenceSet<-getSeq(DNASequenceSet)
     }
-    if(class(chromatinState) != "GRanges" & !is.null(chromatinState)){
+    if(!is(chromatinState,"GRanges")){
     stop(paste0(deparse(substitute(chromatinState)),
     " must be a GRanges Object."))
     }
@@ -34,9 +34,9 @@ computePWMScore <- function(genomicProfiles,DNASequenceSet,
 
     # Loci check from chipscore
     if(!is.null(loci)){
-        if(class(loci)=="ChIPScore"){
+        if(is(loci,"ChIPScore")){
            loci<-loci(loci)
-        } else if(class(loci)=="Granges") {
+        } else if(is(loci,"Granges")) {
            loci <-loci
         }
     } else {

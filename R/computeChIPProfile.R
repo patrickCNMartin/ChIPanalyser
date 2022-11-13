@@ -10,7 +10,7 @@ computeChIPProfile <- function(genomicProfiles,loci=NULL,
 
     # Validity checking
     if(!is.null(loci)){
-        if(class(loci)=="ChIPScore"){
+        if(is(loci,"ChIPScore")){
           chipMean(genomicProfiles)<-chipMean(loci)
           chipSd(genomicProfiles)<-chipSd(loci)
           chipSmooth(genomicProfiles)<-chipSmooth(loci)
@@ -19,7 +19,7 @@ computeChIPProfile <- function(genomicProfiles,loci=NULL,
           loci<-loci(loci)
 
 
-        } else if(class(loci)=="Granges") {
+        } else if(is(loci,"Granges")) {
            loci <-loci
         }
     } else {
