@@ -22,11 +22,15 @@ computePWMScore <- function(genomicProfiles,DNASequenceSet,
     if(is(DNASequenceSet,"BSgenome")){
     DNASequenceSet<-getSeq(DNASequenceSet)
     }
-    if(!is(chromatinState,"GRanges")){
+    if(!is(chromatinState,"GRanges") && !is.null(chromatinState)){
     stop(paste0(deparse(substitute(chromatinState)),
     " must be a GRanges Object."))
     }
-
+    if(!.is.parameterOptions(parameterOptions) &&
+    !is.null(parameterOptions)){
+    stop(paste0(deparse(substitute(parameterOptions)),
+    " is not an parameterOptions Object."))
+    }
     if(!is.null(parameterOptions)){
         genomicProfiles<-.updateGenomicProfiles(genomicProfiles,parameterOptions)
     }
