@@ -8,7 +8,11 @@ computeOptimal <- function(genomicProfiles,DNASequenceSet,ChIPScore, chromatinSt
     stop(paste0(deparse(substitute(genomicProfiles)),
     " is not a Genomic Profile Paramter object."))
     }
-
+    if(!.is.parameterOptions(parameterOptions) &&
+    !is.null(parameterOptions)){
+    stop(paste0(deparse(substitute(parameterOptions)),
+    " is not an parameterOptions Object."))
+    }
     if(!is.null(parameterOptions)){
         genomicProfiles<-.updateGenomicProfiles(genomicProfiles,parameterOptions)
     }

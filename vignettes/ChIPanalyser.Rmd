@@ -169,6 +169,7 @@ optimal <- suppressWarnings(computeOptimal(genomicProfiles = GP,
                         DNASequenceSet = DNASequenceSet,
                         ChIPScore = chip,
                         chromatinState = Access))
+
 ```
 NOTE Default Optimal parameters are provided internally as the following:
 

@@ -18,7 +18,11 @@ computeOccupancy <- function(genomicProfiles ,
 
     #Generating parameterOptions if not given by user.
     #All Value will be defaut settings
-
+    if(!.is.parameterOptions(parameterOptions) &&
+    !is.null(parameterOptions)){
+    stop(paste0(deparse(substitute(parameterOptions)),
+    " is not an parameterOptions Object."))
+    }
     if(!is.null(parameterOptions)){
         genomicProfiles<-.updateGenomicProfiles(genomicProfiles,parameterOptions)
     }
