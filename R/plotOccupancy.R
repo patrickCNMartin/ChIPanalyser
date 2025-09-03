@@ -54,7 +54,7 @@ plotOccupancyProfile <- function(predictedProfile,
     ## Extracting chromatin states if present 
     if(!is.null(chromatinState)){
         chromaState <- .what.is.chromatinState(chromatinState,lociLocal)
-        states <- unique(unlist(sapply(chromaState,function(x){return(x$stateID)})))
+        states <- sort(unique(unlist(sapply(chromaState,function(x){return(x$stateID)}))))
         cs <- TRUE
     } else {
         cs <- FALSE
@@ -190,14 +190,19 @@ plotOccupancyProfile <- function(predictedProfile,
     # Dispatch occup color 
     param$colOccup <- ifelse(any(names(graph) == "colOccup"),graph$colChIP,"#56B4E9")
     # Dispatch CS color
-    param$colCS <- ifelse(any(names(graph) == "colCS"),
-        colorRampPalette(graph$colCS),
-        colorRampPalette(c("#F0E442","#999999","#E69F00", "#56B4E9", "#009E73",
-            "#0072B2", "#D55E00", "#CC79A7")))
+    if (any(names(graph) == "colCS")) {
+        param$colCS <- graph$colCS
+    } else {
+        param$colCS <- colorRampPalette(c("#F0E442","#999999","#E69F00", "#56B4E9", "#009E73",
+            "#0072B2", "#D55E00", "#CC79A7"))
+    }
     # Dispatch Gene Ref color
-    param$colGR <- ifelse(any(names(graph) == "colGR"),
-        colorRampPalette(graph$colGR),
-        colorRampPalette(brewer.pal(8, "Accent")))
+    if (any(names(graph) == "colGR")) {
+        param$colGR <- graph$colGR
+    } else {
+        param$colGR <- colorRampPalette(brewer.pal(8, "Accent"))
+    }
+
     # Dispatch xlab names 
     param$xlab <- ifelse(any(names(graph) == "xlab"),graph$xlab,
         paste("Occupancy at Position",chr,paste(xlim[1],":",xlim[2],sep=""),sep=" "))
@@ -238,8 +243,17 @@ plotOccupancyProfile <- function(predictedProfile,
     CS$y0 <- -0.3
     CS$y1 <- -0.1
     CS$density <- param$densityCS
-    col_local <- param$colCS(length(states))
-    CS$col <- col_local[match(CS$stateID,states)]
+
+    if (is(param$colCS,"vector")) {
+        
+        CS$col <- param$colCS[match(CS$stateID, states)]
+    } else {
+        col_local <- param$colCS(length(states))
+        names(col_local) <- states
+        CS$col <- col_local[match(CS$stateID,states)]
+    }
+    
+    
     return(CS)
 }
 
@@ -317,9 +331,17 @@ plotOccupancyProfile <- function(predictedProfile,
    gr$y0 <- elemY0
    gr$y1 <- elemY1
 
-   ## Setting colours 
-   col_local <- param$colGR(length(types))
-   gr$col <- col_local[match(gr$type,types)]
+    ## Setting colours
+    
+    if (is(param$colGR,"vector")) {
+        gr$col <- param$colGR[match(gr$type,types)]
+    } else {
+        types <- as.character(types)
+        col_local <- param$colGR(length(types))
+        names(col_local) <- types
+        gr$col <- col_local[match(gr$type,types)]
+    }
+   
    
    gr$cex <-c(param$cex.lab,(rep(gr$cex,nrow(gr)-1)*0.5))
    return(gr)
