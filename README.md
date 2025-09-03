@@ -8,7 +8,7 @@ Patrick C.N. Martin <pcnmartin@gmail.com>
 
 and
 
-Dr. Nicolae Radu Zabet <nzabet@essex.ac.uk>
+Dr. Nicolae Radu Zabet <r.zabet@qmul.ac.uk>
 
 ## Description
 Based on a statistical thermodynamic framework, ChIPanalyser
