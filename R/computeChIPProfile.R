@@ -31,7 +31,7 @@ computeChIPProfile <- function(genomicProfiles,loci=NULL,
     stop(paste0(deparse(substitute(genomicProfiles)),
     " is not a Genomic Profiles Object"))
     }
-    if(!.is.parameterOptions(parameterOptions) &
+    if(!.is.parameterOptions(parameterOptions) &&
     !is.null(parameterOptions)){
     stop(paste0(deparse(substitute(parameterOptions)),
     " is not an parameterOptions Object."))

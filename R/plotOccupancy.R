@@ -182,9 +182,9 @@ plotOccupancyProfile <- function(predictedProfile,
     # Dispatch prediction line width 
     param$lwd <- ifelse(any(names(graph) == "lwd"),graph$lwd,1)
     # Dispatch CS density 
-    param$densityCS <- ifelse(any(names(graph) == "densityCS"),graph$densityCS,50)
+    param$densityCS <- ifelse(any(names(graph) == "densityCS"),graph$densityCS,NA)
     # Dispatch geneRef Density 
-    param$densityGR <- ifelse(any(names(graph) == "densityGR"),graph$densityGR,50)
+    param$densityGR <- ifelse(any(names(graph) == "densityGR"),graph$densityGR,NA)
     # Dispatch pred color 
     param$colPred <- ifelse(any(names(graph) == "colPred"),graph$colPred,"#E69F00")
     # Dispatch ChIPcolor 
