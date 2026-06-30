@@ -10,6 +10,7 @@ plotOccupancyProfile <- function(predictedProfile,
     PWM = FALSE,
     geneRef = NULL,
     addLegend = TRUE,
+    overlay = FALSE,
     ...){
     ## First we check that all objects contain what they need to contain 
     ### handling paramter checks and building up object for plotting
@@ -17,6 +18,7 @@ plotOccupancyProfile <- function(predictedProfile,
     lociLocal<-buffer$loci
     predictedProfileLocal<-buffer$predictedProfile
     stepSize<-buffer$stepSize
+    predNames <- buffer$names
     .cleanUpAfterYourself(buffer)
 
     ## Extracting Chromosome information
@@ -82,6 +84,7 @@ plotOccupancyProfile <- function(predictedProfile,
             occupancy = occup,
             gof = gof,
             legend = addLegend)
+        predCols <- .prepPrediction(length(predictedProfileLocal), param)
         # Extracting data to be plotted 
         stepIndex <- seq(1, width(lociLocal[i]),by=stepSize)
         localPosition<-seq(start(lociLocal[i]), end(lociLocal[i]),by=stepSize)
@@ -90,36 +93,69 @@ plotOccupancyProfile <- function(predictedProfile,
         localPredcitedPropfile <- c(0,localPredcitedPropfile,0)
 
         ## Plot empty window 
-        .drawBackground(param)
+        if (overlay && i == 1) {
+            .drawBackground(param)
+        } else if (!overlay){
+            .drawBackground(param)
+        }
+        
 
          ## Adding ChIPscore 
-        if(chip){
+        if(chip && overlay && i == 1){
+            chipProfile<-ChIPScoreLocal[[i]]
+            localchipProfile <- c(0,chipProfile[stepIndex],0)
+            .drawChIP(localPosition,localchipProfile,param)
+        } else if (chip && !overlay){
             chipProfile<-ChIPScoreLocal[[i]]
             localchipProfile <- c(0,chipProfile[stepIndex],0)
             .drawChIP(localPosition,localchipProfile,param)
         }
         ## Adding Occupancy 
-        if(occup){
+        if(occup && overlay && i == 1){
+            .drawOccup(occupancyLocal[[i]],param,PWM)
+        } else if(occup && !overlay){
             .drawOccup(occupancyLocal[[i]],param,PWM)
         }
         ## Adding Predicted 
-        .drawPrediction(localPosition,localPredcitedPropfile,param)
+        if (overlay) {
+            .drawPrediction(localPosition,localPredcitedPropfile,param, predCols, i)
+        } else {
+            .drawPrediction(localPosition,localPredcitedPropfile,param, predCols)
+        }
+        
 
          ## Adding chromatin states 
-        if(cs){
+        if(cs && overlay && i == 1){
+            chroma <- .prepCS(chromaState[[i]],states,param)
+            .drawCS(chroma)
+        } else if (cs && !overlay){
             chroma <- .prepCS(chromaState[[i]],states,param)
             .drawCS(chroma)
         }
 
         ## Adding gene reference 
-        if(gr){
+        if(gr && overlay && i == 1){
+            genelist <- .prepGR(genes[[i]],types,param)
+            .drawGeneRef(genelist)
+        } else if (gr && !overlay){
             genelist <- .prepGR(genes[[i]],types,param)
             .drawGeneRef(genelist)
         }
 
-        if(addLegend){
-           
-           leg <- .prepLegend(chip = chip,
+        if(addLegend && overlay && i==1){
+           leg <- .prepLegend(predNames,
+                predCols,
+                chip = chip,
+                occup = occup,
+                cs = ifelse(cs,list(chroma),"empty"),
+                gof = ifelse(gof,goodnessOfFitLocal[i],"empty"),
+                gr = ifelse(gr,list(genelist),"empty"),
+                param)
+            .drawLegend(leg)
+        } else if (addLegend && !overlay){
+            leg <- .prepLegend(predNames[i],
+                predCols,
+                chip = chip,
                 occup = occup,
                 cs = ifelse(cs,list(chroma),"empty"),
                 gof = ifelse(gof,goodnessOfFitLocal[i],"empty"),
@@ -186,7 +222,12 @@ plotOccupancyProfile <- function(predictedProfile,
     # Dispatch geneRef Density 
     param$densityGR <- ifelse(any(names(graph) == "densityGR"),graph$densityGR,NA)
     # Dispatch pred color 
-    param$colPred <- ifelse(any(names(graph) == "colPred"),graph$colPred,"#E69F00")
+    #param$colPred <- ifelse(any(names(graph) == "colPred"),graph$colPred,"#E69F00")
+    if (any(names(graph) == "colPred")) {
+        param$colPred <- colorRampPalette(graph$colPred)
+    } else {
+        param$colPred <- colorRampPalette(c("#E69F00", "#D55E00", "#4E0707"))
+    }
     # Dispatch ChIPcolor 
     param$colChIP <- ifelse(any(names(graph) == "colChIP"),graph$colChIP,"#999999")
     # Dispatch occup color 
@@ -279,12 +320,25 @@ plotOccupancyProfile <- function(predictedProfile,
         density = param$densityChIP)
 }
 
-.drawPrediction <- function(x,y,param){
-    lines(x,
+.prepPrediction <- function(len_pred,param){
+    return(param$colPred(len_pred))
+}
+
+.drawPrediction <- function(x,y,param,cols,iter = NULL){
+    if (is.null(iter)){
+        lines(x,
         y,
         type = "l",
         lwd = param$lwd,
-        col = param$colPred)
+        col = cols)
+    } else {
+        lines(x,
+        y,
+        type = "l",
+        lwd = param$lwd,
+        col = cols[iter])
+    }
+    
 }
 
 .drawOccup <- function(occupancy,param,PWM){
@@ -436,7 +490,9 @@ plotOccupancyProfile <- function(predictedProfile,
     
 }
 
-.prepLegend <- function(chip,
+.prepLegend <- function(predNames,
+    predCols,
+    chip,
     occup,
     cs,
     gof,
@@ -444,15 +500,15 @@ plotOccupancyProfile <- function(predictedProfile,
     param){
     leg <- list()
     leg$pred <- list("x" = param$xlim[2],
-        "y" = 0.5,
-        "legend" = "Predicted Profile",
-        "col" = param$colPred,
+        "y" = 0.65,
+        "legend" = predNames,
+        "col" = predCols,
         "fill" = NA,
         "border" = NA,
         "cex" = param$cex)
     if(chip){
         leg$chip <- list("x" = param$xlim[2],
-        "y" = 0.75,
+        "y" = 1,
         "legend" = "ChIP Profile",
         "col" = NA,
         "fill" = param$colChIP,
@@ -461,7 +517,7 @@ plotOccupancyProfile <- function(predictedProfile,
     }
     if(occup){
         leg$occup <- list("x" = param$xlim[2],
-        "y" = 0.25,
+        "y" = 0.85,
         "legend" = "Binding Site",
         "col" = param$colOccup,
         "fill" = NA,

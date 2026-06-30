@@ -923,7 +923,9 @@ searchSites <- function(Sites,lambdaPWM="all",
 
          predictedProfile<-.internalUnlist(predictedProfile)
          predictedProfile<-lapply(predictedProfile, function(x){return(x$ChIP)})
-
+         names <- names(predictedProfile)
+         names <- gsub("lambda", "l", names)
+         names <- gsub("boundMolecules", "N", names)
          #warning("No Parameter Combination selected - We will just plot everything",immediate.=TRUE)
     } else if(is(predictedProfile,"list") &
               any(!grepl("lambda",names(predictedProfile)))){
@@ -933,16 +935,18 @@ searchSites <- function(Sites,lambdaPWM="all",
                                   ranges=IRanges(start(x)[1], end(x)[length(x)])))
            }))))
            predictedProfile <- lapply(predictedProfile, function(x){return(x$ChIP)})
+           names <- "Predicted Profile"
     } else if(is(predictedProfile,"GRanges")){
          stepSize<-unique(width(predictedProfile))
          loci<- GRanges(seqnames=as.character(predictedProfile),
                         ranges=IRanges(start(predictedProfile)[1],end(predictedProfile)[length(predictedProfile)]))
          predictedProfiles<-list(predictedProfile$ChIP)
+         names <- "Predicted Profile"
     } else{
        stop("Oops Somthing went wrong. We are not sure what your are parsing to predictedProfile")
     }
     # building loci from predicted
-    return(list("loci"=loci,"predictedProfile"=predictedProfile,"stepSize"=stepSize))
+    return(list("loci"=loci,"predictedProfile"=predictedProfile,"stepSize"=stepSize, "names" = names))
 }
 
 
