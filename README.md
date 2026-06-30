@@ -1,4 +1,5 @@
 # ChIPanalyser
+![R-CMD-check](https://github.com/patrickCNMartin/ChIPanalyser/actions/workflows/R-CMD-check.yaml/badge.svg?branch=master)
 
 ## ChIPanalyser
 ChIPanalyser: Predicting Transcription Factor Binding Sites

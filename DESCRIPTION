@@ -36,7 +36,7 @@ Collate: 2AllS4Class_ProfileParameters.R
 	  profileAccuracyEstimateDev.R
 	  GAAnalysis.R
     GAGeneric.R
-Depends: R (>= 3.5.0),GenomicRanges, Biostrings, BSgenome, RcppRoll, parallel
+Depends: R (>= 3.5.0),GenomicRanges, Biostrings, BSgenome, RcppRoll, parallel, rmarkdown
 Imports: methods, IRanges, S4Vectors,grDevices,graphics,stats,utils,rtracklayer,ROCR, BiocManager,GenomeInfoDb,RColorBrewer
 Suggests: BSgenome.Dmelanogaster.UCSC.dm6,knitr, RUnit, BiocGenerics
 Encoding: UTF-8

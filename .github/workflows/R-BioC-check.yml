@@ -35,6 +35,5 @@ jobs:
           upgrade: 'TRUE'
           cache: true
 
-
-      - name: Run checks
-        uses: r-lib/actions/check-r-package@v2
+      - name: Run BiocCheck
+        uses: insightsengineering/bioc-check-action@v1
