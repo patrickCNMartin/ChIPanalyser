@@ -2,8 +2,8 @@ Package: ChIPanalyser
 Type: Package
 Title: Predicting Transcription Factor Binding Sites
 Authors@R: c(
-    person(c("Patrick", "CN"), "Martin", role=c("cre", "aut"), email="pcnmartin@gmail.com"),
-    person(c("Nicolea","Radu"), "Zabet", role="aut"))
+    person(c("Patrick", "CN"), "Martin", role=c("cre", "aut"), email="pcnmartin@gmail.com",comment = c(ORCID = "0000-0002-4093-8277")),
+    person(c("Nicolea","Radu"), "Zabet", role="aut", comment= c(ORCID = "0000-0001-9964-6271")))
 Version: 1.31.0
 Date: 2026-07-19
 Description: Predicts and helps understand TF binding by utilizing a

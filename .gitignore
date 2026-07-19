@@ -5,3 +5,9 @@ ChIPanalyser.RCheck
 .DS_Store
 *.tar.gz
 CLAUDE.md
+# Rendered vignette PDFs (local only)
+ChIPanalyser.pdf
+GA_ChIPanalyser.pdf
+*.tex
+ChIPanalyser_files/
+GA_ChIPanalyser_files/

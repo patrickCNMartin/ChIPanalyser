@@ -24,7 +24,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libbz2-dev liblzma-dev zlib1g-dev libglpk-dev pandoc texlive-latex-recommended texlive-latex-extra
+          sudo apt-get install -y libcurl4-openssl-dev libbz2-dev liblzma-dev zlib1g-dev libglpk-dev pandoc texlive-latex-recommended texlive-latex-extra ghostscript qpdf
 
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
@@ -38,3 +38,12 @@ jobs:
 
       - name: Run checks
         uses: r-lib/actions/check-r-package@v2
+        with:
+          # --as-cran (on by default here) enables the gs+qpdf vignette size
+          # check, so the built PDFs must already be compacted or the check
+          # emits a WARNING -- which error-on: "warning" turns into a failure.
+          # Compacting at build time is the fix; gs_quality "ebook" matches
+          # what the check itself recommends.
+          build_args: 'c("--no-manual", "--compact-vignettes=both")'
+        env:
+          GS_QUALITY: ebook

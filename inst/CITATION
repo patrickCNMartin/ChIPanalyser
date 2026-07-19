@@ -1,10 +1,29 @@
+citHeader("To cite ChIPanalyser in publications, please use:")
+
 bibentry(bibtype = "Article",
 	author = "Zabet NR & Adryan B",
 	doi = "10.1093/nar/gku1269",
 	journal = "Nucleic Acids Research",
+	volume = "43",
+	number = "1",
+	pages = "84--94",
 	title = "Estimating binding properties of transcription factors from genome-wide binding profiles",
 	year = "2015",
 	textVersion = paste("Zabet NR & Adryan B.",
 	 "Estimating binding properties of transcription factors from genome-wide binding profiles.",
-	 "Nucleic Acids Research, gku1269, https://dx.doi.org/10.1093%2Fnar%2Fgku1269 (2015).")
+	 "Nucleic Acids Research, 43(1), 84-94, https://doi.org/10.1093/nar/gku1269 (2015).")
+)
+
+bibentry(bibtype = "Article",
+	author = "Martin PCN & Zabet NR",
+	doi = "10.1016/j.csbj.2020.11.006",
+	journal = "Computational and Structural Biotechnology Journal",
+	volume = "18",
+	pages = "3590--3605",
+	title = "Dissecting the binding mechanisms of transcription factors to DNA using a statistical thermodynamics framework",
+	year = "2020",
+	textVersion = paste("Martin PCN & Zabet NR.",
+	 "Dissecting the binding mechanisms of transcription factors to DNA using a statistical thermodynamics framework.",
+	 "Computational and Structural Biotechnology Journal, 18, 3590-3605,",
+	 "https://doi.org/10.1016/j.csbj.2020.11.006 (2020).")
 )

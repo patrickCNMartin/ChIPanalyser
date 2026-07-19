@@ -2,11 +2,11 @@
 title: "The ChIPanalyser User's Guide"
 author: "Patrick Martin"
 output:
-    pdf_document: null
-    keep_tex: yes
-    number_sections: no
-    html_document: default
-    code_folding: show
+    pdf_document:
+        keep_tex: yes
+        number_sections: no
+    html_document:
+        code_folding: show
 package: '`ChIPanalyser'''
 vignette: |
     %\VignetteIndexEntry{ChIPanalyser User's Guide for Genetic Algorithms}
@@ -297,3 +297,15 @@ plotOccupancyProfile(predictedProfile = superFit$ChIP,
 ```{r session-info, eval = TRUE, echo = TRUE}
 sessionInfo()
 ```
+
+## References
+
+If you use ChIPanalyser in your research, please cite:
+
+Zabet NR, Adryan B (2015) Estimating binding properties of transcription
+factors from genome-wide binding profiles. Nucleic Acids Res., 43(1), 84–94.
+https://doi.org/10.1093/nar/gku1269
+
+Martin PCN, Zabet NR (2020) Dissecting the binding mechanisms of transcription
+factors to DNA using a statistical thermodynamics framework. Comput. Struct.
+Biotechnol. J., 18, 3590–3605. https://doi.org/10.1016/j.csbj.2020.11.006

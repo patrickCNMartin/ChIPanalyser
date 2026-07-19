@@ -2,9 +2,9 @@
 title: "The ChIPanalyser User's Guide"
 author: "Patrick Martin"
 output:
-    pdf_document: null
-    keep_tex: yes
-    number_sections: no
+    pdf_document:
+        keep_tex: yes
+        number_sections: no
     html_document: default
 package: '`ChIPanalyser'''
 vignette: |
@@ -17,7 +17,10 @@ vignette: |
 ChIPanalyser provides a quick an easy method to predict and explain TF binding. The package uses a statistical thermodynamic framework to model the bidning of proteins to DNA.
 ChIPanalyser makes the assumption that the probability that any given sites along the genome is bound by a TF can be explained by four main factors: DNA accessibility, Binding energy, a scaling factor 
 modulating binding energy ($\lambda$) and number of TF bound ($N$) to DNA. Both $N$ and $\lambda$ are inferred internally by maximisng (or  minimising) a goodness of fit metric between 
-predictions and actual ChIP-data. The package will produce a ChIP like profile at a base pair level. As opposed to machine learning type frameworks, if these paramters are known by other means (experimentally), ChIPanalyser does require any training to produce ChIP like profiles. Estimated values can directly be plugged into the model. Furthermore, ChIPanalyser helps gain an understanding of the mechanims behind TF binding as described by (Zabet et al 2015 & Martin and Zabet 2019).
+predictions and actual ChIP-data. The package will produce a ChIP like profile at a base pair level. As opposed to machine learning type frameworks, if these paramters are known by other means (experimentally), ChIPanalyser does require any training to produce ChIP like profiles. Estimated values can directly be plugged into the model. Furthermore, ChIPanalyser helps gain an understanding of the mechanims behind TF binding as described by (Zabet et al 2015 & Martin and Zabet 2020).
+
+If you use ChIPanalyser in your research, please cite Zabet and Adryan (2015)
+and Martin and Zabet (2020) — see the References section below.
 
 # Methods - The Model
 
@@ -594,4 +597,9 @@ sessionInfo()
 ## References
 
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
-factors from genome-wide binding profiles. Nucleic Acids Res., 43, 84–94.
+factors from genome-wide binding profiles. Nucleic Acids Res., 43(1), 84–94.
+https://doi.org/10.1093/nar/gku1269
+
+Martin PCN, Zabet NR (2020) Dissecting the binding mechanisms of transcription
+factors to DNA using a statistical thermodynamics framework. Comput. Struct.
+Biotechnol. J., 18, 3590–3605. https://doi.org/10.1016/j.csbj.2020.11.006

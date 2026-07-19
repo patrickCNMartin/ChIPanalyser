@@ -7,3 +7,9 @@
 ^ChIPanalyser.RCheck$
 \.tar\.gz$
 ^CLAUDE\.md$
+^ChIPanalyser\.pdf$
+^GA_ChIPanalyser\.pdf$
+^ChIPanalyser\.tex$
+^GA_ChIPanalyser\.tex$
+^ChIPanalyser_files$
+^GA_ChIPanalyser_files$
