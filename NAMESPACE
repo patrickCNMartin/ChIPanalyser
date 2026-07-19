@@ -1,6 +1,9 @@
-import("GenomicRanges","Biostrings", "BSgenome","RcppRoll","parallel",
-    "rtracklayer","BiocManager","GenomeInfoDb")
 
+importFrom("GenomicRanges","GRanges","GRangesList","seqnames","findOverlaps",
+    "intersect","start","end","width","strand","mcols","start<-","end<-","mcols<-","ranges")
+importFrom("Biostrings","getSeq","alphabetFrequency","DNAStringSet","consensusMatrix","PWMscoreStartingAt","reverseComplement","readDNAStringSet")
+importFrom("RcppRoll","roll_mean","roll_sum")
+importFrom("BiocParallel","bplapply","bpmapply","SerialParam","MulticoreParam","SnowParam")
 importFrom("grDevices", "colorRampPalette", "heat.colors","as.raster","rainbow")
 importFrom("RColorBrewer","brewer.pal")
 importFrom("graphics", "axis", "box", "contour", "image", "lines",
@@ -9,17 +12,42 @@ importFrom("graphics", "axis", "box", "contour", "image", "lines",
 importFrom("methods", "new", "validObject","is")
 importFrom("stats", "cor", "dgamma","sd","na.omit","median","ks.test",
     "quantile","runif")
-importFrom("utils", "read.table","write.table")
-importFrom("IRanges","IRanges")
+importFrom("utils", "read.table","write.table","head","tail")
+importFrom("IRanges","IRanges","tile")
 importFrom("rtracklayer","import")
 importFrom("S4Vectors","queryHits")
 importFrom("ROCR","prediction","performance")
-importFrom("GenomeInfoDb","seqlevels","dropSeqlevels")
+importFrom("GenomeInfoDb","seqlevels","dropSeqlevels","seqlevelsStyle","seqlevelsStyle<-")
 importFrom("methods", "slot", "slot<-", "slotNames")
 
+importMethodsFrom("methods", "initialize", "show")
+importClassesFrom("GenomicRanges", "GRanges", "GRangesList", "CompressedGRangesList")
+importClassesFrom("S4Vectors", "Hits")
 
-
-exportPattern("^[[:alpha:]]+")
+export(
+    "computeChIPProfile",
+    "computeGenomeWideScores",
+    "computeOccupancy",
+    "computeOptimal",
+    "computePWMScore",
+    "evolve",
+    "generateStartingPopulation",
+    "genomicProfiles",
+    "getHighestFitnessSolutions",
+    "getTestingData",
+    "getTrainingData",
+    "initialize",
+    "parameterOptions",
+    "plotOccupancyProfile",
+    "plotOptimalHeatMaps",
+    "processingChIP",
+    "profileAccuracyEstimate",
+    "searchSites",
+    "setChromatinStates",
+    "show",
+    "singleRun",
+    "splitData"
+)
 exportMethods(
     "averageExpPWMScore",
     "backgroundSignal",
@@ -36,7 +64,6 @@ exportMethods(
     "chipSmooth<-",
     "DNASequenceLength",
     "drop",
-    "initialize",
     "lambdaPWM",
     "lambdaPWM<-",
     "loci",
@@ -68,7 +95,6 @@ exportMethods(
     "removeBackground",
     "removeBackground<-",
     "scores",
-    "show",
     "stepSize",
     "stepSize<-",
     "strandRule",

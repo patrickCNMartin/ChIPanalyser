@@ -27,7 +27,7 @@ generateStartingPopulation(population,parameters,names=NULL)
 \code{generateStartingPopulation} generates a starting poppulation to be used
 in the genetic algortihm implemented in ChIPanalyser. There are two main ways a
 starting population can be generated:
-  \enumerate{
+  \describe{
       \item{by name}{
           Using names of each parameter that should be parse to each "chromosome".
           The possible paramters are N, lambda, PWMThreshold, CS

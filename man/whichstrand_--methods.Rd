@@ -7,12 +7,14 @@
 Setter method for the \code{whichstrand} slot in a
 \code{\linkS4class{parameterOptions}} object
 }
+\value{
+ An updated object of the same class as \code{object}, with the \code{whichstrand} value set to a single \code{character} value.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{whichstrand(object)<-value}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

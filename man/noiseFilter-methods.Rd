@@ -7,6 +7,10 @@
 \description{
 Accessor method for \code{noiseFilter}
 }
+\value{
+ A single \code{character} value: the current \code{noiseFilter} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
@@ -15,4 +19,3 @@ Noise Filter that will be applied to ChIP scores
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

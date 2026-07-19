@@ -7,16 +7,17 @@
 \description{
  ~~ Methods for function \code{BPFrequency<-}  ~~
 }
+\value{
+ An updated object of the same class as \code{object}, with the \code{BPFrequency} value set to a \code{numeric} vector.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{signature(object = "genomicProfilesInternal", value = "DNAStringSet")}}{
-%%  ~~describe this method here~~
 }
 
 \item{\code{signature(object = "genomicProfilesInternal", value = "vector")}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

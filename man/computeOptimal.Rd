@@ -135,7 +135,7 @@ optimalParam <- computeOptimal(genomicProfiles = GPP,
     ChIPScore = chip,
     chromatinState = Access,
     parameterOptions = OPP,
-    parameter = "all",
+    optimalMethod = "all",
     peakMethod="moving_kernel")
 }
 }

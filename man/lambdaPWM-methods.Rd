@@ -7,12 +7,14 @@
 \description{
  ~~ Methods for function \code{lambdaPWM}  ~~
 }
+\value{
+ A \code{numeric} vector: the current \code{lambdaPWM} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{lambdaPWM(object)}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

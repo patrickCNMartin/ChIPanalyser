@@ -6,6 +6,10 @@
 \description{
 Setter method for the \code{lambdaPWM} slot in the \code{parameterOptions}
 }
+\value{
+ An updated object of the same class as \code{object}, with the \code{lambdaPWM} value set to a \code{numeric} vector.
+}
+
 \section{Methods}{
 \describe{
 
@@ -14,4 +18,3 @@ Setter method for the \code{lambdaPWM} slot in the \code{parameterOptions}
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

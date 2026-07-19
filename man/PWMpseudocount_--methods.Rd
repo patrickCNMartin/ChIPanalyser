@@ -8,12 +8,14 @@
 Setter Method for the \code{pseudocount} slot in a
 \code{\link{parameterOptions}} object
 }
+\value{
+ An updated object of the same class as \code{object}, with the \code{PWMpseudocount} value set to a single \code{numeric} value.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{PWMpseudocount(object)<-value}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

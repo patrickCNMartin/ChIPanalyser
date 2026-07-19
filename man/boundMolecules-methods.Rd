@@ -7,12 +7,14 @@
 \description{
  ~~ Methods for function \code{boundMolecules}  ~~
 }
+\value{
+ A \code{numeric} vector: the current \code{boundMolecules} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{signature(object = "parameterOptions")}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

@@ -8,12 +8,14 @@
 Accessor method for the \code{PWMThreshold} slot in  a
 \code{\link{parameterOptions}} object
 }
+\value{
+ A single \code{numeric} value: the current \code{PWMThreshold} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{PWMThreshold(object)}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

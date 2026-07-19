@@ -6,12 +6,14 @@
 \description{
  ~~ Methods for function \code{chipMean}  ~~
 }
+\value{
+ A single \code{numeric} value: the current \code{chipMean} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{chipMean(object)}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

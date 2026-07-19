@@ -291,4 +291,9 @@ plotOccupancyProfile(predictedProfile = superFit$ChIP,
     addLegend = TRUE)
 
 ```
-    
+
+## Session Info
+
+```{r session-info, eval = TRUE, echo = TRUE}
+sessionInfo()
+```

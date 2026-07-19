@@ -7,12 +7,14 @@
 Setter Method for the \code{PositionWeightMatrix} slot in a
 \code{\link{genomicProfiles}} object
 }
+\value{
+ An updated object of the same class as \code{object}, with the \code{PositionWeightMatrix} value set to a \code{matrix} representing the Position Weight Matrix (PWM).
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{PositionWeightMatrix(object)<-value}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

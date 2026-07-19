@@ -8,20 +8,20 @@
 \description{
 Show methods for various objects
 }
+\value{
+ Invisibly returns \code{NULL}. Called for its side effect of printing a summary of the object to the console.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{signature(object = "ChIPScore")}}{
-%%  ~~describe this method here~~
 }
 
 \item{\code{signature(object = "genomicProfiles")}}{
-%%  ~~describe this method here~~
 }
 
 \item{\code{signature(object = "parameterOptions")}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

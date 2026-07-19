@@ -11,7 +11,8 @@ Parameters and highlight the optimal combination of
 }
 
 \usage{
-plotOptimalHeatMaps(optimalParam,contour=TRUE,col=NULL,main=NULL,layout=TRUE,overlay=FALSE)
+plotOptimalHeatMaps(optimalParam,contour=TRUE,col=NULL,main=NULL,layout=TRUE,
+    overlay=FALSE)
 }
 \arguments{
     \item{optimalParam}{
@@ -74,9 +75,11 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
     }
 library(BSgenome.Dmelanogaster.UCSC.dm6)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
+chip<-processingChIP(chip,top)
 
 #Building data objects
 GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR",BPFrequency=DNASequenceSet)
+OPP <- parameterOptions()
 
 #Computing Optimal set of Parameters
 optimalParam <- computeOptimal(genomicProfiles = GPP,
@@ -84,7 +87,7 @@ optimalParam <- computeOptimal(genomicProfiles = GPP,
     ChIPScore = chip,
     chromatinState = Access,
     parameterOptions = OPP,
-    parameter = "all",
+    optimalMethod = "all",
     peakMethod="moving_kernel")
 plotOptimalHeatMaps(optimalParam)
 }

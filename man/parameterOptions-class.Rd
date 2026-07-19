@@ -52,7 +52,6 @@ needed throughout this analysis pipeline.
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{parameterOptions(ploidy, boundMolecules, backgroundSignal, maxSignal, lociWidth, chipMean, chipSd, chipSmooth, stepSize, noiseFilter, removeBackground, lambdaPWM, PWMpseudocount, naturalLog, noOfSites, PWMThreshold, strandRule, whichstrand)}.
-%%  ~~ describe objects here ~~
 }
 \section{Slots}{
   \describe{

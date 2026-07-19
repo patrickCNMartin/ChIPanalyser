@@ -7,12 +7,14 @@
 Accessor Method for a \code{PWMpseudocount} slot in a
 \code{\link{parameterOptions}}
 }
+\value{
+ A single \code{numeric} value: the current \code{PWMpseudocount} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{PWMpseudocount(object)}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

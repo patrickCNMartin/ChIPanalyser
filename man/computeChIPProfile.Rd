@@ -20,7 +20,7 @@ computeChIPProfile(genomicProfiles, loci, parameterOptions = NULL,
     This object should be a \code{\link{genomicProfiles}} object.
     }
     \item{loci}{
-    \code{loci} is either a \code{\link{GRanges}} or \code{\linkS4class{ChIPScore}}
+    \code{loci} is either a \code{\link[GenomicRanges]{GRanges}} or \code{\linkS4class{ChIPScore}}
     object. ChIPScore-class will be the result of \code{\link{processingChIP}}.
     This object represents the set of Loci you are interested in analysing.
     If you have followed the full ChIPanalyser pipe line, you would have used

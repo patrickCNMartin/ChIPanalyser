@@ -11,6 +11,11 @@ permissions: read-all
 jobs:
   check-package:
     runs-on: ubuntu-latest
+    # bioc-check-action posts/updates a PR comment by default, which needs
+    # write access; the workflow-level "read-all" alone is not enough.
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout
@@ -24,7 +29,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libbz2-dev liblzma-dev zlib1g-dev libglpk-dev pandoc texlive-latex-recommended texlive-latex-extra
+          sudo apt-get install -y libcurl4-openssl-dev libbz2-dev liblzma-dev zlib1g-dev libglpk-dev libgit2-dev pandoc texlive-latex-recommended texlive-latex-extra
 
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
@@ -32,8 +37,14 @@ jobs:
           extra-packages: |
             any::rcmdcheck
             cran::BiocManager
+            cran::gert
           upgrade: 'TRUE'
           cache: true
 
       - name: Run BiocCheck
         uses: insightsengineering/bioc-check-action@v1
+        with:
+          # NOTE: despite the name, "allow-failure: true" is what makes this
+          # action actually fail the job when BiocCheck reports ERRORs.
+          # (See https://github.com/insightsengineering/bioc-check-action)
+          allow-failure: true

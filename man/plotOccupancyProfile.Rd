@@ -12,7 +12,7 @@ PWMScores (or Occupancy), chromatin States, Goodness of Fit estimates and gene i
 \usage{
   plotOccupancyProfile(predictedProfile, ChIPScore = NULL,chromatinState = NULL,
     occupancy = NULL,goodnessOfFit = NULL,PWM=FALSE,
-    geneRef = NULL,addLegend = TRUE,...)
+    geneRef = NULL,addLegend = TRUE,overlay = FALSE,...)
 }
 
 \arguments{
@@ -53,7 +53,10 @@ PWMScores (or Occupancy), chromatin States, Goodness of Fit estimates and gene i
     \code{addLegend} is a logical value defining if the legend should be added.
     The legend will add all elements provided. See details. 
     }
-    
+    \item{overlay}{
+        \code{overlay} is a logical value defining if multiple predicted profiles
+        should be overlayed in the same plot. See Details.
+    }
     \item{...}{
     Any other graphical Parameter of the following : cex, cex.lab, cex.main, 
     densityCS , densityGR , ylab, xlab, main, colPred,
@@ -72,13 +75,16 @@ be used in a colorRampPalettte.
 
 * cex = font sizes - for text, axis labels and main 
 
-* Density = fill density for chromatin state and/or geneRef blocks
 
 Pred = predictedProfile
 ChIP = ChIP score (Experimental ChIP data)
 CS = Chromatin States
 GR = Gene reference 
 Occup = Occupnacy locations
+
+In the case, that more than one predicted profile is available for the same genomic
+region, the overlay argument allows for these profiles to be plotted together 
+rather than in seperate profile plots.
 }
 \value{
 Returns a profile plot with "Occupancy" on the y axis and DNA position on
@@ -110,6 +116,7 @@ if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
     }
 library(BSgenome.Dmelanogaster.UCSC.dm6)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
+chip<-processingChIP(chip,top)
 #Building data objects
 GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
 
@@ -126,7 +133,7 @@ PWMScores <- computePWMScore(DNASequenceSet = DNASequenceSet,
 Occupancy <- computeOccupancy(genomicProfiles = PWMScores)
 
 #Compute ChIP profiles
-chipProfile <- computeChipProfile(loci = top,
+chipProfile <- computeChIPProfile(loci = top,
     genomicProfiles = Occupancy)
 
 

@@ -8,7 +8,8 @@ Computing Genome Wide scores
 \code{computeGenomeWideScores} compute the max and min PWM score over the entire genome.
 }
 \usage{
-computeGenomeWideScores(genomicProfiles, DNASequenceSet, chromatinState = NULL, parameterOptions = NULL, cores = 1, verbose = TRUE)
+computeGenomeWideScores(genomicProfiles, DNASequenceSet, chromatinState = NULL,
+    parameterOptions = NULL, cores = 1, verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,7 +36,7 @@ computeGenomeWideScores(genomicProfiles, DNASequenceSet, chromatinState = NULL, 
 \code{computeGenomeWideScores} function computes PWM scores over the entire genome (or accessible Genome if chromatin State are provided ). Genome wide scores are used to determine the maximum and minimum PWM score as well as the average exponential score. These scores will in turn be used to determine which score are above the PWM theshold. The average exponential score is an integrale part of the equation used to compute Occupancy. Using defualt settings, ChIPanalyser will only compute occupancy on the top 70\% of PWM scores. This threshold can be changed. See \code{\link{PWMThreshold}}
 }
 \value{
-Returns a \code{genomicsProfiles} object with updated values for max score, min score and averageExpPWMScore.
+Returns a \code{genomicProfiles} object with updated values for max score, min score and averageExpPWMScore.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -48,6 +49,17 @@ Patrick C.N Martin <pm16057@essex.ac.uk>
 
 \examples{
 
+  # Small self-contained (fast, no download) example using a synthetic
+  # DNA sequence instead of a full BSgenome
+  DNASequenceSet <- Biostrings::DNAStringSet(vapply(seq_len(2), function(i){
+      paste(sample(c("A","C","G","T"), 2000, replace=TRUE), collapse="")
+  }, character(1)))
+  names(DNASequenceSet) <- c("chr1","chr2")
+  PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
+  GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
+  GenomeWide <- computeGenomeWideScores(genomicProfiles = GPP,
+      DNASequenceSet = DNASequenceSet, verbose = FALSE)
+
   \donttest{
   if(!require("BSgenome.Dmelanogaster.UCSC.dm6", character.only = TRUE)){
       if (!requireNamespace("BiocManager", quietly=TRUE))
@@ -56,6 +68,8 @@ Patrick C.N Martin <pm16057@essex.ac.uk>
       }
   library(BSgenome.Dmelanogaster.UCSC.dm6)
   DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
+  # path to Position Frequency Matrix
+  PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
   # Building genomicProfiles object
   GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
 

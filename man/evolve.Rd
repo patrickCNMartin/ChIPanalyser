@@ -87,14 +87,14 @@ it would potentially take more time for accuracy minor gains.
 
 \value{
 Returns a named list with three elements.
-  \itemize{
+  
   \item{database}{ saves the data frame containing all
   scores for each individual since generation 1}
   \item{population}{ saves the last population with
   chromosome values}
   \item{fitest}{saves the fittest individual
    for a given generation}
-  }
+
 
 }
 

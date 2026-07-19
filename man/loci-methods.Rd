@@ -7,6 +7,10 @@
 \description{
 Accessor method for the \code{loci} slot in \code{\linkS4class{ChIPScore}}
 }
+\value{
+ A \code{GRanges} object (or \code{NULL}) containing the loci stored in the \code{ChIPScore} object.
+}
+
 \section{Methods}{
 \describe{
 
@@ -15,4 +19,3 @@ Loci of interest parsed to or extracted from the ChIPScore object
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

@@ -12,7 +12,6 @@ to facilitate that parsing and changing of paramters.
 }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{genomicProfiles(ploidy, boundMolecules, backgroundSignal, maxSignal, lociWidth, chipMean, chipSd, chipSmooth, stepSize, noiseFilter, removeBackground, lambdaPWM, PWMpseudocount, naturalLog, noOfSites, PWMThreshold, strandRule, whichstrand, PFM, PWM, PFMFormat, BPFrequency, minPWMScore, maxPWMScore, profiles, DNASequenceLength, averageExpPWMScore)}.
-%%  ~~ describe objects here ~~
 }
 \section{Slots}{
   \describe{

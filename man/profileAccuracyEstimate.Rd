@@ -66,12 +66,13 @@ PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
       }
   library(BSgenome.Dmelanogaster.UCSC.dm6)
   DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
+  chip<-processingChIP(chip,top)
   # Building genomicProfiles object
   GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
-
+  OPP <- parameterOptions()
 
   # Computing Genome Wide
-  GenomeWide <- computeGenomeWideScore(genomicProfiles = GPP,
+  GenomeWide <- computeGenomeWideScores(genomicProfiles = GPP,
       DNASequenceSet = DNASequenceSet)
 
   #Compute PWM Scores
@@ -85,6 +86,6 @@ PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 #Estimating accuracy estimate
 AccuracyEstimate <- profileAccuracyEstimate(genomicProfiles = chipProfile,
     ChIPScore = chip,
-    occupancyProfileParameters = OPP)
+    parameterOptions = OPP)
 }
 }

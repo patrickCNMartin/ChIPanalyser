@@ -6,6 +6,10 @@
 \description{
 Accessor method for \code{scores} slot in a \code{ChIPScore} object.
 }
+\value{
+ A \code{list} of the extracted and normalised ChIP scores stored in the \code{ChIPScore} object.
+}
+
 \section{Methods}{
 \describe{
 
@@ -14,4 +18,3 @@ Extracted and normalised ChIP scores at loci of interest.
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

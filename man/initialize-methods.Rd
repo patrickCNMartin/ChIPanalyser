@@ -8,6 +8,10 @@
 \description{
  ~~ Methods for function \code{initialize}  ~~
 }
+\value{
+ An initialized object of the dispatched class (\code{ChIPScore}, \code{genomicProfiles}, or \code{parameterOptions}).
+}
+
 \section{Methods}{
 \describe{
 
@@ -24,4 +28,3 @@ Initialize parameterOptions
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

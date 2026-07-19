@@ -24,7 +24,6 @@ Patrick C. N. Martin <pm16057@essex.ac.uk>
 
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\linkS4class{ChIPScore}}

@@ -1,243 +1,254 @@
-# Cleaner plotting function for occupancy profiles. 
+# Cleaner plotting function for occupancy profiles.
 
-## Plotting occupency main function 
+## Plotting occupency main function
 
-plotOccupancyProfile <- function(predictedProfile,
-    ChIPScore = NULL,
-    chromatinState = NULL,
-    occupancy = NULL,
-    goodnessOfFit = NULL,
-    PWM = FALSE,
-    geneRef = NULL,
-    addLegend = TRUE,
-    overlay = FALSE,
-    ...){
-    ## First we check that all objects contain what they need to contain 
+plotOccupancyProfile <- function(
+  predictedProfile,
+  ChIPScore = NULL,
+  chromatinState = NULL,
+  occupancy = NULL,
+  goodnessOfFit = NULL,
+  PWM = FALSE,
+  geneRef = NULL,
+  addLegend = TRUE,
+  overlay = FALSE,
+  ...
+) {
+    ## First we check that all objects contain what they need to contain
     ### handling paramter checks and building up object for plotting
-    buffer<- .what.is.predictedProfile(predictedProfile)
-    lociLocal<-buffer$loci
-    predictedProfileLocal<-buffer$predictedProfile
-    stepSize<-buffer$stepSize
+    buffer <- .what.is.predictedProfile(predictedProfile)
+    lociLocal <- buffer$loci
+    predictedProfileLocal <- buffer$predictedProfile
+    stepSize <- buffer$stepSize
     predNames <- buffer$names
     .cleanUpAfterYourself(buffer)
 
     ## Extracting Chromosome information
     chromosome <- as.character(seqnames(lociLocal))
     startPoint <- start(lociLocal)
-    #ranges <- ranges(lociLocal)
+    # ranges <- ranges(lociLocal)
     endPoint <- end(lociLocal)
-    
 
-    ## Exrtracting Occupancy if present 
-    if(!is.null(occupancy)){
-        occupancyLocal<-.what.is.occupancy(occupancy)
+
+    ## Exrtracting Occupancy if present
+    if (!is.null(occupancy)) {
+        occupancyLocal <- .what.is.occupancy(occupancy)
         occup <- TRUE
     } else {
         occup <- FALSE
     }
-    
-    ## Extracting ChIPscore if present 
-    if(!is.null(ChIPScore)){
+
+    ## Extracting ChIPscore if present
+    if (!is.null(ChIPScore)) {
         ChIPScoreLocal <- .what.is.ChIPScore(ChIPScore)
-        ChIPScoreLocal <- rep(ChIPScoreLocal,
-            length(predictedProfileLocal)/length(ChIPScoreLocal))
+        ChIPScoreLocal <- rep(
+            ChIPScoreLocal,
+            length(predictedProfileLocal) / length(ChIPScoreLocal)
+        )
         chip <- TRUE
     } else {
         chip <- FALSE
     }
-    ## Extrating GoF score if present 
-    if(!is.null(goodnessOfFit)){
-        goodnessOfFitLocal<-.what.is.goodnessOfFit(goodnessOfFit)
+    ## Extrating GoF score if present
+    if (!is.null(goodnessOfFit)) {
+        goodnessOfFitLocal <- .what.is.goodnessOfFit(goodnessOfFit)
         gof <- TRUE
     } else {
         gof <- FALSE
     }
 
-    ## Extracting chromatin states if present 
-    if(!is.null(chromatinState)){
-        chromaState <- .what.is.chromatinState(chromatinState,lociLocal)
-        states <- sort(unique(unlist(sapply(chromaState,function(x){return(x$stateID)}))))
+    ## Extracting chromatin states if present
+    if (!is.null(chromatinState)) {
+        chromaState <- .what.is.chromatinState(chromatinState, lociLocal)
+        states <- sort(unique(unlist(lapply(chromaState, function(x) {
+            return(x$stateID)
+        }))))
         cs <- TRUE
     } else {
         cs <- FALSE
     }
 
-    ## Extracting geneRef if present 
-    if(!is.null(geneRef)){
-        genes <- .what.is.geneRef(geneRef,lociLocal)
-        types <- unique(unlist(sapply(genes,function(x){return(x$type)})))
+    ## Extracting geneRef if present
+    if (!is.null(geneRef)) {
+        genes <- .what.is.geneRef(geneRef, lociLocal)
+        types <- unique(unlist(lapply(genes, function(x) {
+            return(x$type)
+        })))
         gr <- TRUE
     } else {
         gr <- FALSE
     }
 
-    # Get elipsis arguments 
+    # Get elipsis arguments
     graphical <- list(...)
-    ### Looping over profiles 
-    for(i in seq_along(predictedProfileLocal)){
-        # Get local graphical paramters 
+    ### Looping over profiles
+    for (i in seq_along(predictedProfileLocal)) {
+        # Get local graphical paramters
         param <- .dispatchGraphical(graphical,
-            xlim = c(startPoint[i],endPoint[i]),
+            xlim = c(startPoint[i], endPoint[i]),
             chr = chromosome[i],
             cs = cs,
             geneRef = gr,
             occupancy = occup,
             gof = gof,
-            legend = addLegend)
+            legend = addLegend
+        )
         predCols <- .prepPrediction(length(predictedProfileLocal), param)
-        # Extracting data to be plotted 
-        stepIndex <- seq(1, width(lociLocal[i]),by=stepSize)
-        localPosition<-seq(start(lociLocal[i]), end(lociLocal[i]),by=stepSize)
-        localPosition<-c(localPosition[1]-1,localPosition,localPosition[length(localPosition)]+1)
+        # Extracting data to be plotted
+        stepIndex <- seq(1, width(lociLocal[i]), by = stepSize)
+        localPosition <- seq(start(lociLocal[i]), end(lociLocal[i]), by = stepSize)
+        localPosition <- c(localPosition[1] - 1, localPosition, localPosition[length(localPosition)] + 1)
         localPredcitedPropfile <- predictedProfileLocal[[i]]
-        localPredcitedPropfile <- c(0,localPredcitedPropfile,0)
+        localPredcitedPropfile <- c(0, localPredcitedPropfile, 0)
 
-        ## Plot empty window 
+        ## Plot empty window
         if (overlay && i == 1) {
             .drawBackground(param)
-        } else if (!overlay){
+        } else if (!overlay) {
             .drawBackground(param)
         }
-        
 
-         ## Adding ChIPscore 
-        if(chip && overlay && i == 1){
-            chipProfile<-ChIPScoreLocal[[i]]
-            localchipProfile <- c(0,chipProfile[stepIndex],0)
-            .drawChIP(localPosition,localchipProfile,param)
-        } else if (chip && !overlay){
-            chipProfile<-ChIPScoreLocal[[i]]
-            localchipProfile <- c(0,chipProfile[stepIndex],0)
-            .drawChIP(localPosition,localchipProfile,param)
+
+        ## Adding ChIPscore
+        if (chip && overlay && i == 1) {
+            chipProfile <- ChIPScoreLocal[[i]]
+            localchipProfile <- c(0, chipProfile[stepIndex], 0)
+            .drawChIP(localPosition, localchipProfile, param)
+        } else if (chip && !overlay) {
+            chipProfile <- ChIPScoreLocal[[i]]
+            localchipProfile <- c(0, chipProfile[stepIndex], 0)
+            .drawChIP(localPosition, localchipProfile, param)
         }
-        ## Adding Occupancy 
-        if(occup && overlay && i == 1){
-            .drawOccup(occupancyLocal[[i]],param,PWM)
-        } else if(occup && !overlay){
-            .drawOccup(occupancyLocal[[i]],param,PWM)
+        ## Adding Occupancy
+        if (occup && overlay && i == 1) {
+            .drawOccup(occupancyLocal[[i]], param, PWM)
+        } else if (occup && !overlay) {
+            .drawOccup(occupancyLocal[[i]], param, PWM)
         }
-        ## Adding Predicted 
+        ## Adding Predicted
         if (overlay) {
-            .drawPrediction(localPosition,localPredcitedPropfile,param, predCols, i)
+            .drawPrediction(localPosition, localPredcitedPropfile, param, predCols, i)
         } else {
-            .drawPrediction(localPosition,localPredcitedPropfile,param, predCols)
+            .drawPrediction(localPosition, localPredcitedPropfile, param, predCols)
         }
-        
 
-         ## Adding chromatin states 
-        if(cs && overlay && i == 1){
-            chroma <- .prepCS(chromaState[[i]],states,param)
+
+        ## Adding chromatin states
+        if (cs && overlay && i == 1) {
+            chroma <- .prepCS(chromaState[[i]], states, param)
             .drawCS(chroma)
-        } else if (cs && !overlay){
-            chroma <- .prepCS(chromaState[[i]],states,param)
+        } else if (cs && !overlay) {
+            chroma <- .prepCS(chromaState[[i]], states, param)
             .drawCS(chroma)
         }
 
-        ## Adding gene reference 
-        if(gr && overlay && i == 1){
-            genelist <- .prepGR(genes[[i]],types,param)
+        ## Adding gene reference
+        if (gr && overlay && i == 1) {
+            genelist <- .prepGR(genes[[i]], types, param)
             .drawGeneRef(genelist)
-        } else if (gr && !overlay){
-            genelist <- .prepGR(genes[[i]],types,param)
+        } else if (gr && !overlay) {
+            genelist <- .prepGR(genes[[i]], types, param)
             .drawGeneRef(genelist)
         }
 
-        if(addLegend && overlay && i==1){
-           leg <- .prepLegend(predNames,
+        if (addLegend && overlay && i == 1) {
+            leg <- .prepLegend(predNames,
                 predCols,
                 chip = chip,
                 occup = occup,
-                cs = ifelse(cs,list(chroma),"empty"),
-                gof = ifelse(gof,goodnessOfFitLocal[i],"empty"),
-                gr = ifelse(gr,list(genelist),"empty"),
-                param)
+                cs = ifelse(cs, list(chroma), "empty"),
+                gof = ifelse(gof, goodnessOfFitLocal[i], "empty"),
+                gr = ifelse(gr, list(genelist), "empty"),
+                param
+            )
             .drawLegend(leg)
-        } else if (addLegend && !overlay){
+        } else if (addLegend && !overlay) {
             leg <- .prepLegend(predNames[i],
                 predCols,
                 chip = chip,
                 occup = occup,
-                cs = ifelse(cs,list(chroma),"empty"),
-                gof = ifelse(gof,goodnessOfFitLocal[i],"empty"),
-                gr = ifelse(gr,list(genelist),"empty"),
-                param)
+                cs = ifelse(cs, list(chroma), "empty"),
+                gof = ifelse(gof, goodnessOfFitLocal[i], "empty"),
+                gr = ifelse(gr, list(genelist), "empty"),
+                param
+            )
             .drawLegend(leg)
         }
     }
-
-    
 }
 
 
-
-
-## Creating param table/list for new plots and segment plots 
+## Creating param table/list for new plots and segment plots
 # we just want to make it easier and cleaner to add colors and what not
-.dispatchGraphical <- function(graph,
-    xlim = NULL,
-    chr = NULL,
-    cs = FALSE,
-    geneRef = FALSE,
-    occupancy = FALSE,
-    gof = FALSE,
-    legend = FALSE){
+.dispatchGraphical <- function(
+  graph,
+  xlim = NULL,
+  chr = NULL,
+  cs = FALSE,
+  geneRef = FALSE,
+  occupancy = FALSE,
+  gof = FALSE,
+  legend = FALSE
+) {
     ## First set up parameters for empty plot.
     param <- list()
 
     ## Expanding if legened needs to be added
-    if(legend & cs & gof){
-        param$xpd <- TRUE 
-        param$mar <- c(6,8,4,20)
-    } else if(legend & !cs & gof){
-        param$xpd <- TRUE 
-        param$mar <- c(6,8,4,10)
-    } else if(legend & !cs & !gof){
-        param$xpd <- TRUE 
-        param$mar <- c(6,2,4,10)
-    } else if(legend & !cs & geneRef){
-        param$xpd <- TRUE 
-        param$mar <- c(6,8,4,10)
+    if (legend & cs & gof) {
+        param$xpd <- TRUE
+        param$mar <- c(6, 8, 4, 20)
+    } else if (legend & !cs & gof) {
+        param$xpd <- TRUE
+        param$mar <- c(6, 8, 4, 10)
+    } else if (legend & !cs & !gof) {
+        param$xpd <- TRUE
+        param$mar <- c(6, 2, 4, 10)
+    } else if (legend & !cs & geneRef) {
+        param$xpd <- TRUE
+        param$mar <- c(6, 8, 4, 10)
     }
     ## Expanding ylim to have space for geneRef and/or CS
-    if(cs & geneRef){
-        param$ylim <- c(-1.2,1)
-    }else if((cs & !geneRef)){
-        param$ylim <- c(-0.3,1)
-    }else if(!cs & geneRef){
-        param$ylim <- c(-0.9,1)
-    }else {
-        param$ylim <-c(0,1)
+    if (cs & geneRef) {
+        param$ylim <- c(-1.2, 1)
+    } else if ((cs & !geneRef)) {
+        param$ylim <- c(-0.3, 1)
+    } else if (!cs & geneRef) {
+        param$ylim <- c(-0.9, 1)
+    } else {
+        param$ylim <- c(0, 1)
     }
-    # Adding xlims to param 
+    # Adding xlims to param
     param$xlim <- xlim
-    # Dispatching font size 
-    param$cex <- ifelse(any(names(graph) == "cex"),graph$cex,1)
-    param$cex.lab <- ifelse(any(names(graph) == "cex.lab"),graph$cex.lab,1)
-    # Dispatch main title font 
-    param$cex.main <- ifelse(any(names(graph) == "cex.main"),graph$cex.main,1)
-    # Dispatch prediction line width 
-    param$lwd <- ifelse(any(names(graph) == "lwd"),graph$lwd,1)
-    # Dispatch CS density 
-    param$densityCS <- ifelse(any(names(graph) == "densityCS"),graph$densityCS,NA)
-    # Dispatch geneRef Density 
-    param$densityGR <- ifelse(any(names(graph) == "densityGR"),graph$densityGR,NA)
-    # Dispatch pred color 
-    #param$colPred <- ifelse(any(names(graph) == "colPred"),graph$colPred,"#E69F00")
+    # Dispatching font size
+    param$cex <- ifelse(any(names(graph) == "cex"), graph$cex, 1)
+    param$cex.lab <- ifelse(any(names(graph) == "cex.lab"), graph$cex.lab, 1)
+    # Dispatch main title font
+    param$cex.main <- ifelse(any(names(graph) == "cex.main"), graph$cex.main, 1)
+    # Dispatch prediction line width
+    param$lwd <- ifelse(any(names(graph) == "lwd"), graph$lwd, 1)
+    # Dispatch CS density
+    param$densityCS <- ifelse(any(names(graph) == "densityCS"), graph$densityCS, NA)
+    # Dispatch geneRef Density
+    param$densityGR <- ifelse(any(names(graph) == "densityGR"), graph$densityGR, NA)
+    # Dispatch pred color
+    # param$colPred <- ifelse(any(names(graph) == "colPred"),graph$colPred,"#E69F00")
     if (any(names(graph) == "colPred")) {
         param$colPred <- colorRampPalette(graph$colPred)
     } else {
         param$colPred <- colorRampPalette(c("#E69F00", "#D55E00", "#4E0707"))
     }
-    # Dispatch ChIPcolor 
-    param$colChIP <- ifelse(any(names(graph) == "colChIP"),graph$colChIP,"#999999")
-    # Dispatch occup color 
-    param$colOccup <- ifelse(any(names(graph) == "colOccup"),graph$colChIP,"#56B4E9")
+    # Dispatch ChIPcolor
+    param$colChIP <- ifelse(any(names(graph) == "colChIP"), graph$colChIP, "#999999")
+    # Dispatch occup color
+    param$colOccup <- ifelse(any(names(graph) == "colOccup"), graph$colChIP, "#56B4E9")
     # Dispatch CS color
     if (any(names(graph) == "colCS")) {
         param$colCS <- graph$colCS
     } else {
-        param$colCS <- colorRampPalette(c("#F0E442","#999999","#E69F00", "#56B4E9", "#009E73",
-            "#0072B2", "#D55E00", "#CC79A7"))
+        param$colCS <- colorRampPalette(c(
+            "#F0E442", "#999999", "#E69F00", "#56B4E9", "#009E73",
+            "#0072B2", "#D55E00", "#CC79A7"
+        ))
     }
     # Dispatch Gene Ref color
     if (any(names(graph) == "colGR")) {
@@ -246,348 +257,373 @@ plotOccupancyProfile <- function(predictedProfile,
         param$colGR <- colorRampPalette(brewer.pal(8, "Accent"))
     }
 
-    # Dispatch xlab names 
-    param$xlab <- ifelse(any(names(graph) == "xlab"),graph$xlab,
-        paste("Occupancy at Position",chr,paste(xlim[1],":",xlim[2],sep=""),sep=" "))
-    # Dispatch ylab 
-    param$ylab <- ifelse(any(names(graph) == "ylab"),graph$ylab," ")
-    # Dispatch Main 
-    param$main <- ifelse(any(names(graph) == "main"),graph$main," ")
-    # Dispatch axis ticks 
+    # Dispatch xlab names
+    param$xlab <- ifelse(any(names(graph) == "xlab"), graph$xlab,
+        paste("Occupancy at Position", chr, paste(xlim[1], ":", xlim[2], sep = ""), sep = " ")
+    )
+    # Dispatch ylab
+    param$ylab <- ifelse(any(names(graph) == "ylab"), graph$ylab, " ")
+    # Dispatch Main
+    param$main <- ifelse(any(names(graph) == "main"), graph$main, " ")
+    # Dispatch axis ticks
     param$n_axis_ticks <- ifelse(any(names(graph) == "n_axis_ticks"),
-        list(round(seq(from=xlim[1],to=xlim[2], length.out=graph$n_axis_ticks))),
-        list(round(seq(from=xlim[1],to=xlim[2], length.out=10))))
-    
-    return(param)
+        list(round(seq(from = xlim[1], to = xlim[2], length.out = graph$n_axis_ticks))),
+        list(round(seq(from = xlim[1], to = xlim[2], length.out = 10)))
+    )
 
+    return(param)
 }
 
 
-
-.drawBackground <- function(param){
+.drawBackground <- function(param) {
     ## setting up empty plotting window only using the relevant parameters.
-    ## Checking if the legend needs to be plotted 
-    
+    ## Checking if the legend needs to be plotted
+
     par(xpd = param$xpd)
     par(mar = param$mar)
-    
-    plot(0, type = "n",
+
+    plot(0,
+        type = "n",
         axes = FALSE,
         xlab = "", ylab = "",
         ylim = param$ylim,
-        xlim = param$xlim)
-    axis(side=BELOW<-1,at=param$n_axis_ticks[[1]],labels=param$n_axis_ticks[[1]],cex.axis=param$cex)
-    title(xlab = param$xlab , cex.lab = param$cex.lab)
-    title(ylab = param$ylab , cex.lab = param$cex.lab)
-    title(main = param$main , cex = param$cex.main)
+        xlim = param$xlim
+    )
+    axis(side = BELOW <- 1, at = param$n_axis_ticks[[1]], labels = param$n_axis_ticks[[1]], cex.axis = param$cex)
+    title(xlab = param$xlab, cex.lab = param$cex.lab)
+    title(ylab = param$ylab, cex.lab = param$cex.lab)
+    title(main = param$main, cex = param$cex.main)
 }
 
-.prepCS <- function(CS,states, param){
+.prepCS <- function(CS, states, param) {
     CS$y0 <- -0.3
     CS$y1 <- -0.1
     CS$density <- param$densityCS
 
-    if (is(param$colCS,"vector")) {
-        
+    if (is(param$colCS, "vector")) {
         CS$col <- param$colCS[match(CS$stateID, states)]
     } else {
         col_local <- param$colCS(length(states))
         names(col_local) <- states
-        CS$col <- col_local[match(CS$stateID,states)]
+        CS$col <- col_local[match(CS$stateID, states)]
     }
-    
-    
+
+
     return(CS)
 }
 
-.drawCS <- function(CS){
-    # looping over blocks 
-    for(block in seq_len(nrow(CS))){
+.drawCS <- function(CS) {
+    # looping over blocks
+    for (block in seq_len(nrow(CS))) {
         rect(CS$start[block],
             CS$y0[block],
             CS$end[block],
             CS$y1[block],
             density = CS$density[block],
-            col = CS$col[block])
+            col = CS$col[block]
+        )
     }
 }
 
-.drawChIP <- function(x,y,param){
+.drawChIP <- function(x, y, param) {
     polygon(x,
         y,
         col = param$colChIP,
         border = NA,
-        density = param$densityChIP)
+        density = param$densityChIP
+    )
 }
 
-.prepPrediction <- function(len_pred,param){
+.prepPrediction <- function(len_pred, param) {
     return(param$colPred(len_pred))
 }
 
-.drawPrediction <- function(x,y,param,cols,iter = NULL){
-    if (is.null(iter)){
+.drawPrediction <- function(x, y, param, cols, iter = NULL) {
+    if (is.null(iter)) {
         lines(x,
-        y,
-        type = "l",
-        lwd = param$lwd,
-        col = cols)
+            y,
+            type = "l",
+            lwd = param$lwd,
+            col = cols
+        )
     } else {
         lines(x,
-        y,
-        type = "l",
-        lwd = param$lwd,
-        col = cols[iter])
-    }
-    
-}
-
-.drawOccup <- function(occupancy,param,PWM){
-    if(PWM){
-        PWMScaling <- occupancy[head(order(occupancy$PWMScore,decreasing=T), 
-            round(0.9*length(occupancy$PWMScore)))]
-        ReScale<-((PWMScaling$PWMScore+abs(min(PWMScaling$PWMScore)))/
-            (max(PWMScaling$PWMScore)+abs(min(PWMScaling$PWMScore))))*(param$ylim[2]*0.5)
-        lines(x=start(PWMScaling),y=ReScale,type="h",col = param$colOccup,lwd =2)
-    }else{
-        OccupScaling <- occupancy[head(order(occupancy$Occupancy,decreasing=T), 
-            round(0.9*length(occupancy$Occupancy)))]
-        ReScale<-(OccupScaling$Occupancy/max(OccupScaling$Occupancy))*
-            (param$ylim[2]*0.5)
-        lines(x=start(OccupScaling),y=ReScale,type="h",col = param$colOccup,lwd =2)
-
+            y,
+            type = "l",
+            lwd = param$lwd,
+            col = cols[iter]
+        )
     }
 }
 
-.prepGR <- function(gr, types,param){
-    elem<- data.frame("chr" = "chr",
-            "x0" = param$xlim[1],
-            "x1" = param$xlim[2],
-            "width" = param$xlim[2] - param$xlim[1],
-            "strand" = "*",
-            "type" = "line",
-            "gene_id" = "None")
-    if(!is.null(nrow(gr))){
-        colnames(gr) <- c("chr","x0","x1","width","strand","type","gene_id")
-        gr <- rbind(elem,gr)
-        
-    }else {
+.drawOccup <- function(occupancy, param, PWM) {
+    if (PWM) {
+        PWMScaling <- occupancy[head(
+            order(occupancy$PWMScore, decreasing = TRUE),
+            round(0.9 * length(occupancy$PWMScore))
+        )]
+        ReScale <- ((PWMScaling$PWMScore + abs(min(PWMScaling$PWMScore))) /
+            (max(PWMScaling$PWMScore) + abs(min(PWMScaling$PWMScore)))) * (param$ylim[2] * 0.5)
+        lines(x = start(PWMScaling), y = ReScale, type = "h", col = param$colOccup, lwd = 2)
+    } else {
+        OccupScaling <- occupancy[head(
+            order(occupancy$Occupancy, decreasing = TRUE),
+            round(0.9 * length(occupancy$Occupancy))
+        )]
+        ReScale <- (OccupScaling$Occupancy / max(OccupScaling$Occupancy)) *
+            (param$ylim[2] * 0.5)
+        lines(x = start(OccupScaling), y = ReScale, type = "h", col = param$colOccup, lwd = 2)
+    }
+}
+
+.prepGR <- function(gr, types, param) {
+    elem <- data.frame(
+        "chr" = "chr",
+        "x0" = param$xlim[1],
+        "x1" = param$xlim[2],
+        "width" = param$xlim[2] - param$xlim[1],
+        "strand" = "*",
+        "type" = "line",
+        "gene_id" = "None"
+    )
+    if (!is.null(nrow(gr))) {
+        colnames(gr) <- c("chr", "x0", "x1", "width", "strand", "type", "gene_id")
+        gr <- rbind(elem, gr)
+    } else {
         gr <- elem
     }
-   
-   
-   elemY0 <- param$ylim[1]
-   elemY0[gr$strand == "*"] <- param$ylim[1] + 0.35
-   elemY0[gr$strand == "+"] <- param$ylim[1] + 0.4
-   elemY0[gr$strand == "-"] <- param$ylim[1] + 0.15
 
-   elemY1 <- param$ylim[1]
-   elemY1[gr$strand == "*"] <- param$ylim[1] + 0.35
-   elemY1[gr$strand == "+"] <- param$ylim[1] + 0.55
-   elemY1[gr$strand == "-"] <- param$ylim[1] + 0.3
 
-   gr$y0 <- elemY0
-   gr$y1 <- elemY1
+    elemY0 <- param$ylim[1]
+    elemY0[gr$strand == "*"] <- param$ylim[1] + 0.35
+    elemY0[gr$strand == "+"] <- param$ylim[1] + 0.4
+    elemY0[gr$strand == "-"] <- param$ylim[1] + 0.15
+
+    elemY1 <- param$ylim[1]
+    elemY1[gr$strand == "*"] <- param$ylim[1] + 0.35
+    elemY1[gr$strand == "+"] <- param$ylim[1] + 0.55
+    elemY1[gr$strand == "-"] <- param$ylim[1] + 0.3
+
+    gr$y0 <- elemY0
+    gr$y1 <- elemY1
 
     ## Setting colours
-    
-    if (is(param$colGR,"vector")) {
-        gr$col <- param$colGR[match(gr$type,types)]
+
+    if (is(param$colGR, "vector")) {
+        gr$col <- param$colGR[match(gr$type, types)]
     } else {
         types <- as.character(types)
         col_local <- param$colGR(length(types))
         names(col_local) <- types
-        gr$col <- col_local[match(gr$type,types)]
+        gr$col <- col_local[match(gr$type, types)]
     }
-   
-   
-   gr$cex <-c(param$cex.lab,(rep(gr$cex,nrow(gr)-1)*0.5))
-   return(gr)
+
+
+    gr$cex <- c(param$cex.lab, (rep(gr$cex, nrow(gr) - 1) * 0.5))
+    return(gr)
 }
 
-.getGeneStarts  <- function(gr){
-    genes <- gr[gr$type == "transcript",]
-    if(!is.null(nrow(genes))){
-       
+.getGeneStarts <- function(gr) {
+    genes <- gr[gr$type == "transcript", ]
+    if (!is.null(nrow(genes))) {
         genes <- split(genes, genes$gene_id)
-        genes <- lapply(genes,function(x)return(min(x$x0)))
+        genes <- lapply(genes, function(x) {
+            return(min(x$x0))
+        })
         return(genes)
     }
 }
 
-.drawGeneRef  <- function(gr){
-    # getting start pos of GR 
+.drawGeneRef <- function(gr) {
+    # getting start pos of GR
     genes <- .getGeneStarts(gr)
-    for(seg in seq_len(nrow(gr))){
-        
-        if(gr$type[seg] == "line"){
-            
-            lines(c(gr$x0[seg],gr$x1[seg]),
-                c(gr$y0[seg],gr$y0[seg]),
+    for (seg in seq_len(nrow(gr))) {
+        if (gr$type[seg] == "line") {
+            lines(c(gr$x0[seg], gr$x1[seg]),
+                c(gr$y0[seg], gr$y0[seg]),
                 col = "black",
-                lwd=1)
+                lwd = 1
+            )
             text(gr$x1[seg] + gr$width[seg] * 0.015,
-                 gr$y0[seg] + 0.2,
+                gr$y0[seg] + 0.2,
                 "+",
                 col = "black",
-                cex = gr$cex[seg])
+                cex = gr$cex[seg]
+            )
             text(gr$x1[seg] + gr$width[seg] * 0.015,
                 gr$y1[seg] - 0.2,
                 "-",
                 col = "black",
-                cex = gr$cex[seg])
-        }else if(gr$type[seg] == "exon"){
-             lines(c(gr$x0[seg],gr$x1[seg]),
-                c(gr$y0[seg],gr$y0[seg]),
-                col = gr$col[seg])
-        } else if(gr$type[seg] == "transcript"){
+                cex = gr$cex[seg]
+            )
+        } else if (gr$type[seg] == "exon") {
+            lines(c(gr$x0[seg], gr$x1[seg]),
+                c(gr$y0[seg], gr$y0[seg]),
+                col = gr$col[seg]
+            )
+        } else if (gr$type[seg] == "transcript") {
             rect(gr$x0[seg],
                 gr$y0[seg],
                 gr$x1[seg],
                 gr$y1[seg],
-                col = gr$col[seg])
+                col = gr$col[seg]
+            )
             loc <- genes[[gr$gene_id[seg]]]
-            if(loc == gr$x0[seg] & gr$strand[seg] == "-"){
+            if (loc == gr$x0[seg] & gr$strand[seg] == "-") {
                 text(gr$x0[seg],
-                gr$y0[seg] - 0.08,
-                gr$gene_id[seg],
-                col = "black",
-                cex = gr$cex[seg] * 0.5)
-            } else if(loc == gr$x0[seg] & gr$strand[seg] == "+"){
+                    gr$y0[seg] - 0.08,
+                    gr$gene_id[seg],
+                    col = "black",
+                    cex = gr$cex[seg] * 0.5
+                )
+            } else if (loc == gr$x0[seg] & gr$strand[seg] == "+") {
                 text(gr$x0[seg],
-                gr$y1[seg] + 0.08,
-                gr$gene_id[seg],
-                col = "black",
-                cex = gr$cex[seg] * 0.5)
+                    gr$y1[seg] + 0.08,
+                    gr$gene_id[seg],
+                    col = "black",
+                    cex = gr$cex[seg] * 0.5
+                )
             }
-            
         } else {
             rect(gr$x0[seg],
                 gr$y0[seg],
                 gr$x1[seg],
                 gr$y1[seg],
-                col = gr$col[seg])
-            
+                col = gr$col[seg]
+            )
         }
     }
 }
 
-.reorder <- function(cs,dat = "cs"){
-    if(dat == "cs"){
+.reorder <- function(cs, dat = "cs") {
+    if (dat == "cs") {
         states <- unique(cs$stateID)
-        cols <- rep(NA,length(states))
-        for(i in seq_along(states)){
+        cols <- rep(NA, length(states))
+        for (i in seq_along(states)) {
             cols[i] <- unique(cs$col[cs$stateID == states[i]])
         }
         return(list("stateID" = states, "col" = cols))
-    }else{
+    } else {
         types <- unique(cs$type)
-        cols <- rep(NA,length(types))
-        for(i in seq_along(types)){
+        cols <- rep(NA, length(types))
+        for (i in seq_along(types)) {
             cols[i] <- unique(cs$col[cs$type == types[i]])
         }
         return(list("type" = types, "col" = cols))
     }
-    
 }
 
-.prepLegend <- function(predNames,
-    predCols,
-    chip,
-    occup,
-    cs,
-    gof,
-    gr,
-    param){
+.prepLegend <- function(
+  predNames,
+  predCols,
+  chip,
+  occup,
+  cs,
+  gof,
+  gr,
+  param
+) {
     leg <- list()
-    leg$pred <- list("x" = param$xlim[2],
+    leg$pred <- list(
+        "x" = param$xlim[2],
         "y" = 0.65,
         "legend" = predNames,
         "col" = predCols,
         "fill" = NA,
         "border" = NA,
-        "cex" = param$cex)
-    if(chip){
-        leg$chip <- list("x" = param$xlim[2],
-        "y" = 1,
-        "legend" = "ChIP Profile",
-        "col" = NA,
-        "fill" = param$colChIP,
-        "border" = NA,
-        "cex" = param$cex)
+        "cex" = param$cex
+    )
+    if (chip) {
+        leg$chip <- list(
+            "x" = param$xlim[2],
+            "y" = 1,
+            "legend" = "ChIP Profile",
+            "col" = NA,
+            "fill" = param$colChIP,
+            "border" = NA,
+            "cex" = param$cex
+        )
     }
-    if(occup){
-        leg$occup <- list("x" = param$xlim[2],
-        "y" = 0.85,
-        "legend" = "Binding Site",
-        "col" = param$colOccup,
-        "fill" = NA,
-        "border" = NA,
-        "cex" = param$cex)
+    if (occup) {
+        leg$occup <- list(
+            "x" = param$xlim[2],
+            "y" = 0.85,
+            "legend" = "Binding Site",
+            "col" = param$colOccup,
+            "fill" = NA,
+            "border" = NA,
+            "cex" = param$cex
+        )
     }
-    if(any(gof != "empty")){
+    if (any(gof != "empty")) {
         gof <- gof[[1]]
-        tmp <- gof[names(gof) %in% c("MSE","AUC","pearson")]
-        leg$gof <- list("x" = param$xlim[1] -((param$xlim[2] - param$xlim[1]) * 0.02),
-        "y" = 1,
-        "legend" = paste(paste(names(tmp),"=",signif(tmp,4)),collapse = "\n"),
-        "col" = "black",
-        "fill" = NA,
-        "border" = NA,
-        "cex" = param$cex)
+        tmp <- gof[names(gof) %in% c("MSE", "AUC", "pearson")]
+        leg$gof <- list(
+            "x" = param$xlim[1] - ((param$xlim[2] - param$xlim[1]) * 0.02),
+            "y" = 1,
+            "legend" = paste(paste(names(tmp), "=", signif(tmp, 4)), collapse = "\n"),
+            "col" = "black",
+            "fill" = NA,
+            "border" = NA,
+            "cex" = param$cex
+        )
     }
-    if(any(cs != "empty")){
+    if (any(cs != "empty")) {
         cs <- cs[[1]]
-        cs <- .reorder(cs,dat = "cs")
-        leg$cs <- list("x" = param$xlim[2] +((param$xlim[2] - param$xlim[1]) * 0.2),
-        "y" = 0.5,
-        "legend" = cs$stateID,
-        "col" = NA,
-        "fill" = cs$col,
-        "border" = NA,
-        "cex" = param$cex)
+        cs <- .reorder(cs, dat = "cs")
+        leg$cs <- list(
+            "x" = param$xlim[2] + ((param$xlim[2] - param$xlim[1]) * 0.2),
+            "y" = 0.5,
+            "legend" = cs$stateID,
+            "col" = NA,
+            "fill" = cs$col,
+            "border" = NA,
+            "cex" = param$cex
+        )
     }
-    if(any(gr != "empty")){
+    if (any(gr != "empty")) {
         gr <- gr[[1]]
-        gr <- gr[gr$type != "line",]
-        gr <- .reorder(gr,dat="gr")
-        leg$gr <- list("x" = param$xlim[1] -((param$xlim[2] - param$xlim[1]) * 0.2),
-        "y" = -0.3,
-        "legend" = gr$type,
-        "col" = NA,
-        xjust = 1,
-        "fill" = gr$col,
-        "border" = NA,
-        "cex" = param$cex)
-        
+        gr <- gr[gr$type != "line", ]
+        gr <- .reorder(gr, dat = "gr")
+        leg$gr <- list(
+            "x" = param$xlim[1] - ((param$xlim[2] - param$xlim[1]) * 0.2),
+            "y" = -0.3,
+            "legend" = gr$type,
+            "col" = NA,
+            xjust = 1,
+            "fill" = gr$col,
+            "border" = NA,
+            "cex" = param$cex
+        )
     }
-    
+
     return(leg)
-
 }
-.drawLegend <- function(leg){
-    for(l in seq_along(leg)){
-        if(names(leg)[l] == "gof"){
-            
-            text(x = leg[[l]]$x,
-            y = leg[[l]]$y,
-            labels = leg[[l]]$legend,
-            adj = c(1,0),
-            col = leg[[l]]$col,
-            cex = leg[[l]]$cex)
-        }else {
-            legend(x = leg[[l]]$x,
-            y = leg[[l]]$y,
-            legend = leg[[l]]$legend,
-            bty = "n",
-            col = leg[[l]]$col,
-            fill = leg[[l]]$fill,
-            border = leg[[l]]$border,
-            lwd = 2,
-            xjust = 0,
-            yjust = 0.5,
-            cex = leg[[l]]$cex)
-
+.drawLegend <- function(leg) {
+    for (l in seq_along(leg)) {
+        if (names(leg)[l] == "gof") {
+            text(
+                x = leg[[l]]$x,
+                y = leg[[l]]$y,
+                labels = leg[[l]]$legend,
+                adj = c(1, 0),
+                col = leg[[l]]$col,
+                cex = leg[[l]]$cex
+            )
+        } else {
+            legend(
+                x = leg[[l]]$x,
+                y = leg[[l]]$y,
+                legend = leg[[l]]$legend,
+                bty = "n",
+                col = leg[[l]]$col,
+                fill = leg[[l]]$fill,
+                border = leg[[l]]$border,
+                lwd = 2,
+                xjust = 0,
+                yjust = 0.5,
+                cex = leg[[l]]$cex
+            )
         }
-       
     }
 }

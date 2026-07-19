@@ -34,7 +34,7 @@ genomicProfiles(..., parameterOptions = NULL, genomicProfiles = NULL, ChIPScore 
  object it is possible to use previously computed values by simply parsing the object to the constructor function.
 }
 \value{
-Returns a \code{genomicsProfiles} object with updated slots for all paramters parsed.
+Returns a \code{genomicProfiles} object with updated slots for all paramters parsed.
 }
 \references{
 Zabet NR, Adryan B (2015) Estimating binding properties of transcription
@@ -57,7 +57,4 @@ PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
 genomicProfiles()
 genomicProfiles(PFM=PFM,PFMFormat="JASPAR")
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{classes}

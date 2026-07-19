@@ -7,6 +7,10 @@
 \description{
 Setter method for \code{noiseFilter}
 }
+\value{
+ An updated object of the same class as \code{object}, with the \code{noiseFilter} value set to a single \code{character} value.
+}
+
 \section{Methods}{
 \describe{
 
@@ -15,4 +19,3 @@ Noise Filter that will be applied to ChIP scores
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

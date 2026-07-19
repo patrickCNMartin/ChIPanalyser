@@ -7,12 +7,14 @@
 \description{
 Accessor method for \code{maxPWMScore}
 }
+\value{
+ A \code{numeric} vector: the current \code{maxPWMScore} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{maxPWMScore(object)}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

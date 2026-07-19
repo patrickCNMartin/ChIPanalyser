@@ -6,12 +6,14 @@
 \description{
  ~~ Methods for function \code{averageExpPWMScore}  ~~
 }
+\value{
+ A \code{numeric} vector: the current \code{averageExpPWMScore} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{signature(object = "genomicProfilesInternal")}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

@@ -51,18 +51,19 @@ library(BSgenome.Dmelanogaster.UCSC.dm6)
 DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
 #Building data objects
 GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR",BPFrequency=DNASequenceSet)
+OPP <- parameterOptions()
 
 chip<-processingChIP(chip,top)
 # Computing Genome Wide
 GenomeWide <- computeGenomeWideScores(DNASequenceSet = DNASequenceSet,
-    genomicsProfiles = GPP)
+    genomicProfiles = GPP)
 
 #Compute PWM Scores
-PWMScores <- computePWMScore(genomicsProfiles = GenomeWide,
+PWMScores <- computePWMScore(genomicProfiles = GenomeWide,
     DNASequenceSet = DNASequenceSet,
     loci = top, chromatinState = Access)
 #Compute Occupnacy
-Occupancy <- computeOccupancy(genomicsProfiles = PWMScores,
+Occupancy <- computeOccupancy(genomicProfiles = PWMScores,
     parameterOptions = OPP)
 
 #Compute ChIP profiles

@@ -2,3 +2,8 @@
 ^docs$
 ^pkgdown$
 ^.github$
+^.claude$
+^ChIPanalyser.BiocCheck$
+^ChIPanalyser.RCheck$
+\.tar\.gz$
+^CLAUDE\.md$

@@ -8,12 +8,14 @@
 Accessor method for the \code{naturalLog} slot in a
 \code{\link{parameterOptions}} object.
 }
+\value{
+ A single \code{logical} value: the current \code{naturalLog} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{naturalLog(object)}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

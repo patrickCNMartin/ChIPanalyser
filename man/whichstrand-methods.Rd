@@ -7,12 +7,14 @@
 Accessor method for the \code{whichstrand} slot in a
 \code{\linkS4class{parameterOptions}} object
 }
+\value{
+ A single \code{character} value: the current \code{whichstrand} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{whichstrand(object)}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

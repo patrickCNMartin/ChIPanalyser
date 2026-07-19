@@ -1,2 +1,7 @@
 docs
+.claude/
+ChIPanalyser.BiocCheck
+ChIPanalyser.RCheck
 .DS_Store
+*.tar.gz
+CLAUDE.md

@@ -19,7 +19,7 @@ loci, genetic information, DNA accessibility data and ChIP-seq data.
     data(ChIPanalyserData)
 }
 \format{
-\enumerate{
+\describe{
 
     \item{\code{Access}}{is \code{\link[GenomicRanges]{GRanges}}
     containing DNA Accesibility data for the sequences described above.}

@@ -7,12 +7,14 @@
 Accessor Method for the \code{strandRule} slot in a
 \code{\linkS4class{parameterOptions}} object
 }
+\value{
+ A single \code{character} value: the current \code{strandRule} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{strandRule(object)}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

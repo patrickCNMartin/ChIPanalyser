@@ -8,16 +8,17 @@
 Setter method for the \code{PFM} slot in a
 \code{\link{genomicProfiles}} object
 }
+\value{
+ An updated object of the same class as \code{object}, with the \code{PositionFrequencyMatrix} value set to a \code{matrix} representing the Position Frequency Matrix (PFM).
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{PositionFrequencyMatrix(object)<-"path/to/file/"}}{
-%%  ~~describe this method here~~
 }
 
 \item{\code{PositionFrequencyMatrix(object)<-value}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

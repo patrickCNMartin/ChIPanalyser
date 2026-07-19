@@ -6,6 +6,10 @@
 \description{
 Accessor method for the \code{loci} slot in \code{\linkS4class{ChIPScore}}
 }
+\value{
+ A single \code{numeric} value: the current \code{lociWidth} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
@@ -15,4 +19,3 @@ own loci when using the \code{processingChIP} function.
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

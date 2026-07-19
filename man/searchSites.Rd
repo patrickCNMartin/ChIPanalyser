@@ -68,10 +68,10 @@ PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
   DNASequenceSet <- getSeq(BSgenome.Dmelanogaster.UCSC.dm6)
   # Building genomicProfiles object
   GPP <- genomicProfiles(PFM=PFM,PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
-
+  OPP <- parameterOptions()
 
   # Computing Genome Wide
-  GenomeWide <- computeGenomeWideScore(genomicProfiles = GPP,
+  GenomeWide <- computeGenomeWideScores(genomicProfiles = GPP,
       DNASequenceSet = DNASequenceSet)
 
   #Compute PWM Scores
@@ -79,23 +79,24 @@ PFM <- file.path(system.file("extdata",package="ChIPanalyser"),"BEAF-32.pfm")
        DNASequenceSet = DNASequenceSet, loci = top, chromatinState = Access)
   #Compute Occupnacy
   Occupancy <- computeOccupancy(genomicProfiles = PWMScores)
-  searchSites(Occupancy,ScalingFactor=c(1,4), BoundMolecules = c(1,100),
+  searchSites(Occupancy,lambdaPWM=c(1,4), BoundMolecules = c(1,100),
       Locus="eve")
 
   #Compute ChIP profiles
   chipProfile <- computeChIPProfile(genomicProfiles=Occupancy,loci=top)
-  searchSites(chipProfile,ScalingFactor=c(1,4), BoundMolecules = c(1,100),
+  searchSites(chipProfile,lambdaPWM=c(1,4), BoundMolecules = c(1,100),
       Locus="eve")
 
+chip<-processingChIP(chip,top)
 optimalParam <- computeOptimal(genomicProfiles = GPP,
         DNASequenceSet = DNASequenceSet,
         ChIPScore = chip,
         chromatinState = Access,
         parameterOptions = OPP,
-        parameter = "all",
+        optimalMethod = "all",
         peakMethod="moving_kernel")
 
-searchSites(optimalParam,ScalingFactor=c(1,4), BoundMolecules = c(1,100),
+searchSites(optimalParam,lambdaPWM=c(1,4), BoundMolecules = c(1,100),
     Locus="eve")
 
 }

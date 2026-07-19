@@ -56,7 +56,7 @@ the different functions. All data is derived from real biological data
 in *Drosophila melanogaster* (The *Drosophila melanogaster*
 genome can be found as a `BSgenome` ).
 
-```{r, eval=TRUE, warnings = FALSE, echo=TRUE,message=FALSE}
+```{r load-data, eval=TRUE, warnings = FALSE, echo=TRUE,message=FALSE}
 
 library(ChIPanalyser)
 
@@ -126,7 +126,7 @@ or data frame (_bed_ format style)
 `loci` is a GRanges object containing loci of interest. Default set as NULL
 (see **Advanced Work**)
 
-```{r,eval=TRUE, warnings = FALSE}
+```{r process-chip, eval=TRUE, warnings = FALSE}
 chip <- processingChIP(profile = chip,
                       loci = top,
                       cores = 1)
@@ -143,7 +143,7 @@ results as you make your way through the analysis pipeline.
 
 From a Position Frequency Matrix:
 
-```{r, eval =TRUE}
+```{r genomic-profiles-from-pfm, eval =TRUE}
 # PFMs are automatically converted to PWM when build genomicProfiles
 GP <- genomicProfiles(PFM = PFM, PFMFormat = "JASPAR")
 GP
@@ -151,7 +151,7 @@ GP
 
 From a Position Weight Matrix:
 
-```{r, eval=FALSE}
+```{r genomic-profiles-from-pwm, eval=FALSE}
 GP <- genomicProfiles(PWM=PositionWeightMatrix)
 ```
 
@@ -163,7 +163,7 @@ the analysis pipeline. To do so, we will be parsing the follwing: a DNA sequence
 a Position Weight Matrix (contained in a genomicProfiles), chromatin States (Accessible DNA - This is optional), 
 and extracted/normalised experimental ChIP score (result of the `processingChIP` function).
 
-```{r,eval=TRUE,warnings=FALSE}
+```{r compute-optimal, eval=TRUE,warnings=FALSE}
 ## surpress dependency warnings
 optimal <- suppressWarnings(computeOptimal(genomicProfiles = GP,
                         DNASequenceSet = DNASequenceSet,
@@ -173,7 +173,7 @@ optimal <- suppressWarnings(computeOptimal(genomicProfiles = GP,
 ```
 NOTE Default Optimal parameters are provided internally as the following:
 
-```{r, eval=TRUE, echo=TRUE}
+```{r default-optimal-parameters, eval=TRUE, echo=TRUE}
  ## Lambda Values
  seq(0.25,5,by=0.25)
 
@@ -188,7 +188,7 @@ NOTE To change these parameters see __Advanced Work__
 ### Step 4 - Extracting Optimal Paramters (Prelim)
 Once computed, we will extract the optimal set of parameters.
 
-```{r, eval =T}
+```{r extract-optimal-parameters, eval =TRUE}
 optimalParam <- optimal$Optimal
 optimalParam$OptimalParameters
 ```
@@ -202,10 +202,10 @@ own set of parameters. To this effect, we have implemented an Optimal parameter
 plotting fucntion.
 
 
-```{r, eval=TRUE, warnings = FALSE, fig.width=10, fig.height=8}
+```{r plot-optimal-heatmaps, eval=TRUE, warnings = FALSE, fig.width=10, fig.height=8}
 # Plotting Optimal heat maps
 par(oma=c(0,0,3,0))
-layout(matrix(1:8,ncol=4, byrow=T),width=c(6,1.5,6,1.5),height=c(1,1))
+layout(matrix(1:8,ncol=4, byrow=TRUE),width=c(6,1.5,6,1.5),height=c(1,1))
 plotOptimalHeatMaps(optimalParam,layout=FALSE)
 
 ```
@@ -216,7 +216,7 @@ associated to those parameters. You can select more that one parameter however
 the values assigned to each argument must be one of the values used for computing the 
 optimal set of parameters. 
 
-```{r,eval=TRUE}
+```{r search-sites, eval=TRUE}
 optimalParam <- searchSites(optimal,lambdaPWM = 1.25,BoundMolecules = 10000)
 ```
 
@@ -224,7 +224,7 @@ optimalParam <- searchSites(optimal,lambdaPWM = 1.25,BoundMolecules = 10000)
 The final step is to plot the computed predicted profiles. We provide a plotting
 function to produce predicted profile plots.
 
-```{r, eval=TRUE,fig.width=15, fig.height=8}
+```{r plot-occupancy-profile-optimal, eval=TRUE,fig.width=15, fig.height=8}
 plotOccupancyProfile(predictedProfile = optimalParam$ChIPProfiles,
                      ChIPScore = chip,
                      chromatinState = Access,
@@ -243,7 +243,7 @@ will enable you to tweak and improve the quality of your analysis.
 
 There are many parameters to choose from. These parameters already have default value assigned to them.
 
-```{r, eval =TRUE}
+```{r parameter-options-setup, eval =TRUE}
 ## Suggested Parameters to start with.
 parameterOptions()
 
@@ -257,7 +257,7 @@ These parameters will be parsed through the different steps of the pipeline as l
 In some case you will not have a pre-determined idea of which loci you wish to look at.
 The `processingChIP` function offers a few possibilities to work around this issue.
 
-```{r,eval=FALSE}
+```{r processing-chip-advanced, eval=FALSE}
 ## Top 50 loci based on ChIP score
 processingChIP(profile = "/path/to/ChIP",
                loci = NULL,
@@ -297,7 +297,7 @@ PWMs depend on Base Pair Frequency in the genome of interest. Either you can pro
 a vector containing the base pair frequency (A C T G in order) or the `genomicProfiles`
 object will compute it internally if you provide a BSgenome/DNAStringSet.
 
-```{r, eval=TRUE}
+```{r genomic-profiles-bpfrequency, eval=TRUE}
 str(genomicProfiles())
 
 GP <- genomicProfiles(PFM=PFM, PFMFormat="JASPAR", BPFrequency=DNASequenceSet)
@@ -310,7 +310,7 @@ the analysis pipeline. The `genomicProfiles` object will be updated internally a
 parameters. This object will also be the main object that you will parse through each step of the analysis.
 There are a few different ways to add new paramters:
 
-```{r, eval=FALSE}
+```{r genomic-profiles-parsing-options, eval=FALSE}
 ## Parsing pre computed parameters (processingChIP function)
 GP <- genomicProfiles(PFM = PFM, 
                      PFMFormat = "JASPAR",
@@ -344,7 +344,7 @@ NOTE `parameterOptions` is inherited by `genomicProfiles` hence why you can also
 
 The `computeOptimal` function offers a few more options that we will briefly describe here.
 
-```{r, eval=FALSE}
+```{r compute-optimal-custom-parameters, eval=FALSE}
 ## Setting custom parameters
 OP <- parameterOptions(lambdaPWM = seq(1,10,by=0.5), 
                       boundMolecules = seq(1,100000, length.out=20))
@@ -380,7 +380,7 @@ Finally, `optimalMethod` argument will enbale you to selected the goodness Of Fi
 ### Step 5 - Extracting and Plotting Optimal Parameters
 Now that you have selected custom parameters, you will want to plot the associated heat maps.
 
-```{r, eval=FALSE}
+```{r extract-plot-optimal-custom, eval=FALSE}
 ## Extracted Optimal Parameters
 optimalParam <- optimal$Optimal
 
@@ -395,7 +395,7 @@ Using the `overlay` argument in the plotting function will plot overlay the top 
 Let's imagine that when looking at the optimal parameter heat maps, you would like to run a combination of parameters that is not in the ones that had been provided but you do not want to re-compute optimal parameters. Or Let us imagine that you have already an estimate of number of bound molecules. ChIPanalyser provides functions that will enable you to run the piple line on
 individual parameter combinations. The steps are described as following:
 
-```{r,eval=TRUE,warnings=FALSE}
+```{r single-parameter-combination, eval=TRUE,warnings=FALSE}
 
 ## Creating genomic Profiles object with PFMs and associated parameters
 GP <- genomicProfiles(PFM = PFM,
@@ -440,7 +440,7 @@ For more information on these functions see **Parameters Discription**
 
 Finally, you can plot your newly computed profiles.
 
-```{r, eval=TRUE,fig.width=12, fig.height=4.5}
+```{r plot-single-combination, eval=TRUE,fig.width=12, fig.height=4.5}
 
 plotOccupancyProfile(predictedProfile=pred,
                      ChIPScore=chip,
@@ -464,7 +464,7 @@ Information concerning arguments to functions are described in the manual pages 
 As a reminder, here are the parameter options for the `parameterOptions` object. 
 Parameters are divided into different categories depending on when they are required internally.
 
-```{r, eval=TRUE,echo=TRUE}
+```{r parameter-options-summary, eval=TRUE,echo=TRUE}
 parameterOptions()
 ```
 
@@ -498,7 +498,7 @@ to avoid unwanted parameter mismatch.
 
 Next, we will describe the content of `genomicProfiles` objects. As a reminder, `genomicProfiles` object have the following structure:
 
-```{r, eval=T, echo=T}
+```{r genomic-profiles-structure, eval=TRUE, echo=TRUE}
 str(genomicProfiles())
 ```
 
@@ -526,7 +526,7 @@ between each step. They should not be changed by user.
 
 
 Finally, we provide a list of setter/getter functions for each slot:
-```{r, eval=F, echo=T}
+```{r accessors-list, eval=FALSE, echo=TRUE}
     ## Accessors and Setters for parameterOptions and genomicProfiles
     avrageExpPWMScore(obj)
     backgroundSignal(obj)
@@ -586,7 +586,7 @@ Finally, we provide a list of setter/getter functions for each slot:
 
 ## Session Info 
 
-```{r,eval=T}
+```{r session-info, eval=TRUE}
 sessionInfo()
 ```
 

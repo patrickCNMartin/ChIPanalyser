@@ -9,7 +9,11 @@ parameter Options object
 needed throughout this analysis pipeline.
 }
 \usage{
-parameterOptions(ploidy = 2, boundMolecules = 1000, backgroundSignal = 0, maxSignal = 1, lociWidth = 20000, chipMean = 200, chipSd = 200, chipSmooth = 250, stepSize = 10, removeBackground = 0, noiseFilter = "zero", naturalLog = TRUE, noOfSites = "all", PWMThreshold = 0.7, strandRule = "max", whichstrand = "+-", PWMpseudocount = 1, lambdaPWM = 1)
+parameterOptions(ploidy = 2, boundMolecules = 1000, backgroundSignal = 0,
+    maxSignal = 1, lociWidth = 20000, chipMean = 200, chipSd = 200,
+    chipSmooth = 250, stepSize = 10, removeBackground = 0, noiseFilter = "zero",
+    naturalLog = TRUE, noOfSites = "all", PWMThreshold = 0.7, strandRule = "max",
+    whichstrand = "+-", PWMpseudocount = 1, lambdaPWM = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -110,7 +114,4 @@ parameterOptions(ploidy = 2, boundMolecules = 1000, backgroundSignal = 0,
     lambdaPWM = 1)
 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{classes}

@@ -7,12 +7,14 @@
 Accessor method of the \code{stepSize} slot in
 \code{\linkS4class{parameterOptions}} object
 }
+\value{
+ A single \code{numeric} value: the current \code{stepSize} value stored in the object.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{stepSize(object)}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

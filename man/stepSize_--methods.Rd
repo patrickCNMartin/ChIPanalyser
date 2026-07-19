@@ -7,12 +7,14 @@
 Setter Method for the \code{stepSize} slot in a
 \code{\linkS4class{parameterOptions}}
 }
+\value{
+ An updated object of the same class as \code{object}, with the \code{stepSize} value set to a single \code{numeric} value.
+}
+
 \section{Methods}{
 \describe{
 
 \item{\code{stepSize(object)<-value}}{
-%%  ~~describe this method here~~
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }
